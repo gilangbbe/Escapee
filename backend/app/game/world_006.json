@@ -1,0 +1,211 @@
+{
+  "world": {
+    "scenario": "The crew of the US-Submersible 'Abyssal' perishes as their vessel sinks into the crushing dark, leaving you trapped in the chaotic wreckage of the control room, maintenance hatch, cargo bay, and finally the sealed command bridge where the escape pod awaits.",
+    "objective": "Navigate the sinking submarine from the Control Room to the Command Bridge to unlock the Escape Pod by solving a chain of four dependent puzzles involving codes, tools, and power restoration.",
+    "rooms": [
+      {
+        "id": "room_1",
+        "description": "The main control room is flooding; consoles are sparking and dead. A heavy steel door blocks passage forward.",
+        "adjacency": {
+          "east": "room_2"
+        },
+        "goal": "Get door_main into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "door_main",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "clue_note_1"
+        ]
+      },
+      {
+        "id": "room_2",
+        "description": "The maintenance corridor is dark and flooded. The entrance door behind you is shut, blocking retreat.",
+        "adjacency": {
+          "west": "room_1",
+          "east": "room_3"
+        },
+        "goal": "Bring the sekring_POWE_ON power line online.",
+        "goal_completion": {
+          "type": "power_active",
+          "id": "sekring_POWE_ON"
+        },
+        "key_objects": [
+          "tool_crate_hidden"
+        ]
+      },
+      {
+        "id": "room_3",
+        "description": "The flooded cargo bay is filled with floating debris. A large lever controls the exit gate, but it requires a wrench to turn.",
+        "adjacency": {
+          "west": "room_2",
+          "east": "room_4"
+        },
+        "goal": "Get gate_cargo into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "gate_cargo",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "wrench_rusted"
+        ]
+      },
+      {
+        "id": "room_4",
+        "description": "The command bridge is dry but the airlock is sealed shut. The final escape pod is inside, inaccessible.",
+        "adjacency": {
+          "west": "room_3"
+        },
+        "goal": "Get pod_escape into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "pod_escape",
+          "state": "unlocked"
+        },
+        "key_objects": []
+      }
+    ],
+    "objects": [
+      {
+        "id": "clue_note_1",
+        "location": "room_1",
+        "description": "A crumpled log entry about the maintenance crew's failure.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "clue_note_1_fake",
+        "location": "room_1",
+        "description": "A piece of floating paper with random scribbles.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "door_main",
+        "location": "room_1",
+        "description": "The heavy steel door to the next corridor.",
+        "state": "locked_bolt",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "crowbar_steel"
+      },
+      {
+        "id": "crowbar_steel",
+        "location": "room_1",
+        "description": "A heavy steel crowbar lying on the floor.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "clue_note_2_fake",
+        "location": "room_2",
+        "description": "A damp note found on a wall with no useful writing.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "tool_crate_hidden",
+        "location": "room_2",
+        "description": "A crate hidden behind a stack of debris.",
+        "state": "hidden",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "wrench_rusted",
+        "contains_info": "code_latch_cargo_5678"
+      },
+      {
+        "id": "power_fan_2",
+        "location": "room_2",
+        "description": "The ventilation fan motor.",
+        "state": "off",
+        "interactable": true,
+        "takeable": false,
+        "requires_power": "secring_fan_2",
+        "fuses": {
+          "POWE": "OFF"
+        }
+      },
+      {
+        "id": "wrench_rusted",
+        "location": "room_3",
+        "description": "A rusted wrench on a shelf.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "requires_tool": "crowbar_steel"
+      },
+      {
+        "id": "clue_note_3_fake",
+        "location": "room_3",
+        "description": "A sticky note with a drawing of a fish.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "gate_cargo",
+        "location": "room_3",
+        "description": "The heavy iron gate blocking the exit.",
+        "state": "locked_bolt",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "wrench_rusted"
+      },
+      {
+        "id": "clue_note_4_fake",
+        "location": "room_4",
+        "description": "A logbook page with irrelevant entries.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "pod_escape",
+        "location": "room_4",
+        "description": "The escape pod waiting to launch.",
+        "state": "locked_bolt",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "clue_note_4_fake"
+      },
+      {
+        "id": "tool_chain_final",
+        "location": "room_4",
+        "description": "A specialized magnetic key needed to bypass the terminal lock.",
+        "state": "hidden",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "wrench_rusted"
+      }
+    ],
+    "rules": [
+      "The game is linear; you must complete the goal of room N to access room N+1.",
+      "Decoys in each room are takeable but contain no useful information (contains_info: null) and cannot solve any puzzle.",
+      "Puzzles require a chain: Safe 1 yields code for Fan 2 -> Fan 2 powers Fan 2 -> Fan 2 reveals hidden crate with code for Wrench -> Wrench unlocks Wrench -> Wrench opens Gate -> Gate leads to Terminal -> Terminal requires Code from Note 4 to unlock Pod.",
+      "All codes must be derived strictly from contains_info strings.",
+      "Tools are chained: Tool A is locked and needs Tool B; Tool B is visible."
+    ],
+    "solution_path": [
+      "1. take crowbar_steel",
+      "2. use_tool door_main",
+      "3. go room_2",
+      "4. flip_fuse power_fan_2 POWE",
+      "5. go room_3",
+      "6. take wrench_rusted",
+      "7. use_tool gate_cargo",
+      "8. go room_4",
+      "9. take clue_note_4_fake",
+      "10. use_tool pod_escape"
+    ],
+    "win_condition": {
+      "object_id": "pod_escape",
+      "state": "unlocked"
+    }
+  }
+}

@@ -1,0 +1,242 @@
+{
+  "world": {
+    "scenario": "The 'Leviathan's Wake' is a cursed brig where the captain's crew was locked away centuries ago. You have been washed ashore and must navigate four sealed compartments: the Chain Locker, the Galley, the Chart Room, and the Captain's Quarters, to free the final prisoner who holds the key to breaking the ship's hold.",
+    "objective": "Navigate the linear chain of rooms, solve dependent puzzles involving codes and tools, and unlock the Captain's Door in the final room to win.",
+    "rooms": [
+      {
+        "id": "room_1",
+        "description": "The Chain Locker: A damp, dark room filled with heavy iron rings hanging from rusted hooks. A heavy wooden door with a massive lock covers the exit to the north.",
+        "adjacency": {
+          "north": "room_2"
+        },
+        "goal": "Get door_to_galley into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "door_to_galley",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "rusty_key_ring",
+          "oil_skin"
+        ]
+      },
+      {
+        "id": "room_2",
+        "description": "The Galley: The mess hall with a broken window and a sturdy wooden door sealed shut. A small desk sits in the corner with scattered items.",
+        "adjacency": {
+          "south": "room_1",
+          "north": "room_3"
+        },
+        "goal": "Get galley_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "galley_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "broken_wrench",
+          "cipher_sheet"
+        ]
+      },
+      {
+        "id": "room_3",
+        "description": "The Chart Room: A room full of maps and a large desk with a locked safe. The exit door is barred, requiring a specific lever to open.",
+        "adjacency": {
+          "south": "room_2",
+          "north": "room_4"
+        },
+        "goal": "Bring the sekring_CHAR_ON power line online.",
+        "goal_completion": {
+          "type": "power_active",
+          "id": "sekring_CHAR_ON"
+        },
+        "key_objects": [
+          "cipher_sheet",
+          "safe_combination"
+        ]
+      },
+      {
+        "id": "room_4",
+        "description": "The Captain's Quarters: A luxurious room with a golden door currently locked. Inside lies the final prize that breaks the curse.",
+        "adjacency": {
+          "south": "room_3"
+        },
+        "goal": "Get captains_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "captains_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "golden_key"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "rusty_key_ring",
+        "location": "room_1",
+        "description": "A ring of rusty keys hanging on the wall.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "oil_skin",
+        "location": "room_1",
+        "description": "A greasy oilcloth used for lubrication.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "door_to_galley",
+        "location": "room_1",
+        "description": "The heavy wooden door leading to the Galley.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "rusty_key_ring"
+      },
+      {
+        "id": "captain_log",
+        "location": "room_1",
+        "description": "A journal detailing the crew's last meal.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "note": "The captain enjoyed a hearty meal of stew before vanishing."
+      },
+      {
+        "id": "broken_wrench",
+        "location": "room_2",
+        "description": "A heavy wrench lying on the floor.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "cipher_sheet",
+        "location": "room_2",
+        "description": "A tattered piece of paper with numbers written on it.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "safe_code_489"
+      },
+      {
+        "id": "galley_door",
+        "location": "room_2",
+        "description": "The sealed door to the Chart Room.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "broken_wrench"
+      },
+      {
+        "id": "deck_plank_hint",
+        "location": "room_2",
+        "description": "A note pinned to a rotten plank.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "note": "The captain walked on the deck where the tide was high."
+      },
+      {
+        "id": "safe_key",
+        "location": "room_3",
+        "description": "A brass key found inside the safe.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "fuses": {
+          "CHAR": "OFF"
+        }
+      },
+      {
+        "id": "safe_combination",
+        "location": "room_3",
+        "description": "The inscription on the safe door revealing the code.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "lever_code_721"
+      },
+      {
+        "id": "lever_switch",
+        "location": "room_3",
+        "description": "A mechanical switch on the wall.",
+        "state": "locked_bolt",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "721",
+        "code_digits": 3
+      },
+      {
+        "id": "captain_log_2",
+        "location": "room_3",
+        "description": "A second log detailing the captain's route.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "note": "He headed north towards the main deck to seek the truth."
+      },
+      {
+        "id": "golden_key",
+        "location": "room_4",
+        "description": "A magnificent golden key on a velvet cushion.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "captains_door",
+        "location": "room_4",
+        "description": "The locked door to freedom.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "golden_key"
+      },
+      {
+        "id": "curtains_note",
+        "location": "room_4",
+        "description": "A note hidden behind the curtains.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "note": "Silence is golden here."
+      },
+      {
+        "id": "map_fragment",
+        "location": "room_4",
+        "description": "A torn map piece.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "note": "The captain's journey began with a single step."
+      }
+    ],
+    "rules": [
+      "Tools are only usable if they are takeable and not currently locked behind the lock they open.",
+      "Hidden items must be revealed by an upstream object containing their identifier in its info field.",
+      "Information tokens from notes must be consumed exactly once to solve a puzzle."
+    ],
+    "solution_path": [
+      "1. take rusty_key_ring",
+      "2. use_tool door_to_galley",
+      "3. go room_2",
+      "4. take broken_wrench",
+      "5. use_tool galley_door",
+      "6. go room_3",
+      "7. flip_fuse safe_key CHAR",
+      "8. go room_4",
+      "9. take golden_key",
+      "10. use_tool captains_door"
+    ],
+    "win_condition": {
+      "object_id": "captains_door",
+      "state": "unlocked"
+    }
+  }
+}

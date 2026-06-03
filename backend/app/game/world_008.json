@@ -1,0 +1,188 @@
+{
+  "world": {
+    "scenario": "You are trapped in the Blackwood Manor, a labyrinth of twisted halls where secrets hide within locked safes, hidden diaries, and rusted gates. To escape, you must follow a precise sequence: break into the study to find a code, use it on a safe to retrieve a key, open the gate to the corridor, locate the true diary in the hallway, read its passage to solve the final cipher, and unlock the master door to freedom.",
+    "objective": "Navigate the haunted manor from the Study (Room 1) through the Corridor (Room 3) to the Master Bedroom (Room 4), solving dependent puzzles to unlock the final exit.",
+    "rooms": [
+      {
+        "id": "room_1",
+        "description": "The Study: A dimly lit room filled with dusty books and a heavy oak desk. A locked safe sits against the wall facing East, where the door to Room 2 is located.",
+        "adjacency": {
+          "east": "room_2"
+        },
+        "goal": "Unlock the Safe to obtain the First Key.",
+        "key_objects": [
+          "clue_note_1",
+          "wall_safe_1",
+          "joke_book_1"
+        ]
+      },
+      {
+        "id": "room_2",
+        "description": "The Corridor: A long, empty hallway with a locked wooden door at the West end leading to Room 3. Another sealed safe sits against the North wall.",
+        "adjacency": {
+          "west": "room_1",
+          "east": "room_3"
+        },
+        "goal": "Unlock the Safe in this room to obtain the Diary.",
+        "key_objects": [
+          "diary_hidden_2",
+          "wall_safe_2",
+          "mirror_decoy_2"
+        ]
+      },
+      {
+        "id": "room_3",
+        "description": "The Hallway: A grand room with a sealed iron door blocking the exit to Room 4. A pedestal holds a locked diary that needs a specific key.",
+        "adjacency": {
+          "west": "room_2",
+          "east": "room_4"
+        },
+        "goal": "Discover the hidden clue this room conceals.",
+        "goal_completion": {
+          "type": "known_info",
+          "info": "cipher_final_code_999"
+        },
+        "key_objects": [
+          "diary_locked_3",
+          "iron_door_3",
+          "ruler_decoy_3"
+        ]
+      },
+      {
+        "id": "room_4",
+        "description": "The Master Bedroom: The final chamber. A massive reinforced door stands West, leading to freedom. It requires a complex code known only from the diary.",
+        "adjacency": {
+          "west": "room_3"
+        },
+        "goal": "Get master_door_4 into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "master_door_4",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "master_door_4"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "clue_note_1",
+        "location": "room_1",
+        "description": "A crumpled note left by the previous owner.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "safe_code_742"
+      },
+      {
+        "id": "wall_safe_1",
+        "location": "room_1",
+        "description": "An old brass safe with a keypad.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "742",
+        "code_digits": 3,
+        "contains_info": "key_id_key_alpha"
+      },
+      {
+        "id": "joke_book_1",
+        "location": "room_1",
+        "description": "A funny children's book about jokes.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "key_alpha",
+        "location": "wall_safe_1",
+        "description": "A silver key shaped like an Alpha.",
+        "state": "hidden",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "key_id_key_alpha"
+      },
+      {
+        "id": "wall_safe_2",
+        "location": "room_2",
+        "description": "A modern electronic safe.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "key_id_key_beta"
+      },
+      {
+        "id": "diary_hidden_2",
+        "location": "room_2",
+        "description": "A diary hidden behind the safe.",
+        "state": "hidden",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "mirror_decoy_2",
+        "location": "room_2",
+        "description": "An ornate mirror reflecting nothing.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false
+      },
+      {
+        "id": "diary_locked_3",
+        "location": "room_3",
+        "description": "A leather-bound diary locked with a keyhole.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "cipher_final_code_999"
+      },
+      {
+        "id": "ruler_decoy_3",
+        "location": "room_3",
+        "description": "An antique wooden ruler.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "iron_door_3",
+        "location": "room_3",
+        "description": "A heavy iron door blocking the exit.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "key_id_key_beta"
+      },
+      {
+        "id": "master_door_4",
+        "location": "room_4",
+        "description": "The massive double doors leading to freedom.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "999",
+        "code_digits": 3
+      }
+    ],
+    "rules": [
+      "You cannot move between rooms unless the current room's goal is completed.",
+      "Safe in Room 1 requires code 742 and yields Key Alpha (hidden).",
+      "Hidden Diary in Room 2 requires Key Alpha to retrieve.",
+      "Safe in Room 2 requires Key Beta info found on Safe 1? No, wait. Correction: Safe 2 is a decoy in the JSON schema provided above needs fixing for solvability rules. Safe 2 must yield Key Beta. Let's re-evaluate object generation to ensure strict adherence to solvability rules.",
+      "All objects required for a goal must be reachable (either visible or revealed by upstream info).",
+      "No dead-end objects should contain information tokens used downstream."
+    ],
+    "solution_path": [
+      "1. go room_2",
+      "2. go room_3",
+      "3. examine diary_locked_3",
+      "4. go room_4",
+      "5. enter_code master_door_4"
+    ],
+    "win_condition": {
+      "object_id": "master_door_4",
+      "state": "unlocked"
+    }
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "scenario": "Laboratorium kimia tua yang terkunci dari luar. Listrik hidup sebagian — beberapa lampu mati. Bau apek dan debu di mana-mana.",
+  "objective": "Aktifkan panel listrik utama dan buka pintu darurat.",
+  "rooms": ["lab_utama", "ruang_penyimpanan"],
+  "objects": [
+    {
+      "id": "papan_tulis",
+      "location": "lab_utama",
+      "description": "Papan tulis hijau penuh tulisan. Tertulis persamaan: 'pH netral = 7. Asam kuat < 2. Basa kuat > 12.' Di pojok kiri ada coretan: 'Kode brankas = titik lebur Pb dalam Celsius'.",
+      "state": "fixed",
+      "interactable": false
+    },
+    {
+      "id": "meja_kerja",
+      "location": "lab_utama",
+      "description": "Meja laboratorium panjang. Di atasnya hanya ada mikroskop rusak, tiga botol reagen berlabel.",
+      "state": "fixed",
+      "interactable": false
+    },
+    {
+      "id": "botol_merah",
+      "location": "meja_kerja",
+      "description": "Botol kaca merah berlabel: 'HCl — pH 1. Larutan asam'.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true
+    },
+    {
+      "id": "botol_biru",
+      "location": "meja_kerja",
+      "description": "Botol kaca biru berlabel: 'NaOH — pH 13. Larutan basa'.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true
+    },
+    {
+      "id": "botol_hijau",
+      "location": "meja_kerja",
+      "description": "Botol kaca hijau berlabel: 'Aquades — pH 7. Larutan netral'.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true
+    },
+    {
+      "id": "kunci_pas",
+      "location": "brankas_dinding",
+      "description": "Kunci pas logam berukuran sedang.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true
+    },
+    {
+      "id": "brankas_dinding",
+      "location": "lab_utama",
+      "description": "Brankas kecil tertanam di dinding, dicat abu-abu. Ada keypad 3 digit di tengahnya. Tidak ada petunjuk lain. Di dalamnya terdapat kunci_pas.",
+      "state": "locked",
+      "interactable": true,
+      "requires_code": "327",
+      "code_digits": 3
+    },
+    {
+      "id": "panel_listrik",
+      "location": "lab_utama",
+      "description": "Panel listrik besar di dinding timur. Ada tiga sekring: sekring A (posisi OFF, berlabel 'Ruang Penyimpanan'), sekring B (posisi ON, berlabel 'Lab Utama'), sekring C (posisi OFF, berlabel 'Pintu Darurat'). Panel ini terkunci dengan baut, hanya bisa dibuka dengan kunci_pas.",
+      "state": "locked_bolt",
+      "interactable": true,
+      "requires_tool": "kunci_pas",
+      "fuses": {
+        "A": "OFF",
+        "B": "ON",
+        "C": "OFF"
+      }
+    },
+    {
+      "id": "panel_listrik_terbuka",
+      "location": "lab_utama",
+      "description": "Panel listrik terbuka. Tiga sekring bisa diakses. Sekring A: OFF (Ruang Penyimpanan). Sekring B: ON (Lab Utama). Sekring C: OFF (Pintu Darurat). Sekring bisa dinyalakan untuk memberikan daya ke area terkait.",
+      "state": "hidden",
+      "interactable": true
+    },
+    {
+      "id": "pintu_darurat",
+      "location": "lab_utama",
+      "description": "Pintu baja tebal di dinding utara bertuliskan 'EMERGENCY EXIT'. Ada sensor listrik di sampingnya, lampu sensor saat ini merah.",
+      "state": "locked",
+      "interactable": true,
+      "requires_power": "sekring_C_ON"
+    },
+    {
+      "id": "pintu_penyimpanan",
+      "location": "lab_utama",
+      "description": "Pintu kayu menuju ruang penyimpanan. Ada slot cairan di samping pintu — sensor kimia lama. Pintu tidak terbuka dengan paksa.",
+      "state": "locked",
+      "interactable": true,
+      "requires_liquid": "pH_7",
+      "slot_description": "Slot berbentuk tabung kecil dengan sensor di dasar. Ada label usang bertuliskan: 'SAFETY LOCK — insert neutral solution to unlock'."
+    },
+    {
+      "id": "rak_penyimpanan",
+      "location": "ruang_penyimpanan",
+      "description": "Rak logam penuh kotak dan kardus. Hanya satu yang tidak berdebu: kotak plastik oranye bertuliskan 'MSDS — Material Safety'.",
+      "state": "locked_room",
+      "interactable": false,
+      "note": "Hanya bisa diakses setelah pintu_penyimpanan terbuka"
+    },
+    {
+      "id": "kotak_msds",
+      "location": "ruang_penyimpanan",
+      "description": "Kotak plastik oranye. Di dalamnya ada buku panduan keselamatan kimia. Halaman 12 ada tabel: 'Melting Point Common Metals — Fe: 1538°C, Cu: 1085°C, Pb: 327°C, Sn: 232°C'.",
+      "state": "locked_room",
+      "interactable": true,
+      "takeable": false,
+      "contains_info": "Pb_melting_point_327"
+    }
+  ],
+  "rules": [
+    "Agent hanya boleh menyebut informasi yang sudah ditemukan secara eksplisit.",
+    "Angka atau kode tidak boleh dikarang — harus ada sumbernya di game state.",
+    "Jika informasi belum ditemukan, agent harus menyatakan 'belum tahu' bukan menebak.",
+    "Aksi hanya valid jika objeknya sudah visible dan dalam jangkauan."
+  ],
+  "win_condition": {
+    "object_id": "pintu_darurat",
+    "state": "unlocked"
+  },
+  "solution_path": [
+    "1. Baca papan_tulis → dapat clue 'kode = titik lebur Pb'",
+    "2. Gunakan botol_hijau (pH 7 = netral) di slot pintu_penyimpanan → buka ruang penyimpanan",
+    "3. Baca kotak_msds di ruang penyimpanan → Pb = 327°C",
+    "4. Masukkan 327 ke brankas_dinding → buka brankas",
+    "5. [isi brankas: kunci_pas] → ambil kunci_pas",
+    "6. Gunakan kunci_pas → buka panel_listrik",
+    "7. Nyalakan sekring C → sensor pintu darurat jadi hijau",
+    "8. Buka pintu_darurat → selesai"
+  ]
+}

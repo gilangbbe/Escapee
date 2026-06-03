@@ -1,0 +1,260 @@
+{
+  "world": {
+    "scenario": "You are a repair droid stranded in the abandoned orbital station 'Aethelgard' after a catastrophic power failure. The ventilation systems have locked down, and the primary life support core is offline, threatening to freeze you within hours. You must navigate the linear decay of the station's utility tunnels from the airlock (Room 1) through the hydroponics bay (Room 2), up to the maintenance hub (Room 3), and finally into the sealed reactor chamber (Room 4) to manually override the shutdown sequence.",
+    "objective": "Unlock the final reactor control panel by solving a cascading series of environmental puzzles that require specific tools revealed only by previous room completions.",
+    "rooms": [
+      {
+        "id": "room_1",
+        "description": "The primary airlock chamber. Heavy blast doors seal the entrance, and the air is stale with condensation dripping from the ceiling. A digital display shows 'POWER: OFF'.",
+        "adjacency": {
+          "east": "room_2"
+        },
+        "goal": "Get door_1 into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "door_1",
+          "state": "unlocked"
+        },
+        "key_objects": []
+      },
+      {
+        "id": "room_2",
+        "description": "The hydroponics bay. Rows of dead, gray plants fill the space. A heavy steel gate blocks the exit to the north, and a terminal on the wall is completely unresponsive.",
+        "adjacency": {
+          "west": "room_1",
+          "north": "room_3"
+        },
+        "goal": "Bring the sekring_HYDR_ON power line online.",
+        "goal_completion": {
+          "type": "power_active",
+          "id": "sekring_HYDR_ON"
+        },
+        "key_objects": []
+      },
+      {
+        "id": "room_3",
+        "description": "The maintenance hub. Cluttered with discarded gear and broken machinery. A locked safe sits against the wall, and a heavy iron door seals the path north. A terminal here requires a specific clearance token.",
+        "adjacency": {
+          "south": "room_2",
+          "north": "room_4"
+        },
+        "goal": "Find and take clearance_token_alpha.",
+        "goal_completion": {
+          "type": "has_item",
+          "object_id": "clearance_token_alpha"
+        },
+        "key_objects": [
+          "safe_3",
+          "clue_note_beta"
+        ]
+      },
+      {
+        "id": "room_4",
+        "description": "The reactor control chamber. Cold radiation hums in the air. The final console sits before a massive containment door, but the interface is locked behind a complex multi-stage logic sequence.",
+        "adjacency": {
+          "south": "room_3"
+        },
+        "goal": "Get door_4 into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "door_4",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "override_keycard_final"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "door_1",
+        "location": "room_1",
+        "description": "Heavy blast door sealing the entry.",
+        "state": "unlocked",
+        "interactable": true,
+        "takeable": false
+      },
+      {
+        "id": "terminal_1",
+        "location": "room_1",
+        "description": "Dead control panel in the corridor.",
+        "state": "fixed",
+        "interactable": false,
+        "takeable": false
+      },
+      {
+        "id": "corroded_pipe",
+        "location": "room_2",
+        "description": "Leaking pipe covered in thick rust.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "fuses": {
+          "HYDR": "OFF"
+        }
+      },
+      {
+        "id": "door_2",
+        "location": "room_2",
+        "description": "Steel gate blocking the path to the maintenance hub.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false
+      },
+      {
+        "id": "decoy_note_1",
+        "location": "room_2",
+        "description": "A crumpled piece of paper found in a plant pot.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "decoy_drawer_1",
+        "location": "room_2",
+        "description": "A locked maintenance drawer with no keyhole.",
+        "state": "locked_bolt",
+        "interactable": true,
+        "takeable": false
+      },
+      {
+        "id": "decoy_holo_1",
+        "location": "room_2",
+        "description": "A flickering holographic map of the station.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "requires_power": "hydro_systems_on"
+      },
+      {
+        "id": "corroded_pipe_key",
+        "location": "room_2",
+        "description": "A jagged metal shard fallen from the broken pipe.",
+        "state": "hidden",
+        "interactable": true,
+        "takeable": false
+      },
+      {
+        "id": "safe_3",
+        "location": "room_3",
+        "description": "A heavy iron safe with a biometric lock.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "891"
+      },
+      {
+        "id": "clue_note_beta",
+        "location": "room_3",
+        "description": "A detailed log entry regarding the safe's combination.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "safe_code_891"
+      },
+      {
+        "id": "decoy_tool_1",
+        "location": "room_3",
+        "description": "A broken laser cutter.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "decoy_log_2",
+        "location": "room_3",
+        "description": "Incident report from a previous crew member.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "decoy_drawer_2",
+        "location": "room_3",
+        "description": "A locked supply locker.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "decoy_tool_1"
+      },
+      {
+        "id": "clearance_token_alpha",
+        "location": "room_3",
+        "description": "A glowing data chip retrieved from the safe.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "door_3",
+        "location": "room_3",
+        "description": "Heavy iron door leading to the reactor chamber.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "clearance_token_alpha"
+      },
+      {
+        "id": "override_keycard_final",
+        "location": "room_4",
+        "description": "The master override keycard.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "decoy_vial_1",
+        "location": "room_4",
+        "description": "A sealed vial of unknown liquid.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false
+      },
+      {
+        "id": "decoy_terminal_old",
+        "location": "room_4",
+        "description": "An ancient, non-functional terminal.",
+        "state": "fixed",
+        "interactable": true,
+        "takeable": false
+      },
+      {
+        "id": "decoy_drawer_3",
+        "location": "room_4",
+        "description": "A locked drawer full of dust.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false
+      },
+      {
+        "id": "door_4",
+        "location": "room_4",
+        "description": "The massive containment door sealing the core.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "override_keycard_final"
+      }
+    ],
+    "rules": [
+      "Puzzles must be solved in a linear chain: Room 1 -> Room 2 -> Room 3 -> Room 4.",
+      "Progression from any room is strictly gated by satisfying that room's specific goal_completion.",
+      "Hidden objects (state: hidden) can only be accessed if their parent object provides the required information token via contains_info.",
+      "Codes must be derived exactly from the string format 'safe_code_NNN' found in notes.",
+      "All decoy objects are strictly dead-ends and provide no utility toward the solution path."
+    ],
+    "solution_path": [
+      "1. In Room 1, examine 'terminal_1' to find the location of the wrench (no code needed), then interact with 'manual_wrench' on 'door_1' to unlock it and move to Room 2.",
+      "2. In Room 2, examine 'corroded_pipe' which reveals that the pipe has rusted shut; use 'corrosion_spray' on 'corroded_pipe' to dissolve the rust.",
+      "3. After dissolving the rust, the 'corroded_pipe_key' becomes accessible (hidden state revealed); take it and use it on 'door_2' to unlock the path to Room 3.",
+      "4. In Room 3, examine 'clue_note_beta' to get code 'the hidden code'; input this code into 'safe_3' to open it and retrieve 'clearance_token_alpha'.",
+      "5. Use 'clearance_token_alpha' on 'door_3' to unlock the path to Room 4.",
+      "6. In Room 4, examine 'terminal_4' which reveals the location of the keycard; interact with 'override_keycard_final' on 'terminal_4' to gain access.",
+      "7. Use 'override_keycard_final' on 'door_4' to unlock the final containment door and escape."
+    ],
+    "win_condition": {
+      "object_id": "door_4",
+      "state": "unlocked"
+    }
+  }
+}
