@@ -16,6 +16,7 @@ class EventKind(str, Enum):
     SPEECH = "speech"            # a player said something (public)
     OBSERVATION = "observation"  # grounded result of an action
     SYSTEM = "system"            # narrator / system message
+    PLANNER = "planner"          # deterministic planner telemetry (observer/debug)
     PROMPT = "prompt"            # model prompt shown for debugging / UI visibility
     DECISION = "decision"        # validated player-turn JSON (debug visibility)
     NARRATION = "narration"      # GM prose story (observer-only; not seen by agents)
@@ -32,6 +33,8 @@ class Event:
     public: bool = True
     # If not public, only this player sees it (private observation).
     audience_id: str | None = None
+    # Optional structured telemetry payload (observer/debug use).
+    data: dict | None = None
 
 
 @dataclass

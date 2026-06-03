@@ -24,6 +24,16 @@ from app.engine.observation import Observation
 from app.schemas.game_setting import GameSetting, ObjectState
 
 
+def _state_satisfies(expected: ObjectState, current: ObjectState | None) -> bool:
+    """Return True when current state satisfies the expected target state."""
+    if current is None:
+        return False
+    if current == expected:
+        return True
+    equivalent_open_states = {ObjectState.OPEN, ObjectState.UNLOCKED}
+    return expected in equivalent_open_states and current in equivalent_open_states
+
+
 class GameSimulator:
     def __init__(self, setting: GameSetting) -> None:
         self.setting = setting
@@ -301,7 +311,7 @@ class GameSimulator:
     # ------------------------------------------------------------------ #
     def _check_win(self) -> bool:
         wc = self.setting.win_condition
-        return self.state.object_state.get(wc.object_id) == wc.state
+        return _state_satisfies(wc.state, self.state.object_state.get(wc.object_id))
 
     # ------------------------------------------------------------------ #
     # Helpers

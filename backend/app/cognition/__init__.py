@@ -23,10 +23,14 @@ from app.cognition.team_cognition import (
     TeamCognition,
     world_fingerprint,
 )
+from app.cognition.action_planner import ActionPlanner, PlannerDecision, PlannerOption
 
 __all__ = [
     "AttemptRecord",
     "CognitionConfig",
     "TeamCognition",
+    "ActionPlanner",
+    "PlannerDecision",
+    "PlannerOption",
     "world_fingerprint",
 ]

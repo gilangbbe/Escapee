@@ -110,6 +110,34 @@ def test_decision_event_to_dict_shape():
     assert d["turn"] == 3
 
 
+def test_planner_event_to_dict_shape():
+    payload = {
+        "reason": "out_of_policy",
+        "chosen": "move to_room=command_deck",
+        "candidates": [
+            {
+                "rank": 1,
+                "action": "move to_room=command_deck",
+                "score": 12.5,
+                "rationale": "success",
+            }
+        ],
+    }
+    e = Event(
+        kind=EventKind.PLANNER,
+        actor_id="player_1",
+        text="planner trace",
+        turn=4,
+        data=payload,
+    )
+    d = event_to_dict(e)
+    assert d["type"] == "event"
+    assert d["kind"] == "planner"
+    assert d["actor_id"] == "player_1"
+    assert d["turn"] == 4
+    assert d["data"] == payload
+
+
 def test_state_snapshot_is_grounded(setting: GameSetting):
     sim = GameSimulator(setting)
     snap = state_snapshot(sim.state)

@@ -9,6 +9,7 @@ const KIND_LABEL: Record<EventMessage["kind"], string> = {
   speech: "💬",
   observation: "👁",
   system: "✦",
+  planner: "🧭",
   prompt: "🧾",
   decision: "🧠",
   narration: "📖",

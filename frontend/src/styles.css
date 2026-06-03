@@ -136,6 +136,12 @@ body {
   padding: 16px;
 }
 
+.col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 h2 {
   font-size: 14px;
   margin: 0 0 12px;
@@ -243,3 +249,47 @@ code { color: var(--accent); }
 .obj-locked, .obj-locked_bolt, .obj-locked_room { border-left: 3px solid var(--red); }
 .obj-hidden { opacity: 0.45; }
 .obj-taken { border-left: 3px solid var(--accent); }
+
+.planner-panel {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.planner-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.planner-chosen {
+  font-size: 12px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.planner-table-wrap {
+  overflow-x: auto;
+}
+
+.planner-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.planner-table th,
+.planner-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 5px 6px;
+  text-align: left;
+}
+
+.planner-table th {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}

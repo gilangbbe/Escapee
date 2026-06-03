@@ -30,6 +30,16 @@ _OPENED_STATES = {ObjectState.OPEN, ObjectState.UNLOCKED, ObjectState.POWERED}
 _LOCKED_STATES = {ObjectState.LOCKED, ObjectState.LOCKED_BOLT, ObjectState.LOCKED_ROOM}
 
 
+def _state_satisfies(expected: ObjectState, current: ObjectState | None) -> bool:
+    """Return True when current state satisfies the expected target state."""
+    if current is None:
+        return False
+    if current == expected:
+        return True
+    equivalent_open_states = {ObjectState.OPEN, ObjectState.UNLOCKED}
+    return expected in equivalent_open_states and current in equivalent_open_states
+
+
 @dataclass(frozen=True)
 class CandidateAction:
     """Deterministic next-action option exposed to the LLM policy layer."""
@@ -176,7 +186,7 @@ def derive_board(state: GameState) -> SolutionBoard:
 
     win = setting.win_condition
     cur_win = state.object_state.get(win.object_id)
-    if cur_win != win.state:
+    if not _state_satisfies(win.state, cur_win):
         now = cur_win.value if cur_win else "unknown"
         unsolved.append(
             f"WIN CONDITION: [{win.object_id}] must reach '{win.state.value}' (now '{now}')"
@@ -679,6 +689,24 @@ class TeamCognition:
             for c in self._compile_candidates(player_id, state, current_goal, next_plan_step)
         }
         return action_signature(action) in allowed
+
+    def policy_candidates(
+        self,
+        player_id: str,
+        state: GameState,
+        current_goal: str,
+        next_plan_step: str = "",
+    ) -> list[GameAction]:
+        """Deterministic valid/reachable action candidates for this turn."""
+        return [
+            c.action
+            for c in self._compile_candidates(
+                player_id,
+                state,
+                current_goal,
+                next_plan_step,
+            )
+        ]
 
     def _candidate_actions(
         self,

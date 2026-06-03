@@ -30,6 +30,7 @@ def event_to_dict(event: Event) -> dict:
         "turn": event.turn,
         "public": event.public,
         "audience_id": event.audience_id,
+        "data": event.data,
     }
 
 

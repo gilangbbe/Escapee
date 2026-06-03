@@ -10,6 +10,8 @@ into the `MessageLog`.
 
 from __future__ import annotations
 
+import json
+import re
 from dataclasses import dataclass, field
 from typing import Awaitable, Callable
 
@@ -136,6 +138,12 @@ class GamePlayerAgent:
                 if result.value is not None:
                     self._own_actions.append(action_signature(result.value.action))
                 return result
+
+            repaired = self._repair_common_action_omission(raw, state, team_brief)
+            if repaired is not None:
+                self._own_actions.append(action_signature(repaired.action))
+                return ParseResult(ok=True, value=repaired)
+
             last = result
             messages.append({"role": "assistant", "content": raw})
             messages.append(
@@ -146,3 +154,77 @@ class GamePlayerAgent:
                 }
             )
         return last
+
+    def _repair_common_action_omission(
+        self,
+        raw: str,
+        state: GameState,
+        team_brief: TeamBrief | None,
+    ) -> GameTurn | None:
+        """Deterministically repair common missing-field slips before retrying.
+
+        This is a narrow escape hatch for local 7B models that occasionally emit
+        a valid action verb but omit a required target. We only repair when the
+        missing field is unambiguous from grounded state / deterministic policy.
+        """
+        try:
+            data = json.loads((raw or "").strip())
+        except Exception:
+            return None
+        if not isinstance(data, dict):
+            return None
+
+        action = data.get("action")
+        if not isinstance(action, dict):
+            return None
+
+        verb = action.get("action")
+        if verb != "use":
+            return None
+
+        item_id = action.get("item_id")
+        target_id = action.get("target_id")
+        if not item_id or target_id:
+            return None
+
+        inferred = self._infer_use_target(state, item_id, team_brief)
+        if not inferred:
+            return None
+
+        repaired_action = dict(action)
+        repaired_action["target_id"] = inferred
+        data["action"] = repaired_action
+
+        try:
+            return GameTurn.model_validate(data)
+        except Exception:
+            return None
+
+    def _infer_use_target(
+        self,
+        state: GameState,
+        item_id: str,
+        team_brief: TeamBrief | None,
+    ) -> str | None:
+        """Infer the intended USE target from grounded state or policy candidates."""
+        visible_targets: list[str] = []
+        for oid in state.visible_objects_for(self.persona.id):
+            obj = state.obj(oid)
+            if obj is None:
+                continue
+            if obj.requires_tool == item_id:
+                visible_targets.append(oid)
+
+        if len(visible_targets) == 1:
+            return visible_targets[0]
+
+        if team_brief is not None:
+            pattern = re.compile(rf"use\s+{re.escape(item_id)}\s+on\s+(\S+)")
+            for candidate in team_brief.candidate_actions:
+                if f"use {item_id} on" not in candidate.lower():
+                    continue
+                match = pattern.search(candidate.lower())
+                if match:
+                    return match.group(1).strip().strip("[]")
+
+        return None

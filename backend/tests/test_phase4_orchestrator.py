@@ -144,6 +144,38 @@ async def test_agent_decide_returns_validated_turn(setting: GameSetting):
     assert result.value.action.target_id == "captains_log"
 
 
+@pytest.mark.asyncio
+async def test_agent_repairs_missing_use_target_from_grounded_state(setting: GameSetting):
+    from app.engine.game_actions import GameAction, GameActionType as A
+
+    sim = GameSimulator(setting)
+    log = MessageLog()
+    seed_private_clues(log, sim.state)
+
+    # Make access_card available so the intended USE target is unambiguous.
+    sim.step("player_1", GameAction(action=A.ENTER_CODE, target_id="supply_locker", code="0451"))
+    sim.step("player_1", GameAction(action=A.TAKE, target_id="access_card"))
+
+    client = ScriptedClient(
+        [
+            turn_json(
+                {
+                    "action": "use",
+                    "item_id": "access_card",
+                    "target_id": None,
+                }
+            )
+        ]
+    )
+    agent = GamePlayerAgent(persona=setting.players[0], client=client)
+    orch = GameOrchestrator(setting, [agent, GamePlayerAgent(persona=setting.players[1], client=ScriptedClient([]))], max_rounds=1, enable_planning=False)
+
+    result = await agent.decide(sim.state, log, team_brief=orch.cognition.brief_for("player_1", sim.state))
+    assert result.ok
+    assert result.value.action.action == A.USE
+    assert result.value.action.target_id == "command_door"
+
+
 # --------------------------------------------------------------------------- #
 # Orchestrator
 # --------------------------------------------------------------------------- #
@@ -232,6 +264,47 @@ async def test_orchestrator_stops_at_turn_limit(setting: GameSetting):
     result = await orch.run()
     assert result.won is False
     assert result.reason == "turn_limit"
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_uses_planner_override_when_stuck_on_free_actions(setting: GameSetting):
+    # Repeated LOOK actions create no progress. With a low stall threshold,
+    # the orchestrator should escalate and override via planner-as-tool.
+    script = [
+        turn_json({"action": "look"}),
+        turn_json({"action": "look"}),
+        turn_json({"action": "look"}),
+        turn_json({"action": "look"}),
+    ]
+    agent = GamePlayerAgent(persona=setting.players[0], client=ScriptedClient(script))
+
+    streamed: list[Event] = []
+
+    async def sink(e: Event) -> None:
+        streamed.append(e)
+
+    orch = GameOrchestrator(
+        setting,
+        [agent],
+        max_rounds=3,
+        on_event=sink,
+        enable_planning=False,
+        stall_threshold=1,
+        enforce_candidate_policy=True,
+        max_redecide=1,
+    )
+    await orch.run()
+
+    assert any(
+        e.kind == EventKind.SYSTEM and "(planner override)" in e.text
+        for e in streamed
+    )
+    planner_events = [e for e in streamed if e.kind == EventKind.PLANNER]
+    assert planner_events
+    assert any(
+        e.data and isinstance(e.data.get("candidates"), list) and e.data.get("chosen")
+        for e in planner_events
+    )
 
 
 @pytest.mark.asyncio
@@ -458,6 +531,7 @@ async def test_team_is_flagged_stuck_after_no_progress(setting: GameSetting):
     orch = GameOrchestrator(
         setting, idlers, max_rounds=8, on_event=sink, stall_threshold=4,
         enable_planning=False,
+        enable_planner_tool=False,
     )
     await orch.run()
 
@@ -531,6 +605,18 @@ def test_derive_board_lists_solved_items_and_open_win_condition(setting: GameSet
     # The win condition (escape) is not met yet -> it appears as still-to-do.
     assert any("WIN CONDITION" in u for u in board.unsolved)
     assert board.objective  # the room's objective string is carried through
+
+
+def test_derive_board_treats_open_as_satisfying_unlocked_win_condition(setting: GameSetting):
+    from app.cognition.team_cognition import derive_board
+    from app.schemas.game_setting import ObjectState
+
+    sim = GameSimulator(setting)
+    # Win target in this setting is UNLOCKED; OPEN should count as satisfied too.
+    sim.state.object_state["airlock_door"] = ObjectState.OPEN
+
+    board = derive_board(sim.state)
+    assert not any("WIN CONDITION" in u for u in board.unsolved)
 
 
 def test_already_done_blocks_completed_goals(setting: GameSetting):

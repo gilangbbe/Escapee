@@ -21,7 +21,7 @@
       },
       {
         "id": "room_2",
-        "description": "The cryo-storage corridor. The heavy blast door is locked, requiring a specific access code to open.",
+        "description": "The cryo-storage corridor. A frost-covered archway at the far end leads deeper into the facility.",
         "adjacency": {
           "west": "room_1",
           "east": "room_3"
@@ -54,10 +54,8 @@
       },
       {
         "id": "room_4",
-        "description": "The Core Reactor Control Room. The final blast doors are sealed, requiring the thermal_seal_pattern to disarm.",
-        "adjacency": {
-          "west": "room_3"
-        },
+        "description": "The Core Reactor Control Room. The final blast doors are sealed, requiring the correct thermal sequence to disarm.",
+        "adjacency": {},
         "goal": "Get blast_doors_final into the 'unlocked' state.",
         "goal_completion": {
           "type": "object_state",
@@ -103,15 +101,22 @@
         "takeable": true
       },
       {
-        "id": "terminal_panel_2",
+        "id": "corridor_door_23",
         "location": "room_2",
-        "description": "An access terminal displaying a keypad.",
+        "description": "A frost-covered archway leading deeper into the facility toward the hydroponics bay.",
         "state": "visible",
         "interactable": true,
         "takeable": false,
-        "requires_code": "thermal_seal_pattern",
-        "code_digits": 4,
-        "contains_info": "thermal_seal_pattern"
+        "connects_to": "room_3"
+      },
+      {
+        "id": "terminal_panel_2",
+        "location": "room_2",
+        "description": "An access terminal displaying environmental readouts. A sticky note taped to the frame reads: thermal access code 3742.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "thermal_code_3742"
       },
       {
         "id": "cryo_log_2a",
@@ -141,11 +146,12 @@
       {
         "id": "heavy_frozen_valve",
         "location": "room_3",
-        "description": "A massive frozen valve blocking the path.",
+        "description": "A massive frozen valve blocking the path to the reactor.",
         "state": "locked_bolt",
         "interactable": true,
         "takeable": false,
-        "requires_tool": "hydro_wrench"
+        "requires_tool": "hydro_wrench",
+        "connects_to": "room_4"
       },
       {
         "id": "frozen_plant_3a",
@@ -166,11 +172,12 @@
       {
         "id": "blast_doors_final",
         "location": "room_4",
-        "description": "The final blast doors sealing the core reactor.",
+        "description": "The final blast doors sealing the core reactor. A keypad beside them requires a 4-digit thermal sequence.",
         "state": "locked",
         "interactable": true,
         "takeable": false,
-        "requires_code": "thermal_seal_pattern"
+        "requires_code": "3742",
+        "code_digits": 4
       }
     ],
     "rules": [
@@ -179,14 +186,14 @@
     ],
     "solution_path": [
       "1. take ice_melt_tool",
-      "2. use_tool door_1",
-      "3. go room_2",
-      "4. examine terminal_panel_2",
-      "5. go room_3",
+      "2. use ice_melt_tool on door_1",
+      "3. move to room_2",
+      "4. inspect terminal_panel_2 (reveals thermal_code_3742)",
+      "5. move to room_3 via corridor_door_23",
       "6. take hydro_wrench",
-      "7. use_tool heavy_frozen_valve",
-      "8. go room_4",
-      "9. enter_code blast_doors_final"
+      "7. use hydro_wrench on heavy_frozen_valve",
+      "8. move to room_4",
+      "9. enter_code blast_doors_final 3742"
     ],
     "win_condition": {
       "object_id": "blast_doors_final",

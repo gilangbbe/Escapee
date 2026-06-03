@@ -18,7 +18,20 @@ export interface PersonaInfo {
   backstory: string;
 }
 
-export type EventKind = "speech" | "observation" | "system" | "prompt" | "decision" | "narration";
+export type EventKind = "speech" | "observation" | "system" | "planner" | "prompt" | "decision" | "narration";
+
+export interface PlannerCandidate {
+  rank: number;
+  action: string;
+  score: number;
+  rationale: string;
+}
+
+export interface PlannerEventData {
+  reason: string | null;
+  chosen: string;
+  candidates: PlannerCandidate[];
+}
 
 export interface EventMessage {
   type: "event";
@@ -28,6 +41,7 @@ export interface EventMessage {
   turn: number;
   public: boolean;
   audience_id: string | null;
+  data?: PlannerEventData | null;
 }
 
 export interface ObjectSnapshot {

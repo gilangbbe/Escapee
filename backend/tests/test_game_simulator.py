@@ -112,6 +112,14 @@ def test_no_actions_after_finish(sim: GameSimulator):
     assert "over" in obs.message.lower()
 
 
+def test_open_state_satisfies_unlocked_win_condition(sim: GameSimulator):
+    """Regression: OPEN should satisfy a win target declared as UNLOCKED."""
+    sim.state.object_state["airlock_door"] = ObjectState.OPEN
+    obs = sim.step("player_1", GameAction(action=A.LOOK))
+    assert obs.game_won is True
+    assert sim.state.won is True
+
+
 def test_bracketed_ids_are_normalized(sim: GameSimulator):
     """7B models often copy the [id] display form verbatim; we strip brackets."""
     a = GameAction(action=A.INSPECT, target_id="[captains_log]")

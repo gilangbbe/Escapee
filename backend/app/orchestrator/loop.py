@@ -37,6 +37,7 @@ from app.cognition.team_cognition import (
     action_signature,
     world_fingerprint,
 )
+from app.cognition.action_planner import ActionPlanner
 from app.context.channels import Event, EventKind, MessageLog
 from app.context.game_builder import seed_private_clues
 from app.engine.game_actions import GameAction, GameActionType
@@ -45,6 +46,7 @@ from app.schemas.game_setting import GameSetting
 
 # An optional sink for streaming events (e.g. a WebSocket broadcaster in Phase 5).
 EventSink = Callable[[Event], Awaitable[None]]
+_FREE_ACTIONS = {GameActionType.SAY, GameActionType.LOOK}
 
 
 @dataclass
@@ -70,6 +72,8 @@ class GameOrchestrator:
         narrator: Optional[GameMasterNarrator] = None,
         stall_threshold: Optional[int] = None,
         cognition: Optional[TeamCognition] = None,
+        planner: Optional[ActionPlanner] = None,
+        enable_planner_tool: bool = True,
         max_redecide: int = 2,
         enable_planning: bool = True,
         enforce_candidate_policy: bool = True,
@@ -99,6 +103,8 @@ class GameOrchestrator:
         elif stall_threshold is not None:
             cognition.config.stall_threshold = stall_threshold
         self.cognition = cognition
+        self.enable_planner_tool = enable_planner_tool
+        self.planner = planner or ActionPlanner()
         # How many times to re-ask an agent when it proposes a proven dead-end
         # before letting the (harmless) move through to keep the game flowing.
         self.max_redecide = max_redecide
@@ -199,6 +205,26 @@ class GameOrchestrator:
                 turn=self.sim.state.turn,
             )
 
+        world_key = world_fingerprint(self.sim.state)
+        plan = None
+        if self.enable_planner_tool:
+            planning_brief = self.cognition.brief_for(
+                pid,
+                self.sim.state,
+                reflect=reflect,
+                blocked_note=None,
+                critical_note=critical_note,
+            )
+            plan = self.planner.plan_turn(
+                player_id=pid,
+                state=self.sim.state,
+                cognition=self.cognition,
+                current_goal=planning_brief.current_goal,
+                next_plan_step=planning_brief.next_plan_step,
+            )
+            if self.cognition.stuck:
+                await self._emit_planner_trace(pid, plan, self.sim.state.turn)
+
         # --- Loop guard: re-ask if the agent proposes a proven dead-end ---
         # External cognition decides whether a move is pointless (already tried in
         # this exact world state); we re-prompt with an explicit block note rather
@@ -251,10 +277,51 @@ class GameOrchestrator:
                 await self._announce_cognition(update)
                 return obs.game_won
             candidate = result.value
+
+            # Stall escalation: if the team is stuck and the agent emits a pure
+            # free action, force a progress-biased planner fallback.
+            if (
+                self.enable_planner_tool
+                and
+                self.cognition.stuck
+                and plan is not None
+                and candidate.action.action in _FREE_ACTIONS
+                and plan.best_progress_action is not None
+            ):
+                blocked_note = (
+                    "STALL MODE: free/no-progress action rejected while stuck. "
+                    "Choose a progress candidate (unlock/take/move/use/enter_code) now."
+                )
+                if attempt < self.max_redecide:
+                    await self._emit(
+                        EventKind.SYSTEM,
+                        pid,
+                        f"(stall gate) {blocked_note}",
+                        turn=self.sim.state.turn,
+                    )
+                    continue
+                turn = candidate.model_copy(deep=True)
+                turn.action = plan.best_progress_action
+                await self._emit_planner_trace(
+                    pid,
+                    plan,
+                    self.sim.state.turn,
+                    chosen=turn.action,
+                    reason="stall_free_action",
+                )
+                await self._emit(
+                    EventKind.SYSTEM,
+                    pid,
+                    (
+                        "(planner override) stalled too long; "
+                        f"executing {action_signature(turn.action)}"
+                    ),
+                    turn=self.sim.state.turn,
+                )
+                break
+
             if (
                 self.enforce_candidate_policy
-                and
-                attempt < self.max_redecide
                 and (self.cognition.stuck or blocked_note is not None)
                 and not self.cognition.is_policy_candidate(
                     pid,
@@ -269,6 +336,29 @@ class GameOrchestrator:
                     "for this turn. Your previous action was not in the "
                     "deterministic valid/reachable policy set."
                 )
+                if attempt >= self.max_redecide:
+                    if self.enable_planner_tool and plan is not None:
+                        turn = candidate.model_copy(deep=True)
+                        turn.action = plan.best_action
+                        await self._emit_planner_trace(
+                            pid,
+                            plan,
+                            self.sim.state.turn,
+                            chosen=turn.action,
+                            reason="out_of_policy",
+                        )
+                        await self._emit(
+                            EventKind.SYSTEM,
+                            pid,
+                            (
+                                "(planner override) action remained out-of-policy; "
+                                f"executing {action_signature(turn.action)}"
+                            ),
+                            turn=self.sim.state.turn,
+                        )
+                    else:
+                        turn = candidate
+                    break
                 await self._emit(
                     EventKind.SYSTEM,
                     pid,
@@ -277,15 +367,35 @@ class GameOrchestrator:
                 )
                 continue
             if (
-                attempt < self.max_redecide
-                and (
-                    block := self.cognition.blocked_reason(
-                        pid, candidate.action, world_key, self.sim.state
-                    )
+                block := self.cognition.blocked_reason(
+                    pid, candidate.action, world_key, self.sim.state
                 )
             ):
                 # Tell the agent (and observers) why, then let it choose again.
                 blocked_note = block
+                if attempt >= self.max_redecide:
+                    if self.enable_planner_tool and plan is not None:
+                        turn = candidate.model_copy(deep=True)
+                        turn.action = plan.best_action
+                        await self._emit_planner_trace(
+                            pid,
+                            plan,
+                            self.sim.state.turn,
+                            chosen=turn.action,
+                            reason="blocked_repeat",
+                        )
+                        await self._emit(
+                            EventKind.SYSTEM,
+                            pid,
+                            (
+                                "(planner override) repeated blocked action; "
+                                f"executing {action_signature(turn.action)}"
+                            ),
+                            turn=self.sim.state.turn,
+                        )
+                    else:
+                        turn = candidate
+                    break
                 await self._emit(
                     EventKind.SYSTEM,
                     pid,
@@ -393,6 +503,51 @@ class GameOrchestrator:
                 turn=self.sim.state.turn,
             )
 
+    async def _emit_planner_trace(
+        self,
+        player_id: str,
+        plan,
+        turn: int,
+        *,
+        chosen: GameAction | None = None,
+        reason: str | None = None,
+    ) -> None:
+        """Stream compact planner telemetry for observers/debuggers.
+
+        This event is intentionally NOT recorded into `MessageLog` so planner
+        diagnostics never bloat agent context.
+        """
+        candidates = []
+        for idx, option in enumerate(plan.ranked, start=1):
+            candidates.append(
+                {
+                    "rank": idx,
+                    "action": action_signature(option.action),
+                    "score": round(option.score, 3),
+                    "rationale": option.rationale,
+                }
+            )
+        chosen_text = action_signature(chosen or plan.best_action)
+        top = [f"{c['rank']}) {c['action']} score={c['score']:.1f}" for c in candidates]
+        reason_text = f" reason={reason};" if reason else ""
+        text = (
+            f"planner:{reason_text} chosen={chosen_text}; "
+            f"top={'; '.join(top)}"
+        )
+        payload = {
+            "reason": reason,
+            "chosen": chosen_text,
+            "candidates": candidates,
+        }
+        await self._emit(
+            EventKind.PLANNER,
+            player_id,
+            text,
+            turn=turn,
+            record=False,
+            data=payload,
+        )
+
     async def _emit(
         self,
         kind: EventKind,
@@ -403,6 +558,7 @@ class GameOrchestrator:
         public: bool = True,
         audience_id: Optional[str] = None,
         record: bool = True,
+        data: dict | None = None,
     ) -> None:
         event = Event(
             kind=kind,
@@ -411,6 +567,7 @@ class GameOrchestrator:
             turn=turn,
             public=public,
             audience_id=audience_id,
+            data=data,
         )
         # NARRATION is a presentation overlay: stream it to observers but keep it
         # OUT of the shared log so it can never feed back into player agents.

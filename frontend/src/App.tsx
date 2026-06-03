@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useGameSocket } from "./useGameSocket";
 import { NarrativeFeed } from "./components/NarrativeFeed";
+import { PlannerPanel } from "./components/PlannerPanel";
 import { StatePanel } from "./components/StatePanel";
 import { SetupPanel } from "./components/SetupPanel";
 
@@ -74,6 +75,7 @@ export default function App() {
         </section>
         <aside className="col-right">
           <StatePanel snapshot={state.snapshot} />
+          <PlannerPanel events={state.events} personas={state.setup?.players ?? []} />
         </aside>
       </main>
     </div>
