@@ -1,0 +1,219 @@
+{
+  "world": {
+    "scenario": "You are a prisoner in Block 4 of the maximum-security facility, having escaped the initial holding cells by crawling through a maintenance grate. Now trapped in the sterile ventilation shaft leading to the server farm, you realize you cannot simply walk out; you must navigate four specific zones: the Ventilation Shaft, the Heavy Door Locker, the Server Control Room, and finally the Exit Airlock. Each zone presents a unique mechanical puzzle that yields the key to the next, forming an unbroken chain of dependency from your current confinement to freedom.",
+    "objective": "Navigate the four connected rooms in sequence by solving the locked objects within each room to unlock the passage to the next, culminating in unlocking the exit airlock door.",
+    "rooms": [
+      {
+        "id": "room_1",
+        "description": "A narrow concrete ventilation shaft smelling of stale dust and oil. A heavy steel grate blocks the entrance, secured by a padlock with no keyhole visible until solved. To the side, a maintenance console sits embedded in the wall.",
+        "adjacency": {
+          "east": "room_2"
+        },
+        "goal": "Get grate_door_1 into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "grate_door_1",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "padlock_cipher"
+        ]
+      },
+      {
+        "id": "room_2",
+        "description": "A cramped utility locker filled with heavy industrial equipment. A massive steel door seals the entry, requiring a specific mechanical tool to disengage the bolt. Inside, a terminal monitor glows faintly.",
+        "adjacency": {
+          "west": "room_1",
+          "east": "room_3"
+        },
+        "goal": "Get heavy_door_2 into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "heavy_door_2",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "bolt_wrench_tool"
+        ]
+      },
+      {
+        "id": "room_3",
+        "description": "A cold server room filled with humming racks and blinking lights. The air is thick with ozone. A reinforced blast door blocks the exit, requiring a digital code to unlock. On a workbench, a portable datapad lies next to a power strip.",
+        "adjacency": {
+          "west": "room_2",
+          "east": "room_4"
+        },
+        "goal": "Discover the hidden clue this room conceals.",
+        "goal_completion": {
+          "type": "known_info",
+          "info": "airlock_code_991"
+        },
+        "key_objects": [
+          "datapad_device"
+        ]
+      },
+      {
+        "id": "room_4",
+        "description": "The final exit airlock chamber. Stainless steel walls reflect the dim emergency lights. A double-locked heavy door stands between you and freedom, requiring both a physical override key and a secondary power source to function.",
+        "adjacency": {
+          "west": "room_3"
+        },
+        "goal": "Get exit_airlock_door_4 into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "exit_airlock_door_4",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "override_master_key",
+          "emergency_battery_4"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "padlock_cipher",
+        "location": "room_1",
+        "description": "A small paper slip found tucked in the grate bars, written in frantic scrawl.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "padlock_code_384",
+        "scenic": false
+      },
+      {
+        "id": "grate_door_1",
+        "location": "room_1",
+        "description": "The heavy steel grate covering the vent passage to the next room.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "code_digits": 3,
+        "requires_tool": "padlock_cipher",
+        "fuses": {
+          "secring_A": "OFF"
+        },
+        "scenic": false
+      },
+      {
+        "id": "dusty_crate_1",
+        "location": "room_1",
+        "description": "A sagging wooden crate filled with forgotten paperbacks and old manuals.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "vent_fan_1",
+        "location": "room_1",
+        "description": "A massive industrial fan spinning slowly on the ceiling.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "bolt_wrench_tool",
+        "location": "room_2",
+        "description": "A heavy-duty hex wrench used for industrial bolts.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "heavy_door_2",
+        "location": "room_2",
+        "description": "The massive steel door sealing the corridor to the server room.",
+        "state": "locked_bolt",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "bolt_wrench_tool",
+        "scenic": false
+      },
+      {
+        "id": "datapad_device",
+        "location": "room_3",
+        "description": "A portable data terminal used for monitoring the servers.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "scenic": false
+      },
+      {
+        "id": "server_rack_alpha",
+        "location": "room_3",
+        "description": "Row of blinking server racks humming loudly.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "emergency_battery_4",
+        "location": "room_3",
+        "description": "A backup battery unit required to power the door override.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "airlock_code_991",
+        "scenic": false
+      },
+      {
+        "id": "override_master_key",
+        "location": "room_4",
+        "description": "A heavy metal key found on a hook near the door.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "exit_airlock_door_4",
+        "location": "room_4",
+        "description": "The final double-locked airlock door leading to freedom.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "code_digits": 3,
+        "requires_tool": "override_master_key",
+        "scenic": false
+      },
+      {
+        "id": "concrete_wall_4",
+        "location": "room_4",
+        "description": "Smooth concrete walls of the exit chamber.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "The player must visit rooms in numerical order (1 -> 2 -> 3 -> 4).",
+      "Passage to the next room is gated by the goal_completion of the current room.",
+      "Information revealed by one object may be required to reveal another or unlock a specific mechanism.",
+      "Tools that are initially hidden must be revealed by information found in previous rooms."
+    ],
+    "solution_path": [
+      "1. Examine 'padlock_cipher' in room_1 to reveal code '384'.",
+      "2. Use code '384' on 'grate_door_1' in room_1 to unlock it (state: unlocked).",
+      "3. Move East into room_2. Examine 'the object' to reveal info 'the object_X'.",
+      "4. Search for 'bolt_wrench_tool' using info 'the object_X', revealing the hidden wrench in room_2.",
+      "5. Use 'bolt_wrench_tool' on 'heavy_door_2' in room_2 to unlock it (state: unlocked).",
+      "6. Move East into room_3. Examine 'the object' to reveal info 'the object'.",
+      "7. Search for 'datapad_device' using info 'the object', revealing the locked datapad in room_3.",
+      "8. Interact with 'the object' (which requires code from previous steps or is solvable via context) - *Correction*: In this chain, the blast door needs a code derived from the datapad interaction logic or simply acts as a gate once entered. Let's adjust for strict dependency: The Blast Door Panel requires the info 'the object' found in room 4? No, that breaks linearity.",
+      "Revised Path Step 8: Enter room_3. Use 'datapad_device' to solve 'the object'. (Assume datapad interaction yields code 742 for blast door).",
+      "9. Move East into room_4. Examine 'emergency_battery_4' to reveal info 'the object'.",
+      "10. Search for 'override_master_key' using info 'the object', revealing the key in room_4.",
+      "11. Use 'override_master_key' on 'exit_airlock_door_4' to unlock it (state: unlocked).",
+      "12. Goal completed."
+    ],
+    "win_condition": {
+      "object_id": "exit_airlock_door_4",
+      "state": "unlocked"
+    }
+  }
+}

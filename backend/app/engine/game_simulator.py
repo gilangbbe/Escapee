@@ -63,6 +63,11 @@ class GameSimulator:
 
         obs = handler(player_id, action)
 
+        # Keep derived progression predicates current after every action so
+        # fixed-world room-goal gates can unlock immediately once satisfied.
+        self.state.recompute_power_flags()
+        self.state.apply_power_to_consumers()
+
         if not self.state.finished and self._check_win():
             self.state.finished = True
             self.state.won = True

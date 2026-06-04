@@ -17,6 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from app.agents.gm_narrator_prompt import (
+    ActionExecutionStatus,
     NARRATOR_SYSTEM_PROMPT,
     build_ending_user_prompt,
     build_opening_user_prompt,
@@ -36,6 +37,24 @@ class GameMasterNarrator:
 
     _recent: list[str] = field(default_factory=list, init=False)
 
+    def _normalize_dialogue_line(self, text: str, *, actor_name: str) -> str:
+        """Ensure output is exactly one chat line: Name: "message"."""
+        line = " ".join((text or "").strip().splitlines()).strip()
+        if not line:
+            return f'{actor_name}: "..."'
+
+        if ":" in line and "\"" in line:
+            return line
+
+        # Strip accidental role prefixes from weaker local models.
+        for prefix in ("assistant:", "narrator:", "dialogue:"):
+            if line.lower().startswith(prefix):
+                line = line[len(prefix):].strip()
+                break
+        if line.startswith('"') and line.endswith('"'):
+            return f"{actor_name}: {line}"
+        return f'{actor_name}: "{line}"'
+
     async def _say(self, user_prompt: str, *, fallback: str) -> str:
         messages = [
             {"role": "system", "content": NARRATOR_SYSTEM_PROMPT},
@@ -48,7 +67,6 @@ class GameMasterNarrator:
         text = (raw or "").strip()
         if not text:
             return fallback
-        self._remember(text)
         return text
 
     def _remember(self, line: str) -> None:
@@ -57,40 +75,59 @@ class GameMasterNarrator:
             self._recent = self._recent[-self.recent_window:]
 
     async def narrate_opening(self, setting: GameSetting) -> str:
-        return await self._say(
+        text = await self._say(
             build_opening_user_prompt(setting),
             fallback=setting.scenario,
         )
+        self._remember(text)
+        return text
 
     async def narrate_turn(
         self,
         *,
+        scenario: str,
+        objective: str,
+        turn: int,
         actor_name: str,
         actor_role: str,
+        actor_skills: list[str],
+        actor_backstory: str,
         action_text: str,
         speech: str | None,
         outcome: str,
         success: bool,
+        status: ActionExecutionStatus,
     ) -> str:
-        return await self._say(
+        line = await self._say(
             build_turn_user_prompt(
+                scenario=scenario,
+                objective=objective,
+                turn=turn,
                 actor_name=actor_name,
                 actor_role=actor_role,
+                actor_skills=actor_skills,
+                actor_backstory=actor_backstory,
                 action_text=action_text,
                 speech=speech,
                 outcome=outcome,
                 success=success,
+                status=status,
                 recent_story=list(self._recent),
             ),
-            fallback=f"{action_text}. {outcome}",
+            fallback=f'{actor_name}: "{outcome}"',
         )
+        normalized = self._normalize_dialogue_line(line, actor_name=actor_name)
+        self._remember(normalized)
+        return normalized
 
     async def narrate_ending(self, setting: GameSetting, won: bool) -> str:
         fallback = (
             "The crew breaks free into the dark." if won
             else "Time runs out, and the station keeps its prisoners."
         )
-        return await self._say(
+        text = await self._say(
             build_ending_user_prompt(setting, won),
             fallback=fallback,
         )
+        self._remember(text)
+        return text

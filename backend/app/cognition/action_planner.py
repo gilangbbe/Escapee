@@ -51,6 +51,21 @@ class PlannerDecision:
                 return option.action
         return None
 
+    @property
+    def top_score(self) -> float:
+        """Score of the single highest-ranked option (free or not)."""
+        return self.ranked[0].score if self.ranked else 0.0
+
+    def score_of(self, action: GameAction) -> float | None:
+        """Planner score for a specific action, or None if it was not ranked."""
+        from app.cognition.team_cognition import action_signature
+
+        sig = action_signature(action)
+        for option in self.ranked:
+            if action_signature(option.action) == sig:
+                return option.score
+        return None
+
 
 @dataclass
 class ActionPlanner:

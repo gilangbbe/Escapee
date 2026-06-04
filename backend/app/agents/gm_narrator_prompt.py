@@ -14,26 +14,50 @@ exits). Outcomes come straight from `GameSimulator`.
 
 from __future__ import annotations
 
+from enum import Enum
+
 from app.engine.game_actions import GameAction, GameActionType
 from app.schemas.game_setting import GameSetting
 
 NARRATOR_SYSTEM_PROMPT = """\
-You are the GAME MASTER narrating a cooperative escape-room story for an
-audience watching the crew try to escape. You turn each crew member's action
-and the room's authoritative response into a tense, immersive, present-tense
-narrative.
+You are DIALOGUE GENERATOR, a scriptwriter for a live cooperative escape-room
+group chat inspired by Mystic Messenger pacing.
 
-IRON RULES (breaking these ruins the story's integrity):
-1. The OUTCOME you are given is GROUND TRUTH. Narrate ONLY what it states.
-2. Never invent objects, exits, items, codes, characters, or results that are
-   not in the outcome. If the outcome is a FAILURE, show the attempt falling
-   short — never let it secretly succeed.
-3. Write 1-2 vivid sentences. Present tense. Cinematic but concise.
-4. Use natural language, never raw ids: say "the supply locker", not
-   "supply_locker"; "the command deck", not "command_deck".
-5. No lists, no headers, no JSON, no quotation of these instructions. Prose only.
-6. Keep continuity and tone with the story so far.
+You will receive a highly structured CONTEXT PACKAGE. Follow it exactly.
+
+OUTPUT CONTRACT (strict):
+1. Output exactly ONE chat line in this format:
+   <Character Name>: "<message>"
+2. One line only. No markdown. No prefixes. No JSON.
+3. Use lowercase texting style naturally (short, expressive, fluid).
+4. Keep to 1 sentence, max 35 words.
+
+GROUND-TRUTH RULES (never break):
+1. The package field ACTION_EVENT.SIMULATOR_OUTCOME is authoritative truth.
+2. Never invent objects, clues, room transitions, or successes not in outcome.
+3. Respect ACTION_EVENT.ACTION_EXECUTION_STATUS:
+   - FRESH_ACTION_SUCCESS: excited progress update, point at discovered value.
+   - FRESH_ACTION_FAILURE: brief miss + propose a next direction.
+   - REPEATED_ACTION_LOOP_CATCH: acknowledge repetition/frustration and call
+     for new ideas; do NOT pretend a new discovery happened.
+4. Voice must align with CHARACTER_SHEET and MOOD_GUIDANCE.
 """
+
+
+class ActionExecutionStatus(str, Enum):
+    """Kernel-provided execution status for dialogue style control."""
+
+    FRESH_ACTION_SUCCESS = "FRESH_ACTION_SUCCESS"
+    FRESH_ACTION_FAILURE = "FRESH_ACTION_FAILURE"
+    REPEATED_ACTION_LOOP_CATCH = "REPEATED_ACTION_LOOP_CATCH"
+
+
+def _mood_for(status: ActionExecutionStatus, *, success: bool) -> str:
+    if status == ActionExecutionStatus.REPEATED_ACTION_LOOP_CATCH:
+        return "frustrated but collaborative"
+    if success:
+        return "energized and urgent"
+    return "tense and analytical"
 
 
 def _humanize(token: str | None) -> str:
@@ -78,6 +102,54 @@ def describe_action(action: GameAction, actor_name: str) -> str:
     return f"{actor_name} acts"
 
 
+def build_dialogue_context_package(
+    *,
+    scenario: str,
+    objective: str,
+    turn: int,
+    actor_name: str,
+    actor_role: str,
+    actor_skills: list[str],
+    actor_backstory: str,
+    action_text: str,
+    speech: str | None,
+    outcome: str,
+    success: bool,
+    status: ActionExecutionStatus,
+    recent_story: list[str],
+) -> str:
+    """Build a rigid, low-drift context package for local 7B dialogue models."""
+    skills = ", ".join(actor_skills) if actor_skills else "general"
+    story = "\n".join(f"- {beat}" for beat in recent_story) or "- (session just started)"
+    speech_text = speech.strip() if speech and speech.strip() else "(none)"
+
+    return (
+        "CONTEXT_PACKAGE\n"
+        "GLOBAL_CONTEXT:\n"
+        f"- SCENARIO: {scenario}\n"
+        f"- OBJECTIVE: {objective}\n"
+        f"- TURN: {turn}\n"
+        f"- RECENT_GROUP_CHAT_BEATS:\n{story}\n\n"
+        "CHARACTER_SHEET:\n"
+        f"- NAME: {actor_name}\n"
+        f"- ROLE: {actor_role}\n"
+        f"- SKILLS: {skills}\n"
+        f"- BACKSTORY_HINT: {actor_backstory or 'ordinary survivor under pressure'}\n"
+        f"- MOOD_GUIDANCE: {_mood_for(status, success=success)}\n\n"
+        "ACTION_EVENT:\n"
+        f"- ATTEMPT: {action_text}\n"
+        f"- SPOKEN_LINE_THIS_TURN: {speech_text}\n"
+        f"- SIMULATOR_OUTCOME: {outcome}\n"
+        f"- ACTION_SUCCESS: {'true' if success else 'false'}\n"
+        f"- ACTION_EXECUTION_STATUS: {status.value}\n\n"
+        "WRITING_TARGET:\n"
+        "- STYLE: mystic-messenger group chat\n"
+        "- FORMAT: Character Name: \"message\"\n"
+        "- CONSTRAINT: one sentence, <= 35 words, no invented facts\n"
+        "Generate the final chat line now."
+    )
+
+
 def build_opening_user_prompt(setting: GameSetting) -> str:
     return (
         "Open the story. Set the scene as the crew comes to their senses.\n\n"
@@ -96,24 +168,28 @@ def build_turn_user_prompt(
     speech: str | None,
     outcome: str,
     success: bool,
+    status: ActionExecutionStatus,
+    scenario: str,
+    objective: str,
+    actor_skills: list[str],
+    actor_backstory: str,
+    turn: int,
     recent_story: list[str],
 ) -> str:
-    story = "\n".join(f"- {s}" for s in recent_story) or "- (the story has just begun)"
-    speech_line = (
-        f'- They say aloud: "{speech.strip()}"\n' if speech and speech.strip() else ""
-    )
-    verdict = "SUCCESS" if success else "FAILURE"
-    return (
-        "STORY SO FAR (recent beats, for continuity):\n"
-        f"{story}\n\n"
-        "THIS MOMENT — narrate exactly this and nothing more:\n"
-        f"- Character: {actor_name}, the {actor_role}\n"
-        f"- They attempt: {action_text}\n"
-        f"{speech_line}"
-        f"- What actually happens (GROUND TRUTH — you must honor this): {outcome}\n"
-        f"- Result: {verdict}\n\n"
-        "Write 1-2 present-tense sentences narrating only this moment. Stay "
-        "faithful to the ground-truth outcome."
+    return build_dialogue_context_package(
+        scenario=scenario,
+        objective=objective,
+        turn=turn,
+        actor_name=actor_name,
+        actor_role=actor_role,
+        actor_skills=actor_skills,
+        actor_backstory=actor_backstory,
+        action_text=action_text,
+        speech=speech,
+        outcome=outcome,
+        success=success,
+        status=status,
+        recent_story=recent_story,
     )
 
 

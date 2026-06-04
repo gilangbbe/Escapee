@@ -408,7 +408,7 @@ async def test_narration_streams_but_never_enters_message_log(setting: GameSetti
     # Narration reached observers via the stream...
     narration = [e for e in streamed if e.kind == EventKind.NARRATION]
     assert narration, "expected narration events in the stream"
-    assert all(e.text.startswith("STORY#") for e in narration)
+    assert all("STORY#" in e.text for e in narration)
     # ...including an opening (turn 0) and an ending narration.
     assert any(e.turn == 0 for e in narration)
 
@@ -670,7 +670,7 @@ def test_team_plan_refresh_and_render():
     assert len(cog.plan.steps) == 2
     assert all(not s.done for s in cog.plan.steps)
 
-    cog.plan.refresh({"supply_locker"})
+    cog.plan.refresh({"opened:supply_locker"})
     rendered = cog.plan.render()
     assert "[x]" in rendered  # the locker step is now ticked
     assert "[ ]" in rendered  # the access_card step is still open

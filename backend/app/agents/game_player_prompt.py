@@ -58,16 +58,20 @@ AVAILABLE ACTIONS (set "action" to the verb, fill ONLY the fields it needs):
   say        (message)                  - talk only; no world change
 
 HIGH-IMPACT DIRECTIVES:
-1. PROGRESS FIRST: prioritize CURRENT GOAL and STILL-TO-DO using known clues,
-    items, and candidate actions.
-2. PICK A CANDIDATE: prefer one of the CANDIDATE ACTIONS you are given; they are
-   pre-validated as reachable and useful.
-    If you choose an action outside that list, the system will reject it and ask
-    you to decide again.
-3. NO REDUNDANCY: do not repeat solved goals or listed failed actions unless the
+1. FOLLOW THE RECOMMENDATION: if a "⭐ RECOMMENDED NEXT ACTION" is given, DO
+    EXACTLY THAT unless you can state a concrete reason a different CANDIDATE is
+    clearly better. It is computed from the real world state and is almost always
+    the fastest progress.
+2. PROGRESS OVER LOOKING: prefer actions that change the world (take / use /
+    enter_code / set_fuse / move) over inspect/say. Never inspect an object listed
+    under ALREADY EXAMINED — it reveals nothing new.
+3. PICK A CANDIDATE: choose from the CANDIDATE ACTIONS you are given; they are
+    pre-validated as reachable and useful. An action outside that list will be
+    rejected and you will be asked to decide again.
+4. NO REDUNDANCY: do not repeat solved goals or listed failed actions unless the
     world changed.
-4. COORDINATE: share new clues/blockers immediately and critique/support teammate
-    proposals briefly.
+5. COORDINATE: if a teammate is in another room and the next step is there, MOVE
+    to join them (or pass them an item). Share new clues/blockers immediately.
 """
 
 
@@ -121,9 +125,10 @@ def build_player_user_prompt(
         )
     else:
         closing = (
-            "Decide your single best NEW action now. Use CURRENT GOAL + BLOCKERS + "
-            "CANDIDATE ACTIONS. Never redo anything under SOLVED; if blocked, pick a "
-            "different candidate that increases information or unlocks state. Respond "
+            "Decide your single best NEW action now. If a ⭐ RECOMMENDED NEXT ACTION "
+            "is shown, execute exactly that (you may voice a short reaction in "
+            "\"speak\"); otherwise pick the highest-progress CANDIDATE. Never redo "
+            "anything under SOLVED or re-inspect an ALREADY EXAMINED object. Respond "
             "with ONLY the JSON object."
         )
     return (

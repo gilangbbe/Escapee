@@ -1,0 +1,216 @@
+{
+  "world": {
+    "scenario": "Deep undercover agent Alex has infiltrated a high-security data center but is trapped in the outer lobby. The path to the core server room involves decoding a safe, retrieving a decryption tool hidden behind a false wall, and finally bypassing a biometric lock on the main door.",
+    "objective": "Retrieve the Master Decryption Key from Room 4 to unlock the final containment unit.",
+    "rooms": [
+      {
+        "id": "room_1",
+        "description": "A sterile lobby with a reinforced steel door leading deeper into the facility. A heavy safe sits against the far wall, and a discarded datapad lies on the floor nearby.",
+        "adjacency": {
+          "east": "room_2"
+        },
+        "goal": "Get steel_safe_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "steel_safe_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "steel_safe_door",
+          "discarded_datapad_1"
+        ]
+      },
+      {
+        "id": "room_2",
+        "description": "A narrow corridor lined with server racks. A locked drawer sits on a maintenance cart, and a flickering fluorescent light hangs from the ceiling. A heavy steel door blocks the way forward.",
+        "adjacency": {
+          "west": "room_1",
+          "east": "room_3"
+        },
+        "goal": "Find and take circuit_breaker_tool.",
+        "goal_completion": {
+          "type": "has_item",
+          "object_id": "circuit_breaker_tool"
+        },
+        "key_objects": [
+          "circuit_breaker_tool",
+          "flickering_light_fixture"
+        ]
+      },
+      {
+        "id": "room_3",
+        "description": "A large open server room with rows of humming machines. A massive blast door seals the exit to the control room, and a small vent grate is welded shut near the floor.",
+        "adjacency": {
+          "west": "room_2",
+          "east": "room_4"
+        },
+        "goal": "Bring the sekring_MAIN_ON power line online.",
+        "goal_completion": {
+          "type": "power_active",
+          "id": "sekring_MAIN_ON"
+        },
+        "key_objects": [
+          "server_main_console"
+        ]
+      },
+      {
+        "id": "room_4",
+        "description": "The final control room containing the Master Decryption Key in a secure container. A blast door leads back to the previous area, and two suspicious technicians are standing nearby.",
+        "adjacency": {
+          "west": "room_3"
+        },
+        "goal": "Get final_container_lock into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "final_container_lock",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "final_container_lock"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "discarded_datapad_1",
+        "location": "room_1",
+        "description": "A crumpled datapad left by a previous agent.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "safe_code_892",
+        "scenic": false
+      },
+      {
+        "id": "steel_safe_door",
+        "location": "room_1",
+        "description": "The front door of the heavy safe.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "892",
+        "code_digits": 3,
+        "scenic": false
+      },
+      {
+        "id": "circuit_breaker_tool",
+        "location": "room_2",
+        "description": "A specialized breaker tool found inside the maintenance drawer.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "requires_code": "441",
+        "code_digits": 3,
+        "scenic": false
+      },
+      {
+        "id": "flickering_light_fixture",
+        "location": "room_2",
+        "description": "A buzzing fluorescent light tube.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "server_main_console",
+        "location": "room_3",
+        "description": "The central hub controlling the room's power systems.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "fuses": {
+          "MAIN": "OFF"
+        },
+        "scenic": true
+      },
+      {
+        "id": "security_override_key",
+        "location": "room_3",
+        "description": "A key found behind the vent once accessed.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "final_container_lock",
+        "location": "room_4",
+        "description": "The secure lock holding the Master Decryption Key.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "330",
+        "scenic": false
+      },
+      {
+        "id": "decoy_note_room1",
+        "location": "room_1",
+        "description": "A crumpled piece of paper on the floor.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "decoy_drawer_room1",
+        "location": "room_1",
+        "description": "A small desk drawer that appears empty.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "decoy_note_room2",
+        "location": "room_2",
+        "description": "A handwritten note taped to a wall.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "441",
+        "scenic": true
+      },
+      {
+        "id": "decoy_safe_room3",
+        "location": "room_3",
+        "description": "An old safe in the corner of the room.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "decoy_note_room4",
+        "location": "room_4",
+        "description": "A mission briefing summary.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "330",
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Accessing room 2 requires unlocking the steel safe in room 1.",
+      "Accessing room 3 requires having the circuit breaker tool from room 2.",
+      "Accessing room 4 requires disabling the power grid via the server console in room 3.",
+      "Winning requires unlocking the final container in room 4."
+    ],
+    "solution_path": [
+      "1. Take discarded_datapad_1 from room_1 to reveal the object.",
+      "2. Enter code the hidden code on steel_safe_door in room_1 to unlock it and access the object.",
+      "3. Pass through the unlocked door to reach room_2.",
+      "4. Take circuit_breaker_tool from the object (code the hidden code) in room_2.",
+      "5. Use circuit_breaker_tool on the object in room_3 to reveal security_override_key.",
+      "6. Take security_override_key and use it on server_main_console to disable the object.",
+      "7. Power is off, allowing access to the object in room_3 (gate opens).",
+      "8. Enter room_4 and solve final_container_lock with code the hidden code.",
+      "9. Unlock the object to win."
+    ],
+    "win_condition": {
+      "object_id": "final_container_lock",
+      "state": "unlocked"
+    }
+  }
+}

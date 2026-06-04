@@ -1,0 +1,241 @@
+{
+  "world": {
+    "scenario": "You are a prisoner in the deep underground cells of Sector 4, woken by alarms and guards closing off all exits. To escape, you must navigate a series of locked chambers: first bypassing your own cell's electronic lock, then stealing a keycard from the guard station, using that card to unlock the heavy blast doors of the transport tunnel, and finally retrieving the master escape key from the vault beyond.",
+    "objective": "Escape the prison by unlocking four sequential rooms in order, acquiring specific tools and information at each step to progress toward the final exit.",
+    "rooms": [
+      {
+        "id": "room_1",
+        "description": "A grim concrete cell with a heavy steel door sealed by an electronic keypad. A guard station desk sits against the far wall, cluttered with files and equipment.",
+        "adjacency": {
+          "east": "room_2"
+        },
+        "goal": "Get steel_door_1 into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "steel_door_1",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "clue_card_note",
+          "prison_keycard_01"
+        ]
+      },
+      {
+        "id": "room_2",
+        "description": "A narrow hallway lined with metal crates and a security desk. A heavy blast door blocks the path forward, secured by an electronic lock requiring a keycard.",
+        "adjacency": {
+          "west": "room_1",
+          "east": "room_3"
+        },
+        "goal": "Get blast_door_main into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "blast_door_main",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "prison_keycard_01"
+        ]
+      },
+      {
+        "id": "room_3",
+        "description": "A long transport tunnel with conveyor belts and steam pipes. A massive ventilation grate blocks the exit, requiring a specific wrench to pry open.",
+        "adjacency": {
+          "west": "room_2",
+          "east": "room_4"
+        },
+        "goal": "Get vent_grate_big into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "vent_grate_big",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "industrial_hammer",
+          "dampener_circuit"
+        ]
+      },
+      {
+        "id": "room_4",
+        "description": "A secure vault room with a reinforced steel door. Inside sits a locked briefcase containing the master escape key needed to open the final exit.",
+        "adjacency": {
+          "west": "room_3"
+        },
+        "goal": "Get master_key_lock into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "master_key_lock",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "dampener_circuit",
+          "master_key_lock"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "clue_card_note",
+        "location": "room_1",
+        "description": "A folded card found on the guard desk.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "card_code_99",
+        "scenic": false
+      },
+      {
+        "id": "prison_keycard_01",
+        "location": "room_1",
+        "description": "A standard access card labeled 'Cell Access Level 1'.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "steel_door_1",
+        "location": "room_1",
+        "description": "The heavy steel door leading to the corridor.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "99",
+        "code_digits": 2,
+        "scenic": false
+      },
+      {
+        "id": "dusty_shelf_room1",
+        "location": "room_1",
+        "description": "A sagging wooden shelf lined with forgotten paperbacks.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "guard_desk_chaotic",
+        "location": "room_1",
+        "description": "A messy security desk covered in papers and electronics.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "concrete_floor_1",
+        "location": "room_1",
+        "description": "Cold, stained concrete floor of the cell.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "blast_door_main",
+        "location": "room_2",
+        "description": "A massive blast door blocking the transport tunnel.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "prison_keycard_01",
+        "scenic": false
+      },
+      {
+        "id": "metal_crates_stack",
+        "location": "room_2",
+        "description": "A stack of metal storage crates blocking the view.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "industrial_hammer",
+        "location": "room_3",
+        "description": "A heavy industrial hammer used for maintenance.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "dampener_circuit",
+        "location": "room_3",
+        "description": "A small circuit board labeled 'Dampener v2'.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "hammer_code_alpha",
+        "scenic": false
+      },
+      {
+        "id": "vent_grate_big",
+        "location": "room_3",
+        "description": "A large ventilation grate sealed with bolts.",
+        "state": "locked_bolt",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "industrial_hammer",
+        "scenic": false
+      },
+      {
+        "id": "steam_pipes_wall",
+        "location": "room_3",
+        "description": "Rusty steam pipes running along the wall.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "conveyor_belt_rust",
+        "location": "room_3",
+        "description": "A slow-moving rusty conveyor belt.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "master_key_lock",
+        "location": "room_4",
+        "description": "A heavy briefcase locked inside the vault.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "dampener_circuit",
+        "scenic": false
+      },
+      {
+        "id": "escape_key_final",
+        "location": "room_4",
+        "description": "The master key hidden inside the briefcase.",
+        "state": "hidden",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      }
+    ],
+    "rules": [
+      "To progress from room 1 to 2, you must unlock the steel_door_1 using a code found in room 1.",
+      "To progress from room 2 to 3, you must unlock blast_door_main using the prison_keycard_01 obtained in room 1.",
+      "To progress from room 3 to 4, you must unlock vent_grate_big using the industrial_hammer whose location is revealed by reading the tunnel_blueprint.",
+      "To win, you must unlock master_key_lock in room 4 using the dampener_circuit to reveal the escape key, then retrieve the key."
+    ],
+    "solution_path": [
+      "1. Examine clue_card_note in room_1 to find code 'the hidden code'.",
+      "2. Enter code the hidden code on steel_door_1 to unlock it and exit to room_2.",
+      "3. Pick up prison_keycard_01 from room_1 (carried into room_2) and use it to unlock blast_door_main.",
+      "4. Examine the object in room_2 to find info 'the object' which reveals the hidden industrial_hammer.",
+      "5. Take industrial_hammer from room_3 and use it to unlock vent_grate_big, exiting to room_4.",
+      "6. Examine dampener_circuit in room_4 to find code 'alpha'.",
+      "7. Enter code alpha on the object to open the briefcase (master_key_lock).",
+      "8. Retrieve escape_key_final to win."
+    ],
+    "win_condition": {
+      "object_id": "master_key_lock",
+      "state": "unlocked"
+    }
+  }
+}

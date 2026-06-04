@@ -34,6 +34,8 @@ class GameState:
 
     accessible_rooms: set[str] = field(default_factory=set)
     power_flags: set[str] = field(default_factory=set)
+    # Internal derived predicates used by fixed-world room-goal gates.
+    condition_flags: set[str] = field(default_factory=set)
     fuse_state: dict[str, dict[str, str]] = field(default_factory=dict)
 
     # Power sources whose use/tool requirement has been satisfied.
@@ -140,6 +142,10 @@ class GameState:
         room = self.player_locations.get(player_id)
         out: list[str] = []
         for obj in self.setting.objects:
+            # Pure connectors (synthetic gates / passages) are shown to players
+            # as EXITS, not as inspectable objects — keep them out of the list.
+            if obj.connects_to is not None and not obj.interactable:
+                continue
             if self.room_of(obj.id) == room and self.is_visible_to(obj.id, player_id):
                 out.append(obj.id)
         return out
@@ -174,6 +180,28 @@ class GameState:
                 flags.add(obj.provides_power)
         self.power_flags = flags
 
+        # Build a superset of boolean predicates that can be used by synthetic
+        # progression gates (has_item / object_state / known_info / power_active).
+        conditions = set(flags)
+        for info in self.discovered_info:
+            conditions.add(f"known_info_{info}")
+
+        for inv in self.player_inventories.values():
+            for item_id in inv:
+                conditions.add(f"has_item_{item_id}")
+
+        for obj_id, st in self.object_state.items():
+            if st is None:
+                continue
+            conditions.add(f"state_{obj_id}_{st.value}")
+            # Treat open/unlocked as equivalent for progression predicates.
+            if st == ObjectState.OPEN:
+                conditions.add(f"state_{obj_id}_{ObjectState.UNLOCKED.value}")
+            elif st == ObjectState.UNLOCKED:
+                conditions.add(f"state_{obj_id}_{ObjectState.OPEN.value}")
+
+        self.condition_flags = conditions
+
     def apply_power_to_consumers(self) -> list[str]:
         """Auto-open any LOCKED object whose requires_power flag is now active.
 
@@ -183,7 +211,7 @@ class GameState:
         for obj in self.setting.objects:
             if (
                 obj.requires_power
-                and obj.requires_power in self.power_flags
+                and obj.requires_power in self.condition_flags
                 and self.object_state.get(obj.id) in (ObjectState.LOCKED, ObjectState.LOCKED_BOLT)
             ):
                 self.object_state[obj.id] = ObjectState.UNLOCKED

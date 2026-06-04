@@ -30,11 +30,12 @@ from typing import Awaitable, Callable, Optional
 
 from app.agents.game_player_agent import GamePlayerAgent
 from app.agents.gm_narrator import GameMasterNarrator
-from app.agents.gm_narrator_prompt import describe_action
+from app.agents.gm_narrator_prompt import ActionExecutionStatus, describe_action
 from app.cognition.team_cognition import (
     CognitionConfig,
     TeamCognition,
     action_signature,
+    describe_action_brief,
     world_fingerprint,
 )
 from app.cognition.action_planner import ActionPlanner
@@ -47,6 +48,10 @@ from app.schemas.game_setting import GameSetting
 # An optional sink for streaming events (e.g. a WebSocket broadcaster in Phase 5).
 EventSink = Callable[[Event], Awaitable[None]]
 _FREE_ACTIONS = {GameActionType.SAY, GameActionType.LOOK}
+# Minimum planner-score advantage of the best action over a chosen MOVE before
+# the movement progress gate intervenes. Large so only clear wandering (walking
+# away from a high-value next step) is corrected, not normal forward exploration.
+_MOVE_GATE_GAP = 30.0
 
 
 @dataclass
@@ -207,6 +212,7 @@ class GameOrchestrator:
 
         world_key = world_fingerprint(self.sim.state)
         plan = None
+        recommended = ""
         if self.enable_planner_tool:
             planning_brief = self.cognition.brief_for(
                 pid,
@@ -222,6 +228,12 @@ class GameOrchestrator:
                 current_goal=planning_brief.current_goal,
                 next_plan_step=planning_brief.next_plan_step,
             )
+            # Surface the planner's single best move to the agent as an explicit
+            # recommendation, so the 7B model defaults to executing it.
+            if plan.best_progress_action is not None:
+                recommended = describe_action_brief(plan.best_progress_action)
+            elif plan.best_action is not None:
+                recommended = describe_action_brief(plan.best_action)
             # Always stream planner advice so observers can compare it with the
             # eventual executed action in the same turn.
             await self._emit_planner_trace(
@@ -246,6 +258,7 @@ class GameOrchestrator:
                 reflect=reflect,
                 blocked_note=blocked_note,
                 critical_note=critical_note,
+                recommended_action=recommended,
             )
             result = await agent.decide(
                 self.sim.state,
@@ -410,6 +423,58 @@ class GameOrchestrator:
                     turn=self.sim.state.turn,
                 )
                 continue
+            # Movement progress gate (narrow): the agent chose to walk to a room
+            # while the deterministic planner has a much higher-value action
+            # available (typically: go to the room where the next puzzle can be
+            # solved, or solve it). Weak local models wander between explored
+            # rooms here. We re-prompt once, then override the wandering move on
+            # the final attempt. Scoped to MOVE only so it never interferes with
+            # the agent's puzzle-action choices (take/use/enter_code/inspect).
+            if (
+                self.enable_planner_tool
+                and plan is not None
+                and candidate.action.action == GameActionType.MOVE
+                and plan.best_progress_action is not None
+                and action_signature(plan.best_progress_action)
+                != action_signature(candidate.action)
+            ):
+                chosen_score = plan.score_of(candidate.action)
+                chosen_value = chosen_score if chosen_score is not None else 0.0
+                if plan.top_score - chosen_value >= _MOVE_GATE_GAP:
+                    blocked_note = (
+                        "BETTER MOVE AVAILABLE: the team planner has a much "
+                        "higher-value action — "
+                        f"{describe_action_brief(plan.best_progress_action)}. "
+                        "Do that instead of wandering, unless you can state a "
+                        "concrete reason it is wrong."
+                    )
+                    if attempt < self.max_redecide:
+                        await self._emit(
+                            EventKind.SYSTEM,
+                            pid,
+                            f"(move gate) {blocked_note}",
+                            turn=self.sim.state.turn,
+                        )
+                        continue
+                    turn = candidate.model_copy(deep=True)
+                    turn.action = plan.best_progress_action
+                    await self._emit_planner_trace(
+                        pid,
+                        plan,
+                        self.sim.state.turn,
+                        chosen=turn.action,
+                        reason="move_gate_override",
+                    )
+                    await self._emit(
+                        EventKind.SYSTEM,
+                        pid,
+                        (
+                            "(planner override) low-value wander; "
+                            f"executing {action_signature(turn.action)}"
+                        ),
+                        turn=self.sim.state.turn,
+                    )
+                    break
             turn = candidate
             break
 
@@ -459,6 +524,10 @@ class GameOrchestrator:
 
         # 4. Apply the validated action to ground truth.
         world_key = world_fingerprint(self.sim.state)
+        was_repeated_action = self.cognition.is_redundant(pid, turn.action, world_key)
+        was_already_done = (
+            self.cognition.already_done(pid, turn.action, self.sim.state) is not None
+        )
         obs = self.sim.step(pid, turn.action)
 
         # 5. Record the grounded observation (+ any non-spoiler hint).
@@ -478,13 +547,25 @@ class GameOrchestrator:
 
         # 7. GM narration of this beat (observer-only; never fed back to agents).
         if self.narrator is not None:
+            if was_repeated_action or was_already_done:
+                execution_status = ActionExecutionStatus.REPEATED_ACTION_LOOP_CATCH
+            elif obs.success:
+                execution_status = ActionExecutionStatus.FRESH_ACTION_SUCCESS
+            else:
+                execution_status = ActionExecutionStatus.FRESH_ACTION_FAILURE
             prose = await self.narrator.narrate_turn(
+                scenario=self.setting.scenario,
+                objective=self.setting.objective,
+                turn=self.sim.state.turn,
                 actor_name=agent.persona.name,
                 actor_role=agent.persona.role,
+                actor_skills=list(agent.persona.skills),
+                actor_backstory=agent.persona.backstory,
                 action_text=describe_action(turn.action, agent.persona.name),
                 speech=turn.speak,
                 outcome=obs.message,
                 success=obs.success,
+                status=execution_status,
             )
             await self._emit(
                 EventKind.NARRATION,
@@ -492,6 +573,7 @@ class GameOrchestrator:
                 prose,
                 turn=self.sim.state.turn,
                 record=False,
+                data={"action_execution_status": execution_status.value},
             )
 
         return obs.game_won

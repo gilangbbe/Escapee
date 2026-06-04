@@ -1,0 +1,251 @@
+{
+  "world": {
+    "scenario": "You have been captured by the Obsidian Guard and imprisoned in Block A's solitary confinement cell. The only way out is to bypass four security layers: disarm your cell door, hack the corridor safe, breach the heavy blast doors of the control room, and finally override the main power grid to escape through the emergency chute.",
+    "objective": "Navigate the prison from Cell to Control Room to Power Core and Escape Chute by solving a chain of mechanical and digital puzzles.",
+    "rooms": [
+      {
+        "id": "room_1",
+        "description": "A damp, narrow solitary confinement cell. The heavy iron door is barred shut. A small desk holds your personal effects. A rusted ventilation grate sits above the toilet.",
+        "adjacency": {
+          "north": "room_2"
+        },
+        "goal": "Get cell_door_main into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "cell_door_main",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "rusty_knife_hole"
+        ]
+      },
+      {
+        "id": "room_2",
+        "description": "The main corridor is lit by flickering fluorescent lights. A digital keypad safe blocks the path to the next cell block. To the left, a maintenance closet door stands slightly ajar. To the right, a fire extinguisher hangs on the wall.",
+        "adjacency": {
+          "south": "room_1",
+          "east": "room_3"
+        },
+        "goal": "Get corridor_safe into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "corridor_safe",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "fire_extinguisher",
+          "maintenance_clue_tag"
+        ]
+      },
+      {
+        "id": "room_3",
+        "description": "The Control Room. A massive steel blast door separates you from the outer world. On the wall is a fuse panel with several switches labeled 'PUMP', 'LIGHTS', and 'DOOR_OVERRIDE'. A heavy wrench rests on a workbench.",
+        "adjacency": {
+          "west": "room_2",
+          "east": "room_4"
+        },
+        "goal": "Get blast_doors into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "blast_doors",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "industrial_wrench",
+          "fuse_panel_overview"
+        ]
+      },
+      {
+        "id": "room_4",
+        "description": "The Power Core. The emergency escape chute is locked tight, requiring a manual override code to open. A terminal displays the current grid status: 'GRID_LOCKED'. A small box of spare fuses sits nearby.",
+        "adjacency": {
+          "west": "room_3"
+        },
+        "goal": "Get emergency_chute into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "emergency_chute",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "fuse_box"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "cell_door_main",
+        "location": "room_1",
+        "description": "The heavy iron door of the solitary cell.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "rusty_knife_hole",
+        "scenic": false
+      },
+      {
+        "id": "rusty_knife_hole",
+        "location": "room_1",
+        "description": "A jagged piece of metal torn from a guard's belt.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "tool_rusty_knife",
+        "scenic": false
+      },
+      {
+        "id": "corridor_safe",
+        "location": "room_2",
+        "description": "A digital keypad safe blocking the corridor.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "849",
+        "code_digits": 3,
+        "scenic": false
+      },
+      {
+        "id": "fire_extinguisher",
+        "location": "room_2",
+        "description": "A standard red fire extinguisher.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "tool_fire_hose",
+        "scenic": false
+      },
+      {
+        "id": "maintenance_clue_tag",
+        "location": "room_2",
+        "description": "A small tag stuck to the fire extinguisher.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "code_fuse_seq",
+        "scenic": false
+      },
+      {
+        "id": "blast_doors",
+        "location": "room_3",
+        "description": "The massive steel blast doors leading to the outer world.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "industrial_wrench",
+        "scenic": false
+      },
+      {
+        "id": "industrial_wrench",
+        "location": "room_3",
+        "description": "A heavy-duty wrench found in the control room.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "fuse_pattern_A",
+        "scenic": false
+      },
+      {
+        "id": "fuse_panel_overview",
+        "location": "room_3",
+        "description": "A diagram showing the sequence of fuses to activate.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "sequence_A_B_C",
+        "scenic": false
+      },
+      {
+        "id": "grid_power_state",
+        "location": "room_3",
+        "description": "The current state of the prison power grid.",
+        "state": "locked",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "emergency_chute",
+        "location": "room_4",
+        "description": "The emergency escape chute.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "ABC",
+        "scenic": false
+      },
+      {
+        "id": "fuse_box",
+        "location": "room_4",
+        "description": "A box containing spare fuses.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "code_ABC",
+        "scenic": false
+      },
+      {
+        "id": "dusty_furniture_set",
+        "location": "room_1",
+        "description": "A pile of dusty chairs and tables.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "corridor_furniture",
+        "location": "room_2",
+        "description": "Empty benches and lockers.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "849",
+        "scenic": true
+      },
+      {
+        "id": "control_room_clutter",
+        "location": "room_3",
+        "description": "Wires and cables everywhere.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "core_furnishing",
+        "location": "room_4",
+        "description": "Metal grating and pipes.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Every object requires_code must be satisfied by a contains_info token from an upstream taken object.",
+      "Every tool chain must start with a visible or unlocked takeable object.",
+      "No circular dependencies exist between tools and locks.",
+      "Goal completion in each room is the sole prerequisite to access the next room."
+    ],
+    "solution_path": [
+      "1. Examine rusty_knife_hole in room_1 to get info 'the object'.",
+      "2. Use the object on the object in room_1 (locked) -> unlocks it and reveals the object.",
+      "3. Retrieve the object from the object.",
+      "4. Enter code the hidden code into corridor_safe in room_2 -> unlocks it.",
+      "5. Examine fire_extinguisher in room_2 to get info 'the object'.",
+      "6. Use the object on maintenance_clue_tag in room_2 (hidden behind extinguisher) -> reveals the object.",
+      "7. Retrieve the object from maintenance_clue_tag.",
+      "8. Examine fuse_panel_overview in room_3 to get info 'sequence_A_B_C'.",
+      "9. Use the object on the object in room_3 (locked) -> unlocks it.",
+      "10. Enter code sequence_A_B_C into the object -> triggers blast_doors unlock.",
+      "11. Retrieve info 'sequence_A_B_C' from fuse_panel_overview (consumed by previous step).",
+      "12. Use industrial_wrench on blast_doors in room_3 (locked) -> unlocks them.",
+      "13. Retrieve info 'code_the hidden code' from fuse_box in room_4.",
+      "14. Enter code the hidden code into emergency_chute in room_4 -> unlocks it."
+    ],
+    "win_condition": {
+      "object_id": "emergency_chute",
+      "state": "unlocked"
+    }
+  }
+}

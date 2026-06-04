@@ -53,6 +53,9 @@ class TeamBrief:
     ownership: list[str] = field(default_factory=list)         # explicit task ownership
     team_memory: list[str] = field(default_factory=list)       # concise deterministic memory
     candidate_actions: list[str] = field(default_factory=list) # valid/reachable next actions
+    recommended_action: str = ""            # planner's single best next action
+    already_examined: list[str] = field(default_factory=list)  # objects already inspected
+    teammate_locations: list[str] = field(default_factory=list) # where teammates are
     next_plan_step: str = ""                # next open step from shared debated plan
     functional_role: str = ""              # explorer | solver | critic
     critical_note: str | None = None        # orchestrator-injected anti-loop warning
@@ -78,6 +81,14 @@ class TeamBrief:
             sections.append(f"🚨 CRITICAL: {self.critical_note}\n")
         if self.blocked_note:
             sections.append(f"⛔ {self.blocked_note}\n")
+        # The deterministic planner's single best move — surfaced FIRST so the 7B
+        # model defaults to executing it instead of drifting into low-value inspects.
+        if self.recommended_action:
+            sections.append(
+                "⭐ RECOMMENDED NEXT ACTION (computed by the team's planner — do THIS "
+                "unless you have a concrete, stated reason to do something better):\n"
+                f"  → {self.recommended_action}\n"
+            )
         if self.stuck:
             sections.append(
                 "⚠ THE TEAM IS STUCK. Stop repeating actions. Explore an untried "
@@ -95,12 +106,22 @@ class TeamBrief:
             f"BLOCKERS:\n{blockers}"
         )
         sections.append(f"TEAM MEMORY (confirmed facts only):\n{memory}")
+        if self.teammate_locations:
+            sections.append(
+                "TEAMMATE LOCATIONS:\n"
+                + "\n".join(f"- {t}" for t in self.teammate_locations)
+            )
         if self.next_plan_step:
             sections.append(f"NEXT SHARED PLAN STEP:\n- {self.next_plan_step}")
         if self.functional_role:
             sections.append(f"FUNCTIONAL ROLE THIS TURN: {self.functional_role}")
         sections.append(f"ACTIVE OWNERSHIP:\n{owners}")
         sections.append(f"CANDIDATE ACTIONS (valid/reachable/progress-biased):\n{actions}")
+        if self.already_examined:
+            sections.append(
+                "ALREADY EXAMINED (inspecting these again reveals NOTHING new — do not):\n"
+                + ", ".join(self.already_examined)
+            )
         sections.append(
             "OBJECTIVE BOARD:\n"
             f"✅ SOLVED (already done — NEVER redo): {solved}\n"
@@ -128,15 +149,23 @@ class GameStateView:
     inventory: list[str]                    # object ids held
     exits: list[tuple[str, str, bool]]      # (door_id, to_room, is_open)
     other_players_here: list[str]
+    exit_hints: dict[str, str] = field(default_factory=dict)  # to_room -> unlock hint
 
     def render(self) -> str:
         objs = ", ".join(f"[{o}]" for o in self.visible_objects) or "nothing notable"
         inv = ", ".join(f"[{i}]" for i in self.inventory) or "empty-handed"
         if self.exits:
-            exit_str = ", ".join(
-                f"{to} via [{door}] ({'open' if op else 'locked'})"
-                for door, to, op in self.exits
-            )
+            parts = []
+            for door, to, op in self.exits:
+                if op:
+                    parts.append(f"{to} (open)")
+                else:
+                    hint = self.exit_hints.get(to)
+                    if hint:
+                        parts.append(f"{to} (LOCKED — opens when {hint})")
+                    else:
+                        parts.append(f"{to} (locked)")
+            exit_str = ", ".join(parts)
         else:
             exit_str = "none"
         others = ", ".join(self.other_players_here) or "you are alone"
@@ -149,12 +178,41 @@ class GameStateView:
         )
 
 
+def _humanize_exit_condition(flag: str) -> str:
+    """Translate a gate's requirement flag into a short player-facing hint.
+
+    Mirrors the derived ``condition_flags`` produced by ``GameState`` so the
+    player is told exactly which puzzle opens a locked passage.
+    """
+    if flag.startswith("state_") and flag.endswith("_unlocked"):
+        return f"{flag[len('state_'):-len('_unlocked')]} is unlocked"
+    if flag.startswith("state_") and flag.endswith("_open"):
+        return f"{flag[len('state_'):-len('_open')]} is open"
+    if flag.startswith("has_item_"):
+        return f"someone is holding {flag[len('has_item_'):]}"
+    if flag.startswith("known_info_"):
+        return f"the clue '{flag[len('known_info_'):]}' is discovered"
+    if flag.startswith("sekring_") and flag.endswith("_ON"):
+        return f"power line {flag[len('sekring_'):-len('_ON')]} is switched ON"
+    return f"the requirement '{flag}' is met"
+
+
 def build_game_state_view(state: GameState, player_id: str) -> GameStateView:
     """Derive the current grounded state view for one player from GameState."""
     room_id = state.player_locations[player_id]
     visible = state.visible_objects_for(player_id)
     inventory = list(state.player_inventories.get(player_id, []))
     exits = state.exits_for(player_id)
+
+    # For each locked exit, surface the precise unlock condition (if any) so the
+    # 7B model can connect "solve this puzzle" -> "this passage opens".
+    exit_hints: dict[str, str] = {}
+    for door_id, to_room, is_open in exits:
+        if is_open:
+            continue
+        door = state.obj(door_id)
+        if door is not None and door.requires_power:
+            exit_hints[to_room] = _humanize_exit_condition(door.requires_power)
 
     others = [
         _player_name(state, pid)
@@ -169,6 +227,7 @@ def build_game_state_view(state: GameState, player_id: str) -> GameStateView:
         inventory=inventory,
         exits=exits,
         other_players_here=others,
+        exit_hints=exit_hints,
     )
 
 

@@ -1,0 +1,202 @@
+{
+  "world": {
+    "scenario": "You have been captured by the 'Order of the Silent Tide' and thrown into their inner sanctum, a series of four sealed chambers leading to the vault where their deepest secrets are kept. The air grows colder with each room, the walls covered in nautical charts, locked chests, and cryptic graffiti that hints at a ritualistic puzzle designed to break your spirit before revealing the treasure.",
+    "objective": "Navigate through the four interconnected pirate rooms by solving a chain of five dependent puzzles to unlock the final vault door and claim the artifact within.",
+    "rooms": [
+      {
+        "id": "room_1",
+        "description": "A grimy entry cell with rusted bars, a heavy iron safe bolted to the wall, and a crate of supplies in the corner. A map lies on the floor near the door.",
+        "adjacency": {
+          "south": "room_2"
+        },
+        "goal": "Unlock the iron safe to reveal the next stage's clue.",
+        "key_objects": [
+          "captains_log_torn"
+        ]
+      },
+      {
+        "id": "room_2",
+        "description": "A cluttered captain's quarters with a locked journal, a broken lantern hanging from the ceiling, and a wooden chest on a pedestal. The door behind you is sealed shut.",
+        "adjacency": {
+          "north": "room_1",
+          "east": "room_3"
+        },
+        "goal": "Bring the sekring_LANT_ON power line online.",
+        "goal_completion": {
+          "type": "power_active",
+          "id": "sekring_LANT_ON"
+        },
+        "key_objects": []
+      },
+      {
+        "id": "room_3",
+        "description": "A dimly lit torture chamber with a swinging noose, a table covered in bloody instruments, and a locked iron door leading forward. A cryptic cipher is carved into the floorboards.",
+        "adjacency": {
+          "west": "room_2",
+          "east": "room_4"
+        },
+        "goal": "Input the deciphered code to open the heavy iron door.",
+        "key_objects": []
+      },
+      {
+        "id": "room_4",
+        "description": "The final vault. A massive double door stands slightly ajar, revealing a glowing artifact inside the dark room. The mechanism requires a specific tool to swing open.",
+        "adjacency": {
+          "west": "room_3"
+        },
+        "goal": "Get vault_doors into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "vault_doors",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "vault_doors",
+          "master_key_spike"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "captains_log_torn",
+        "location": "room_1",
+        "description": "A tattered piece of logbook paper found on the floor.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "log_entry_part_a",
+        "scenic": false
+      },
+      {
+        "id": "dusty_shelf",
+        "location": "room_1",
+        "description": "A sagging wooden shelf lined with forgotten paperbacks and dust.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "crate_supplies",
+        "location": "room_1",
+        "description": "A rough wooden crate filled with rope and old bread.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "rusty_chain",
+        "location": "room_1",
+        "description": "A heavy chain hanging from the ceiling above the door.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "broken_locket",
+        "location": "room_2",
+        "description": "A broken silver locket lying on the floor.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": true,
+        "scenic": true
+      },
+      {
+        "id": "candle_holder",
+        "location": "room_2",
+        "description": "A decorative holder for candles on the wall.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "fuses": {
+          "LANT": "OFF"
+        },
+        "scenic": true
+      },
+      {
+        "id": "torture_table",
+        "location": "room_3",
+        "description": "A scarred table with a bloody knife on it.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "swinging_noose",
+        "location": "room_3",
+        "description": "A rope hanging ominously from the rafters.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "master_key_spike",
+        "location": "room_4",
+        "description": "A hidden key mechanism disguised as a wall spike.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "vault_doors",
+        "location": "room_4",
+        "description": "The final vault doors leading to the treasure.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "master_key_spike",
+        "scenic": false
+      },
+      {
+        "id": "decoy_map_1",
+        "location": "room_2",
+        "description": "A rolled up map of the Caribbean sea.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": true
+      },
+      {
+        "id": "decoy_bottle_1",
+        "location": "room_3",
+        "description": "A crumpled glass bottle lying on the floor.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": true
+      },
+      {
+        "id": "decoy_mirror_1",
+        "location": "room_4",
+        "description": "A cracked mirror leaning against the wall.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "To progress from room_1 to room_2, you must unlock the iron_safe. The code is found on captains_log_torn.",
+      "To progress from room_2 to room_3, you must reassemble the logbook to reveal the safe combination inside room_2, which powers the lantern, revealing hidden info in room_2 that leads to the next door code.",
+      "To progress from room_3 to room_4, you must decipher the cipher_floorboard to get the code for iron_door_3.",
+      "To win in room_4, you must find the master_key_spike (hidden behind info from room_3) and use it to unlock the vault_doors."
+    ],
+    "solution_path": [
+      "1. Examine captains_log_torn in room_1 to reveal log_entry_part_a, then use that info to unlock the iron_safe.",
+      "2. Once the safe is open, read the new clue inside it (safe_combination_452), take it, and use it to power the lantern in room_2.",
+      "3. With the lantern powered, examine the newly illuminated area or a previously hidden note to find the info 'door_code_918' which is required for room_3.",
+      "4. Use the code 918 derived from the previous clue to unlock the iron_door_3 in room_3.",
+      "5. After entering room_4, examine the wall or a specific object to find the info 'key_location_spike', which reveals the hidden master_key_spike.",
+      "6. Use the master_key_spike tool to unlock the vault_doors and complete the escape."
+    ],
+    "win_condition": {
+      "object_id": "vault_doors",
+      "state": "unlocked"
+    }
+  }
+}

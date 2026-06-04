@@ -5,12 +5,14 @@ from __future__ import annotations
 import json
 import os
 
+from app.engine.game_actions import GameAction, GameActionType
+from app.engine.game_simulator import GameSimulator
 from app.game.orbital_decay_setting import ORBITAL_DECAY_SETTING
 from app.schemas.fixed_world import load_setting_compat
 
 
 FIXED_WORLD_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "app", "game", "world_010.json"
+    os.path.dirname(__file__), "..", "app", "game", "world_013.json"
 )
 
 
@@ -74,10 +76,82 @@ def test_fixed_world_envelope_converts_to_runtime_game_setting():
         if room.get("goal_completion") and room["goal_completion"].get("type")
     }
     assert "object_state" in room_goal_types
-    assert room_goal_types.intersection({"known_info", "power_active"})
+    # Every declared goal type must be one the adapter recognizes.
+    assert room_goal_types.issubset(
+        {"object_state", "known_info", "power_active", "has_item"}
+    )
 
 
 def test_legacy_gamesetting_still_loads_via_compat_loader():
     gs = load_setting_compat(ORBITAL_DECAY_SETTING)
     assert gs.rooms == ["cryo_bay", "command_deck", "airlock"]
     assert len(gs.players) == 2
+
+
+def test_fixed_world_goal_gates_unlock_adjacency_progression():
+    with open(os.path.abspath(FIXED_WORLD_PATH), encoding="utf-8") as fh:
+        data = json.load(fh)
+
+    setting = load_setting_compat(data)
+    sim = GameSimulator(setting)
+    p = "player_1"
+
+    # room_1 -> room_2 gate depends on cell_door_main becoming unlocked.
+    sim.step(p, GameAction(action=GameActionType.TAKE, target_id="rusty_knife_hole"))
+    obs = sim.step(
+        p,
+        GameAction(
+            action=GameActionType.USE,
+            item_id="rusty_knife_hole",
+            target_id="cell_door_main",
+        ),
+    )
+    assert obs.success
+    exits = {to: is_open for _door, to, is_open in sim.state.exits_for(p)}
+    assert exits.get("room_2") is True
+
+    obs = sim.step(p, GameAction(action=GameActionType.MOVE, to_room="room_2"))
+    assert obs.success
+    assert sim.state.player_locations[p] == "room_2"
+
+    # room_2 -> room_3 gate depends on corridor_safe (code 849) being unlocked.
+    sim.step(p, GameAction(action=GameActionType.INSPECT, target_id="corridor_furniture"))
+    obs = sim.step(
+        p,
+        GameAction(
+            action=GameActionType.ENTER_CODE, target_id="corridor_safe", code="849"
+        ),
+    )
+    assert obs.success
+    exits = {to: is_open for _door, to, is_open in sim.state.exits_for(p)}
+    assert exits.get("room_3") is True
+
+    obs = sim.step(p, GameAction(action=GameActionType.MOVE, to_room="room_3"))
+    assert obs.success
+    assert sim.state.player_locations[p] == "room_3"
+
+
+def test_fixed_world_room_wiring_is_deterministic():
+    """Forward edges gate on the source room's goal; backward edges stay open.
+
+    Regression guard for the old hash-seed-dependent door inference that could
+    randomly point a forward exit backward (making a world unwinnable).
+    """
+    with open(os.path.abspath(FIXED_WORLD_PATH), encoding="utf-8") as fh:
+        data = json.load(fh)
+
+    setting = load_setting_compat(data)
+    edges = {
+        (o.location, o.connects_to): o.requires_power
+        for o in setting.objects
+        if o.connects_to is not None
+    }
+
+    # Forward edges are locked behind the source room's object_state goal.
+    assert edges[("room_1", "room_2")] == "state_cell_door_main_unlocked"
+    assert edges[("room_2", "room_3")] == "state_corridor_safe_unlocked"
+    assert edges[("room_3", "room_4")] == "state_blast_doors_unlocked"
+    # Backward edges are open passages (no requirement).
+    assert edges[("room_2", "room_1")] is None
+    assert edges[("room_3", "room_2")] is None
+    assert edges[("room_4", "room_3")] is None

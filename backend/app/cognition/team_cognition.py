@@ -58,6 +58,30 @@ def action_signature(action: GameAction) -> str:
     return " ".join(parts)
 
 
+def describe_action_brief(action: GameAction) -> str:
+    """One-line imperative description of an action (for RECOMMENDED ACTION)."""
+    a = action.action
+    if a == GameActionType.MOVE and action.to_room:
+        return f"move to {action.to_room}"
+    if a == GameActionType.INSPECT and action.target_id:
+        return f"inspect {action.target_id}"
+    if a == GameActionType.TAKE and action.target_id:
+        return f"take {action.target_id}"
+    if a == GameActionType.ENTER_CODE and action.target_id and action.code:
+        return f"enter_code on {action.target_id} with code {action.code}"
+    if a == GameActionType.USE and action.item_id and action.target_id:
+        return f"use {action.item_id} on {action.target_id}"
+    if a == GameActionType.SET_FUSE and action.target_id and action.fuse and action.position:
+        return f"set_fuse {action.fuse} to {action.position} on {action.target_id}"
+    if a == GameActionType.GIVE and action.item_id and action.to_player_id:
+        return f"give {action.item_id} to {action.to_player_id}"
+    if a == GameActionType.SAY:
+        return "say one short clue/blocker update"
+    if a == GameActionType.LOOK:
+        return "look around"
+    return action_signature(action)
+
+
 def world_fingerprint(state: GameState) -> str:
     """A short, stable hash of the symbolic world state.
 
@@ -121,6 +145,17 @@ def _requirement_hint(obj) -> str:
     if obj.fuses is not None:
         return " (a power source — set its fuses)"
     return ""
+
+
+def _has_requirement(obj) -> bool:
+    """True when an object has at least one defined unlock/activation mechanism."""
+    return bool(
+        obj.requires_code
+        or obj.requires_tool
+        or obj.requires_liquid
+        or obj.requires_power
+        or obj.fuses is not None
+    )
 
 
 def solved_object_ids(state: GameState) -> set[str]:
@@ -210,7 +245,7 @@ def derive_current_goal(board: SolutionBoard) -> str:
 
 
 def _goal_object_id(current_goal: str) -> str | None:
-    """Extract leading object id from '<obj> is still ...' goal lines."""
+    """Extract leading object id from goal lines of various formats."""
     if " is still " in current_goal:
         return current_goal.split(" is still ", 1)[0].strip()
     if "WIN CONDITION:" in current_goal and "[" in current_goal and "]" in current_goal:
@@ -218,6 +253,13 @@ def _goal_object_id(current_goal: str) -> str | None:
             return current_goal.split("[", 1)[1].split("]", 1)[0].strip()
         except Exception:
             return None
+    # "set fuse X to ON on <object_id> ..."  → extract object_id
+    if current_goal.startswith("set fuse ") and " on " in current_goal:
+        after_on = current_goal.split(" on ", 1)[1]
+        return after_on.split()[0].strip()
+    # "take <object_id> from ..."  → extract object_id
+    if current_goal.startswith("take ") and " from " in current_goal:
+        return current_goal.split("take ", 1)[1].split(" from ")[0].strip()
     return None
 
 
@@ -238,15 +280,52 @@ class TeamPlan:
 
     steps: list[PlanStep] = field(default_factory=list)
 
-    def refresh(self, solved_ids: set[str]) -> None:
-        tokens = {sid for sid in solved_ids}
-        tokens |= {sid.replace("_", " ") for sid in solved_ids}
+    def refresh(self, milestones: set[str]) -> None:
+        """Tick plan steps using milestone-type-aware matching.
+
+        Milestones look like "took:X", "opened:X", "reached:room_Y", "power:X".
+        We only tick a step when the milestone *kind* matches the verb in the step
+        text, so a "took:circuit_breaker_tool" milestone does NOT prematurely tick
+        "Use circuit_breaker_tool on ..." (only a take/pick-up step would match).
+        """
+        _TAKE_VERBS = ("take", "pick up", "grab", "retrieve", "collect", "get")
+        _OPEN_VERBS = ("enter", "unlock", "open", "use", "code", "set")
+        _MOVE_VERBS = ("move", "reach", "enter", "pass", "go", "advance")
+        _POWER_VERBS = ("power", "fuse", "disable", "enable", "online", "activate")
+        _LEARN_VERBS = ("inspect", "read", "find", "discover", "note", "clue")
+
         for step in self.steps:
             if step.done:
                 continue
-            low = step.text.lower()
-            if any(tok in low for tok in tokens):
-                step.done = True
+            low = step.text.lower().replace("_", " ")
+            for milestone in milestones:
+                kind, _, rest = milestone.partition(":")
+                token = rest.replace("_", " ").strip()
+                if not token:
+                    continue
+                matched = False
+                if kind == "took":
+                    # Only tick steps whose primary verb is a take-like action.
+                    if token in low and any(kw in low for kw in _TAKE_VERBS):
+                        matched = True
+                elif kind == "opened":
+                    # Tick steps that interact with this object to open/unlock it.
+                    if token in low and any(kw in low for kw in _OPEN_VERBS):
+                        matched = True
+                elif kind == "reached":
+                    # Tick movement steps ("reached:room_2" → token "room 2").
+                    if token in low and any(kw in low for kw in _MOVE_VERBS):
+                        matched = True
+                elif kind == "power":
+                    # Tick power/fuse-related steps.
+                    if any(kw in low for kw in _POWER_VERBS):
+                        matched = True
+                elif kind == "learned":
+                    if token in low and any(kw in low for kw in _LEARN_VERBS):
+                        matched = True
+                if matched:
+                    step.done = True
+                    break
 
     def render(self) -> str:
         if not self.steps:
@@ -301,6 +380,7 @@ class TeamCognition:
 
     _seen: set[tuple[str, str, str]] = field(default_factory=set, init=False)  # (player,sig,world)
     _tried_targets: set[str] = field(default_factory=set, init=False)
+    _inspected_targets: set[str] = field(default_factory=set, init=False)  # objects already examined
     _turns_since_progress: int = field(default=0, init=False)
     stuck: bool = field(default=False, init=False)
     _last_critical_turn: dict[str, int] = field(default_factory=dict, init=False)
@@ -353,6 +433,12 @@ class TeamCognition:
             to_room = getattr(action, "to_room", None)
             if to_room and state.player_locations.get(player_id) == to_room:
                 return f"you are already in '{to_room}'."
+        if a == GameActionType.INSPECT and tid:
+            if tid in self._inspected_targets:
+                return (
+                    f"'{tid}' was already inspected — inspecting is idempotent, so "
+                    f"examining it again reveals nothing new."
+                )
         return None
 
     def blocked_reason(
@@ -417,6 +503,11 @@ class TeamCognition:
             tid = getattr(action, fld, None)
             if tid:
                 self._tried_targets.add(tid)
+        # Inspect is idempotent in this engine: a second inspect of the same object
+        # never yields new information. Remember examined objects so we stop
+        # re-proposing inspects of them (the dominant time-waster for 7B agents).
+        if action.action == GameActionType.INSPECT and action.target_id:
+            self._inspected_targets.add(action.target_id)
 
         update = ProgressUpdate()
         current = compute_milestones(state)
@@ -504,9 +595,17 @@ class TeamCognition:
 
         def ingest(text: str) -> None:
             # Intentionally no word-boundaries: clues like "locker_code_0451"
-            # should still yield the numeric token "0451".
-            for token in re.findall(r"[0-9]{3,8}", text):
+            # should still yield the numeric token "0451". Minimum length 2 so
+            # short keypad codes like "99" are captured too (length-matched later
+            # against the lock's code_digits when known).
+            for token in re.findall(r"[0-9]{2,8}", text):
                 numbers.append(token)
+            # Alphabetic / alphanumeric code tokens like "ABC" (e.g. revealed as
+            # "code_ABC"). Case is preserved because keypad codes are usually
+            # case-sensitive. Requires 2+ consecutive uppercase letters so we do
+            # not grab ordinary capitalized words ("The", "Grid").
+            for token in re.findall(r"[A-Z][A-Z0-9]{1,7}", text):
+                phrases.append(token)
             low = text.lower()
             if "reroute auxiliary" in low:
                 phrases.append("reroute auxiliary")
@@ -594,8 +693,7 @@ class TeamCognition:
                         ),
                         "PROGRESS",
                     )
-                # For focused objects, only propose deterministic USE candidates.
-                # Avoid flooding the planner with every inventory item on one target.
+                # USE candidate when the object has a matching tool requirement.
                 if focus_obj.requires_tool and focus_obj.requires_tool in inventory:
                     push(
                         GameAction(
@@ -603,6 +701,28 @@ class TeamCognition:
                             item_id=focus_obj.requires_tool,
                             target_id=focus_id,
                         ),
+                        "PROGRESS",
+                    )
+                # SET_FUSE candidate when the object is a fuse panel.
+                if focus_obj.fuses is not None and focus_id in state.fuse_state:
+                    for fuse, pos in state.fuse_state[focus_id].items():
+                        if pos != "ON":
+                            push(
+                                GameAction(
+                                    action=GameActionType.SET_FUSE,
+                                    target_id=focus_id,
+                                    fuse=fuse,
+                                    position="ON",
+                                ),
+                                "PROGRESS",
+                            )
+                # TAKE candidate when the goal is to pick up this item.
+                if focus_obj.takeable and state.object_state.get(focus_id) not in (
+                    ObjectState.TAKEN,
+                    ObjectState.HIDDEN,
+                ):
+                    push(
+                        GameAction(action=GameActionType.TAKE, target_id=focus_id),
                         "PROGRESS",
                     )
 
@@ -615,7 +735,10 @@ class TeamCognition:
             obj = state.obj(oid)
             if obj is None:
                 continue
-            push(GameAction(action=GameActionType.INSPECT, target_id=oid), "EXPLORATION")
+            # Skip re-inspecting objects already examined (inspect is idempotent),
+            # so the policy stops looping on decoys and stale flavor objects.
+            if oid not in self._inspected_targets:
+                push(GameAction(action=GameActionType.INSPECT, target_id=oid), "EXPLORATION")
             if obj.takeable and state.object_state.get(oid) != ObjectState.TAKEN:
                 push(GameAction(action=GameActionType.TAKE, target_id=oid), "PROGRESS")
 
@@ -777,7 +900,14 @@ class TeamCognition:
         known_codes = numeric_codes + phrase_codes
         for obj in state.setting.objects:
             cur = state.object_state.get(obj.id)
-            if obj.requires_code and cur in _LOCKED_STATES and known_codes:
+            # Only nudge toward a lock the player can actually reach/see right now,
+            # otherwise the agent gets pushed into an unreachable "can't reach" move.
+            if (
+                obj.requires_code
+                and cur in _LOCKED_STATES
+                and known_codes
+                and state.is_visible_to(obj.id, player_id)
+            ):
                 self._last_critical_turn[player_id] = state.turn
                 return (
                     f"The team is looping. You know code '{known_codes[0]}'. "
@@ -841,6 +971,65 @@ class TeamCognition:
                 uniq.append(b)
         return uniq[:4]
 
+    def _derive_positional_goal(self, player_id: str, state: GameState, board: SolutionBoard) -> str:
+        """Return the most actionable goal from the player's current position.
+
+        Priority:
+          1. Fuse panels in the current room with unset fuses (power activation).
+          2. Locked interactable objects in the current room that have a solvable
+             requirement (code / tool / power).
+          3. Takeable items in the current room not yet collected.
+          4. Board-derived goal as fallback (catches the win condition, etc.).
+
+        Using position-aware derivation ensures the model sees the correct
+        *immediate* action (e.g. "set fuse MAIN ON on server_main_console") rather
+        than the far-away global goal ("final_container_lock is still locked").
+        """
+        room = state.player_locations.get(player_id, "")
+        inventory = set(state.player_inventories.get(player_id, []))
+
+        # Priority 1: fuse panels with at least one OFF fuse.
+        for obj in state.setting.objects:
+            if (
+                obj.fuses is not None
+                and state.room_of(obj.id) == room
+                and obj.id in state.fuse_state
+                and state.is_visible_to(obj.id, player_id)
+            ):
+                for fuse, pos in state.fuse_state[obj.id].items():
+                    if pos != "ON":
+                        return (
+                            f"set fuse {fuse} to ON on {obj.id} to activate power"
+                        )
+
+        # Priority 2: locked interactable objects in the current room with
+        # a defined unlock mechanism (filters out un-solvable decoys).
+        for obj in state.setting.objects:
+            if (
+                state.room_of(obj.id) == room
+                and obj.interactable
+                and state.object_state.get(obj.id) in _LOCKED_STATES
+                and state.is_visible_to(obj.id, player_id)
+                and _has_requirement(obj)
+            ):
+                cur = state.object_state[obj.id]
+                return f"{obj.id} is still {cur.value}{_requirement_hint(obj)}"
+
+        # Priority 3: takeable items in the room not yet in inventory.
+        for obj in state.setting.objects:
+            if (
+                obj.takeable
+                and state.room_of(obj.id) == room
+                and obj.id not in inventory
+                and state.object_state.get(obj.id)
+                not in (ObjectState.TAKEN, ObjectState.HIDDEN)
+                and state.is_visible_to(obj.id, player_id)
+            ):
+                return f"take {obj.id} from current room"
+
+        # Fallback: global board derivation (captures win condition etc.).
+        return derive_current_goal(board)
+
     def brief_for(
         self,
         player_id: str,
@@ -849,6 +1038,7 @@ class TeamCognition:
         reflect: bool = False,
         blocked_note: str | None = None,
         critical_note: str | None = None,
+        recommended_action: str = "",
     ) -> TeamBrief:
         teammate_ideas = [
             f"{self._name(state, pid)}: {idea}"
@@ -857,10 +1047,17 @@ class TeamCognition:
         ][-self.config.hypothesis_limit:]
 
         board = derive_board(state)
-        current_goal = derive_current_goal(board)
-        # Keep the shared plan synced with authoritative solved ids each turn.
-        self.plan.refresh(solved_object_ids(state))
+        # Sync milestones from the current authoritative state so plan refresh
+        # works correctly even when observe() hasn't been called (e.g. tests).
+        self.milestones = compute_milestones(state)
+        # Sync the shared plan against the full cumulative milestone set each turn.
+        # This uses milestone-type-aware ticking so steps like "Use X on Y" are not
+        # prematurely ticked just because item X was taken.
+        self.plan.refresh(self.milestones)
         next_plan_step = self._next_plan_step()
+        # Position-aware goal: shows the most proximate actionable goal instead of
+        # the global final objective.
+        current_goal = self._derive_positional_goal(player_id, state, board)
 
         return TeamBrief(
             objective=board.objective,
@@ -876,6 +1073,9 @@ class TeamCognition:
                 current_goal,
                 next_plan_step,
             ),
+            recommended_action=recommended_action,
+            already_examined=self._examined_here(player_id, state),
+            teammate_locations=self._teammate_locations(player_id, state),
             next_plan_step=next_plan_step,
             functional_role=self._functional_role_for(player_id, state),
             teammate_hypotheses=teammate_ideas,
@@ -885,6 +1085,25 @@ class TeamCognition:
             reflect=reflect,
             blocked_note=blocked_note,
         )
+
+    def _examined_here(self, player_id: str, state: GameState) -> list[str]:
+        """Objects in the player's view already examined (don't re-inspect)."""
+        return [
+            oid
+            for oid in state.visible_objects_for(player_id)
+            if oid in self._inspected_targets
+        ]
+
+    def _teammate_locations(self, player_id: str, state: GameState) -> list[str]:
+        """Where each teammate currently is (room), for coordination."""
+        here = state.player_locations.get(player_id)
+        out: list[str] = []
+        for pid, room in state.player_locations.items():
+            if pid == player_id:
+                continue
+            tag = "same room" if room == here else room
+            out.append(f"{self._name(state, pid)} is in {tag}")
+        return out
 
     @staticmethod
     def _name(state: GameState, player_id: str) -> str:

@@ -93,66 +93,90 @@ class FixedWorld(BaseModel):
             raise ValueError("Duplicate room ids in fixed-world format.")
         return self
 
-    def _infer_door_connections(self, objects: list[dict]) -> None:
-        """Fill `connects_to` from room adjacency when omitted.
+    @staticmethod
+    def _goal_condition_flag(goal: GoalCompletion | None) -> str | None:
+        """Map a room goal_completion into a deterministic condition flag."""
+        if goal is None:
+            return None
+        gtype = (goal.type or "").strip().lower()
+        payload = goal.model_dump(exclude_none=True)
 
-        The fixed format stores adjacency under rooms, while the runtime engine
-        navigates through door objects with `connects_to`. We infer this mapping
-        conservatively for door-like objects in each room.
+        if gtype == "power_active":
+            power_id = payload.get("id") or payload.get("object_id") or goal.info
+            return str(power_id) if power_id else None
+        if gtype == "has_item" and goal.object_id:
+            return f"has_item_{goal.object_id}"
+        if gtype == "known_info" and goal.info:
+            return f"known_info_{goal.info}"
+        if gtype == "object_state" and goal.object_id and goal.state:
+            return f"state_{goal.object_id}_{goal.state}"
+        return None
+
+    def _wire_room_progression(self, objects: list[dict]) -> None:
+        """Deterministically wire room-to-room movement from adjacency + goals.
+
+        This replaces the old fuzzy "door inference" heuristic, which was
+        non-deterministic (it iterated a ``set`` and broke ties by hash order, so
+        a forward door could randomly point backward on a different process) and
+        frequently mis-assigned scenery / decoy objects as the room exit.
+
+        Model (deterministic, order-aware):
+          * Rooms are ordered by their position in the ``rooms`` list.
+          * For every adjacency edge ``A -> B``:
+              - FORWARD  (index(B) > index(A)): a gate locked behind room A's
+                ``goal_completion`` condition. Solving room A's puzzle flips the
+                derived condition flag and the gate auto-opens. If room A has no
+                goal, the forward gate is an open passage.
+              - BACKWARD (index(B) < index(A)): always an OPEN passage so players
+                may freely backtrack to rooms they have already cleared.
+          * Author-supplied ``connects_to`` edges are respected and never
+            duplicated.
+
+        Each gate is a non-interactable connector object; it appears to players
+        only as an EXIT (open/locked), never as an inspectable object.
         """
-        by_room: dict[str, list[dict]] = {room.id: [] for room in self.rooms}
-        for obj in objects:
-            loc = obj.get("location")
-            if loc in by_room:
-                by_room[loc].append(obj)
+        room_index = {room.id: i for i, room in enumerate(self.rooms)}
+
+        explicit_pairs = {
+            (obj.get("location"), obj.get("connects_to"))
+            for obj in objects
+            if obj.get("connects_to")
+        }
+        existing_ids = {str(obj.get("id")) for obj in objects if obj.get("id")}
 
         for room in self.rooms:
-            targets = list(dict.fromkeys(room.adjacency.values()))
-            if not targets:
-                continue
+            src_idx = room_index[room.id]
+            condition_flag = self._goal_condition_flag(room.goal_completion)
 
-            candidates = [
-                obj
-                for obj in by_room.get(room.id, [])
-                if not obj.get("takeable")
-                and not obj.get("connects_to")
-                and ("door" in obj.get("id", "") or obj.get("state") in {"locked", "locked_bolt", "locked_room", "unlocked", "open"})
-            ]
-            candidates.sort(
-                key=lambda obj: (
-                    0
-                    if "door" in f"{obj.get('id', '')} {obj.get('description', '')}".lower()
-                    or "gate" in f"{obj.get('id', '')} {obj.get('description', '')}".lower()
-                    else 1,
-                    obj.get("id", ""),
-                )
-            )
+            for to_room in dict.fromkeys(room.adjacency.values()):
+                if to_room not in room_index:
+                    continue
+                if (room.id, to_room) in explicit_pairs:
+                    continue
 
-            def score(candidate: dict, to_room: str) -> int:
-                """Heuristically score how well a door matches a destination room."""
-                cand_text = f"{candidate.get('id', '')} {candidate.get('description', '')}".lower()
-                room_text = next((r.description for r in self.rooms if r.id == to_room), "").lower()
-                room_id = to_room.replace("_", " ").lower()
-                cand_tokens = set(re.findall(r"[a-z0-9]+", cand_text))
-                room_tokens = set(re.findall(r"[a-z0-9]+", room_text + " " + room_id))
-                overlap = len(cand_tokens & room_tokens)
+                forward = room_index[to_room] > src_idx
+                gate_condition = condition_flag if forward else None
+                gate_state = "locked" if gate_condition else "unlocked"
 
-                # Prefer explicit semantic hints in the door description.
-                if to_room in cand_text:
-                    overlap += 4
-                if "path to" in cand_text and to_room.replace("_", " ") in cand_text:
-                    overlap += 4
-                return overlap
+                gate_id = f"gate_{room.id}_to_{to_room}"
+                suffix = 1
+                while gate_id in existing_ids:
+                    suffix += 1
+                    gate_id = f"gate_{room.id}_to_{to_room}_{suffix}"
 
-            remaining = set(targets)
-            for candidate in candidates:
-                if not remaining:
-                    break
-                best_room = max(remaining, key=lambda to_room: score(candidate, to_room))
-                # If every option is equally bad, still pick the best remaining room
-                # rather than leaving the door disconnected.
-                candidate["connects_to"] = best_room
-                remaining.discard(best_room)
+                gate: dict = {
+                    "id": gate_id,
+                    "location": room.id,
+                    "description": f"A passage from {room.id} to {to_room}.",
+                    "state": gate_state,
+                    "interactable": False,
+                    "takeable": False,
+                    "connects_to": to_room,
+                }
+                if gate_condition:
+                    gate["requires_power"] = gate_condition
+                objects.append(gate)
+                existing_ids.add(gate_id)
 
     @staticmethod
     def _normalize_code(obj: dict) -> None:
@@ -171,7 +195,7 @@ class FixedWorld(BaseModel):
 
         for obj in objects:
             self._normalize_code(obj)
-        self._infer_door_connections(objects)
+        self._wire_room_progression(objects)
 
         # Default cooperative cast when personas are not authored in fixed format.
         default_players = [
