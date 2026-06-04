@@ -222,8 +222,15 @@ class GameOrchestrator:
                 current_goal=planning_brief.current_goal,
                 next_plan_step=planning_brief.next_plan_step,
             )
-            if self.cognition.stuck:
-                await self._emit_planner_trace(pid, plan, self.sim.state.turn)
+            # Always stream planner advice so observers can compare it with the
+            # eventual executed action in the same turn.
+            await self._emit_planner_trace(
+                pid,
+                plan,
+                self.sim.state.turn,
+                chosen=plan.best_action,
+                reason="advice",
+            )
 
         # --- Loop guard: re-ask if the agent proposes a proven dead-end ---
         # External cognition decides whether a move is pointless (already tried in
@@ -410,6 +417,14 @@ class GameOrchestrator:
 
         # Debug visibility: stream the exact validated JSON turn chosen by the
         # player agent (kept out of shared agent memory to avoid feedback loops).
+        if self.enable_planner_tool and plan is not None:
+            await self._emit_planner_trace(
+                pid,
+                plan,
+                self.sim.state.turn,
+                chosen=turn.action,
+                reason="executed",
+            )
         await self._emit(
             EventKind.DECISION,
             pid,

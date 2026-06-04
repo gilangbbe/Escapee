@@ -10,7 +10,7 @@ from app.schemas.fixed_world import load_setting_compat
 
 
 FIXED_WORLD_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "app", "game", "world_007.json"
+    os.path.dirname(__file__), "..", "app", "game", "world_010.json"
 )
 
 
@@ -74,7 +74,7 @@ def test_fixed_world_envelope_converts_to_runtime_game_setting():
         if room.get("goal_completion") and room["goal_completion"].get("type")
     }
     assert "object_state" in room_goal_types
-    assert "known_info" in room_goal_types
+    assert room_goal_types.intersection({"known_info", "power_active"})
 
 
 def test_legacy_gamesetting_still_loads_via_compat_loader():

@@ -594,11 +594,13 @@ class TeamCognition:
                         ),
                         "PROGRESS",
                     )
-                for item_id in inventory:
+                # For focused objects, only propose deterministic USE candidates.
+                # Avoid flooding the planner with every inventory item on one target.
+                if focus_obj.requires_tool and focus_obj.requires_tool in inventory:
                     push(
                         GameAction(
                             action=GameActionType.USE,
-                            item_id=item_id,
+                            item_id=focus_obj.requires_tool,
                             target_id=focus_id,
                         ),
                         "PROGRESS",
@@ -639,6 +641,20 @@ class TeamCognition:
                     "PROGRESS",
                 )
 
+            # Fuse toggles are deterministic progress actions for power puzzles.
+            if obj.fuses is not None and oid in state.fuse_state:
+                for fuse, pos in state.fuse_state[oid].items():
+                    if pos != "ON":
+                        push(
+                            GameAction(
+                                action=GameActionType.SET_FUSE,
+                                target_id=oid,
+                                fuse=fuse,
+                                position="ON",
+                            ),
+                            "PROGRESS",
+                        )
+
         push(
             GameAction(
                 action=GameActionType.SAY,
@@ -669,6 +685,8 @@ class TeamCognition:
             return f"{tag}enter_code {a.target_id} with {a.code}"
         if a.action == GameActionType.USE and a.item_id and a.target_id:
             return f"{tag}use {a.item_id} on {a.target_id}"
+        if a.action == GameActionType.SET_FUSE and a.target_id and a.fuse and a.position:
+            return f"{tag}set_fuse {a.target_id} {a.fuse} {a.position}"
         if a.action == GameActionType.SAY:
             return f"{tag}say one short clue/blocker update"
         return f"{tag}{action_signature(a)}"

@@ -1,0 +1,129 @@
+{
+  "world": {
+    "scenario": "A cursed pirate ship lies abandoned in a forgotten cove, its treasure hidden deep within the hull. You are among a group of adventurers who have discovered the ship, but the way forward is blocked by ancient traps, cryptic puzzles, and the wrath of long-dead seafarers. Only by deciphering the ship's secrets can you reach the treasure chamber and escape with the golden hoard.",
+    "objective": "Unlock the final treasure chest in the captain's quarters and escape the cursed ship.",
+    "rooms": [
+      {
+        "id": "room_1",
+        "description": "A dimly lit corridor lined with rusted ship fittings and a single locked door to the east. A wooden chest sits in the corner, its lid slightly ajar.",
+        "adjacency": {
+          "east": "room_2"
+        },
+        "goal": "Unlock the first door",
+        "key_objects": []
+      },
+      {
+        "id": "room_2",
+        "description": "A narrow passageway with a collapsed ceiling and a strange, glowing lock on the door to the east. A small, locked box rests on a table, and a broken compass lies on the floor.",
+        "adjacency": {
+          "east": "room_3",
+          "west": "room_1"
+        },
+        "goal": "Unlock the glowing lock",
+        "key_objects": []
+      },
+      {
+        "id": "room_3",
+        "description": "A large chamber with a rusted ship wheel at its center and a door to the east. A hidden drawer is embedded in the wall, slightly ajar. A sealed, glass vial hangs from the ceiling.",
+        "adjacency": {
+          "east": "room_4",
+          "west": "room_2"
+        },
+        "goal": "Get hidden_drawer into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "hidden_drawer",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "hidden_drawer",
+          "glass_vial"
+        ]
+      },
+      {
+        "id": "room_4",
+        "description": "The captain's quarters, filled with relics and a single locked treasure chest in the center. A large, cursed mirror stands at the back of the room, reflecting nothing but darkness.",
+        "adjacency": {
+          "west": "room_3"
+        },
+        "goal": "Get final_chest into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "final_chest",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "final_chest",
+          "cursed_mirror"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "hidden_drawer",
+        "location": "room_3",
+        "description": "A small, hidden drawer in the wall that appears to be slightly ajar. Inside is a key and a glass vial.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "mirror_key",
+        "contains_info": "mirror_ritual"
+      },
+      {
+        "id": "glass_vial",
+        "location": "room_3",
+        "description": "A sealed glass vial containing a glowing liquid that pulses in time with the cursed mirror.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "vial_liquid"
+      },
+      {
+        "id": "mirror_key",
+        "location": "room_2",
+        "description": "A silver key with an ornate design that matches the lock on the hidden drawer in the next room.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "final_chest",
+        "location": "room_4",
+        "description": "A large, ornate treasure chest covered in seaweed and rust. It is locked and bears an inscription: 'Only the worthy may claim the gold'.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "cursed_mirror",
+        "contains_info": "treasure_unlocked"
+      },
+      {
+        "id": "cursed_mirror",
+        "location": "room_4",
+        "description": "A large, ornate mirror that reflects nothing but darkness. When the ritual is complete, it becomes a key to the treasure.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "requires_liquid": "vial_liquid",
+        "contains_info": "mirror_key"
+      }
+    ],
+    "rules": [
+      "Each room's goal must be completed before the next room becomes accessible.",
+      "No item is usable unless its prerequisite is met.",
+      "Every code must be derived from a prior object's contains_info.",
+      "Every tool must be obtainable without needing to unlock it first.",
+      "Decoy items may be examined but are not required for progress."
+    ],
+    "solution_path": [
+      "1. Examine the wooden chest in room 1 to find the faded map, which contains the info 'map_room_2'.",
+      "2. Use the map to locate the locked box in room 2, which requires the code '742' (found on the broken compass).",
+      "3. Open the locked box to retrieve the mirror key, which contains the info 'mirror_ritual'.",
+      "4. Use the mirror key to unlock the hidden drawer in room 3, which reveals the glass vial with the info 'vial_liquid'.",
+      "5. Use the vial's liquid on the cursed mirror in room 4 to activate the mirror as a key, then use it to unlock the final treasure chest."
+    ],
+    "win_condition": {
+      "object_id": "final_chest",
+      "state": "unlocked"
+    }
+  }
+}

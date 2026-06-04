@@ -713,6 +713,77 @@ def test_candidate_actions_prune_invalid_use_targets(setting: GameSetting):
     assert "use access_card on supply_locker" not in actions
 
 
+def test_focus_goal_use_candidates_only_include_required_tool(setting: GameSetting):
+    from app.cognition.team_cognition import TeamCognition
+    from app.engine.game_actions import GameAction, GameActionType as A
+    from app.engine.game_simulator import GameSimulator
+
+    sim = GameSimulator(setting)
+    cog = TeamCognition()
+
+    # Open locker and take card; add a decoy item in inventory to ensure pruning.
+    sim.step("player_1", GameAction(action=A.ENTER_CODE, target_id="supply_locker", code="0451"))
+    sim.step("player_1", GameAction(action=A.TAKE, target_id="access_card"))
+    sim.state.player_inventories["player_1"].append("captains_log")
+
+    candidates = cog.policy_candidates(
+        "player_1",
+        sim.state,
+        "command_door is still locked",
+    )
+    assert any(
+        a.action == A.USE and a.target_id == "command_door" and a.item_id == "access_card"
+        for a in candidates
+    )
+    assert not any(
+        a.action == A.USE and a.target_id == "command_door" and a.item_id == "captains_log"
+        for a in candidates
+    )
+
+
+def test_candidate_actions_include_set_fuse_for_visible_panels():
+    from app.cognition.team_cognition import TeamCognition
+    from app.engine.game_simulator import GameSimulator
+
+    fuse_setting = GameSetting.model_validate(
+        {
+            "scenario": "Fuse test",
+            "objective": "Turn power on",
+            "rooms": ["room_1"],
+            "start_room": "room_1",
+            "objects": [
+                {
+                    "id": "fuse_panel",
+                    "location": "room_1",
+                    "description": "A panel with one fuse.",
+                    "state": "visible",
+                    "interactable": True,
+                    "takeable": False,
+                    "fuses": {"A": "OFF"},
+                },
+                {
+                    "id": "exit_door",
+                    "location": "room_1",
+                    "description": "A door that is already open.",
+                    "state": "open",
+                    "interactable": True,
+                    "takeable": False,
+                },
+            ],
+            "rules": [],
+            "solution_path": ["set_fuse fuse_panel A ON"],
+            "win_condition": {"object_id": "exit_door", "state": "open"},
+        }
+    )
+
+    sim = GameSimulator(fuse_setting)
+    cog = TeamCognition()
+    brief = cog.brief_for("player_1", sim.state)
+    actions = "\n".join(brief.candidate_actions)
+
+    assert "set_fuse fuse_panel A ON" in actions
+
+
 @pytest.mark.asyncio
 async def test_planning_phase_populates_shared_plan(setting: GameSetting):
     # The first turn of each agent answers the planning debate (PlanProposal JSON).

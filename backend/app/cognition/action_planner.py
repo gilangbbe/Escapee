@@ -38,6 +38,13 @@ class PlannerDecision:
     ranked: list[PlannerOption]
 
     @property
+    def best_non_free_action(self) -> GameAction | None:
+        for option in self.ranked:
+            if option.action.action not in _FREE_ACTIONS:
+                return option.action
+        return None
+
+    @property
     def best_progress_action(self) -> GameAction | None:
         for option in self.ranked:
             if option.action.action not in _FREE_ACTIONS and option.score > 0:
