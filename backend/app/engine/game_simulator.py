@@ -293,6 +293,14 @@ class GameSimulator:
 
         extras: list[str] = []
 
+        # Opening/unlocking a container reveals the information it holds, exactly
+        # as inspecting it would. Without this, an object solved via USE/ENTER_CODE
+        # (e.g. a console unlocked with a tool) would keep its `contains_info`
+        # hidden, stalling any downstream lock or known_info gate that needs it.
+        if obj.contains_info and obj.contains_info not in self.state.discovered_info:
+            self.state.discovered_info.add(obj.contains_info)
+            extras.append(f"you learn {obj.contains_info.replace('_', ' ')}")
+
         # Reveal a hidden target.
         if obj.reveals is not None:
             self.state.object_state[obj.reveals] = ObjectState.VISIBLE

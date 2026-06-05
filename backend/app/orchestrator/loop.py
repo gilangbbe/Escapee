@@ -49,10 +49,23 @@ from app.schemas.game_setting import GameSetting
 # An optional sink for streaming events (e.g. a WebSocket broadcaster in Phase 5).
 EventSink = Callable[[Event], Awaitable[None]]
 _FREE_ACTIONS = {GameActionType.SAY, GameActionType.LOOK}
-# Minimum planner-score advantage of the best action over a chosen MOVE before
-# the movement progress gate intervenes. Large so only clear wandering (walking
-# away from a high-value next step) is corrected, not normal forward exploration.
-_MOVE_GATE_GAP = 30.0
+# Progress gate tuning. The gate only fires when the planner's recommended action
+# is DOMINANT — both near-winning in absolute terms (a discounted win/major-unlock
+# chain scores ~90+, e.g. "walk into the final room and enter the code") AND far
+# better than the agent's chosen action — while the chosen action is itself
+# low-value busywork. The absolute floor is what keeps the gate silent during
+# ordinary mid-game exploration, where the best next step (e.g. inspecting the
+# one clue object) scores only ~25-40 and must NOT be force-overridden.
+_PROGRESS_GATE_DOMINANT_MIN = 90.0
+_PROGRESS_GATE_GAP = 30.0
+_PROGRESS_GATE_LOW_VALUE = 3.0
+# Genuine puzzle attempts are never overridden: a sincere wrong try must still
+# execute so the team can observe and remember the failure.
+_PROGRESS_GATE_EXEMPT = {
+    GameActionType.ENTER_CODE,
+    GameActionType.USE,
+    GameActionType.SET_FUSE,
+}
 
 
 @dataclass
@@ -441,36 +454,51 @@ class GameOrchestrator:
                     detail=blocked_note,
                 )
                 continue
-            # Movement progress gate (narrow): the agent chose to walk to a room
-            # while the deterministic planner has a much higher-value action
-            # available (typically: go to the room where the next puzzle can be
-            # solved, or solve it). Weak local models wander between explored
-            # rooms here. We re-prompt once, then override the wandering move on
-            # the final attempt. Scoped to MOVE only so it never interferes with
-            # the agent's puzzle-action choices (take/use/enter_code/inspect).
+            # Progress gate (general): the agent chose a LOW-VALUE action (walking
+            # to an explored room, re-inspecting a decoy/scenic object, idle speech)
+            # while the deterministic planner has a DOMINANT high-value action
+            # available (go to the room where the puzzle is solved, or solve it).
+            # Weak local models routinely ignore the surfaced recommendation and
+            # linger like this; without enforcement they never finish a solved
+            # world. We re-prompt once, then override on the final attempt.
+            #
+            # Genuine puzzle attempts (enter_code / use / set_fuse) are EXEMPT so a
+            # wrong-but-sincere try still executes, fails, and is recorded in
+            # episodic memory (the team learns from it) instead of being swallowed.
             if (
                 self.enable_planner_tool
                 and plan is not None
-                and candidate.action.action == GameActionType.MOVE
                 and plan.best_progress_action is not None
+                and candidate.action.action not in _PROGRESS_GATE_EXEMPT
                 and action_signature(plan.best_progress_action)
                 != action_signature(candidate.action)
             ):
-                chosen_score = plan.score_of(candidate.action)
-                chosen_value = chosen_score if chosen_score is not None else 0.0
-                if plan.top_score - chosen_value >= _MOVE_GATE_GAP:
+                progress_action = plan.best_progress_action
+                progress_score = plan.score_of(progress_action)
+                if progress_score is None:
+                    progress_score = plan.top_score
+                chosen_value = self.planner.immediate_value(
+                    player_id=pid,
+                    state=self.sim.state,
+                    action=candidate.action,
+                )
+                dominant = (
+                    progress_score >= _PROGRESS_GATE_DOMINANT_MIN
+                    and progress_score - chosen_value >= _PROGRESS_GATE_GAP
+                )
+                if dominant and chosen_value <= _PROGRESS_GATE_LOW_VALUE:
                     blocked_note = (
-                        "BETTER MOVE AVAILABLE: the team planner has a much "
-                        "higher-value action — "
+                        "HIGHER-VALUE ACTION AVAILABLE: that move makes no real "
+                        "progress. The team planner strongly recommends "
                         f"{describe_action_brief(plan.best_progress_action)}. "
-                        "Do that instead of wandering, unless you can state a "
-                        "concrete reason it is wrong."
+                        "Do exactly that now, unless you can state a concrete "
+                        "reason it is wrong."
                     )
                     if attempt < self.max_redecide:
                         await self._emit(
                             EventKind.SYSTEM,
                             pid,
-                            f"(move gate) {blocked_note}",
+                            f"(progress gate) {blocked_note}",
                             turn=self.sim.state.turn,
                         )
                         continue
@@ -481,13 +509,13 @@ class GameOrchestrator:
                         plan,
                         self.sim.state.turn,
                         chosen=turn.action,
-                        reason="move_gate_override",
+                        reason="progress_gate_override",
                     )
                     await self._emit(
                         EventKind.SYSTEM,
                         pid,
                         (
-                            "(planner override) low-value wander; "
+                            "(planner override) low-value action; "
                             f"executing {action_signature(turn.action)}"
                         ),
                         turn=self.sim.state.turn,
