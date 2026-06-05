@@ -29,9 +29,9 @@ Each turn you produce ONE structured turn with these parts:
                 plan — fill this on REFLECTION checkpoints (teammates see it),
   "hypothesis": OPTIONAL public theory about the puzzle + the next step you
                 propose the team try (teammates DO see this),
-  "speak":      OPTIONAL short message to teammates — use it to SUPPORT,
-                CRITIQUE, or COUNTER a teammate's idea, or share an
-                observation (teammates DO see this),
+  "intent":     OPTIONAL one sentence: WHY are you taking this action?
+                (e.g. "this key looks like it fits the cabinet lock") —
+                used by the narrator to generate your speech line,
   "action":     the single structured action you take this turn.
 The output format is enforced for you — just choose good content; you do not
 need to worry about JSON syntax, quoting, or commas.
@@ -120,16 +120,16 @@ def build_player_user_prompt(
         closing = (
             "The team is stuck — do NOT repeat a blocked or already-tried action. "
             "Read the OBJECTIVE BOARD, pick the NEXT UNSOLVED prerequisite, propose "
-            "it in \"hypothesis\", react to your teammates in \"speak\", and take "
-            "that different action now. Respond with ONLY the JSON object."
+            "it in \"hypothesis\", and take that different action now. "
+            "Fill \"intent\" with one sentence explaining why. Respond with ONLY the JSON object."
         )
     else:
         closing = (
             "Decide your single best NEW action now. If a ⭐ RECOMMENDED NEXT ACTION "
-            "is shown, execute exactly that (you may voice a short reaction in "
-            "\"speak\"); otherwise pick the highest-progress CANDIDATE. Never redo "
-            "anything under SOLVED or re-inspect an ALREADY EXAMINED object. Respond "
-            "with ONLY the JSON object."
+            "is shown, execute exactly that; otherwise pick the highest-progress CANDIDATE. "
+            "Never redo anything under SOLVED or re-inspect an ALREADY EXAMINED object. "
+            "Fill \"intent\" with one sentence explaining why you chose this action. "
+            "Respond with ONLY the JSON object."
         )
     return (
         f"TEAM OBJECTIVE: {objective}\n\n"

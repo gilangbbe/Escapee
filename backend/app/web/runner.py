@@ -17,7 +17,7 @@ from typing import Awaitable, Callable, Optional
 
 from app.agents.game_player_agent import GamePlayerAgent
 from app.agents.gm_narrator import GameMasterNarrator
-from app.context.channels import Event
+from app.context.channels import Event, EventKind
 from app.llm.ollama_client import OllamaClient
 from app.orchestrator.loop import GameOrchestrator, GameResult
 from app.schemas.game_setting import GameSetting
@@ -96,6 +96,10 @@ class GameRunner:
         await send(setup_message(self.setting))
 
         async def on_event(event: Event) -> None:
+            # PLANNER events are internal telemetry — hide from UI.
+            # Progress milestones use EventKind.SYSTEM, so they still show.
+            if event.kind == EventKind.PLANNER:
+                return
             await send(event_to_dict(event))
             # Push a grounded snapshot after every event so the panel tracks state.
             await send(state_snapshot(orchestrator.sim.state))
