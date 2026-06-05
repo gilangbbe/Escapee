@@ -12,6 +12,13 @@ from app.schemas.fixed_world import load_setting_compat
 
 
 FIXED_WORLD_PATH = os.path.join(
+    os.path.dirname(__file__), "..", "app", "game", "world_020.json"
+)
+
+# A structurally-specific world used by the wiring/progression tests below,
+# which assert exact object ids and codes. Pinned independently of the generic
+# FIXED_WORLD_PATH so repointing that constant cannot break these tests.
+STRUCT_WORLD_PATH = os.path.join(
     os.path.dirname(__file__), "..", "app", "game", "world_013.json"
 )
 
@@ -89,7 +96,7 @@ def test_legacy_gamesetting_still_loads_via_compat_loader():
 
 
 def test_fixed_world_goal_gates_unlock_adjacency_progression():
-    with open(os.path.abspath(FIXED_WORLD_PATH), encoding="utf-8") as fh:
+    with open(os.path.abspath(STRUCT_WORLD_PATH), encoding="utf-8") as fh:
         data = json.load(fh)
 
     setting = load_setting_compat(data)
@@ -137,7 +144,7 @@ def test_fixed_world_room_wiring_is_deterministic():
     Regression guard for the old hash-seed-dependent door inference that could
     randomly point a forward exit backward (making a world unwinnable).
     """
-    with open(os.path.abspath(FIXED_WORLD_PATH), encoding="utf-8") as fh:
+    with open(os.path.abspath(STRUCT_WORLD_PATH), encoding="utf-8") as fh:
         data = json.load(fh)
 
     setting = load_setting_compat(data)

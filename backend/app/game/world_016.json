@@ -1,0 +1,373 @@
+{
+  "world": {
+"scenario": "In the subterranean holding cells of the Obsidian Penitentiary, a catastrophic ventilation failure has triggered a toxic gas leak that is silently turning guards into mindless automatons. You are Cell Block Alpha-7, trapped behind a reinforced blast door while the silence grows deafening and the temperature drops to freezing, requiring you to navigate a labyrinth of cold, dark corridors where every shadow hides a threat before finding an extraction point at the facility's edge.",
+  "objective": "Survive the gas leak by solving a sequence of environmental puzzles to unlock the exit from Cell Block Alpha-7 before the containment breach collapses.",
+  "rooms": [
+    {
+      "id": "room_1",
+      "description": "The air tastes metallic and sharp like crushed copper pennies, while the flickering red emergency lights cast long, trembling shadows that seem to stretch toward you. Cold iron bars rattle rhythmically in the gloom as the toxic haze curls around your ankles, threatening to numb your breathing.",
+      "adjacency": {
+        "east": "room_2"
+      },
+      "goal": "Get blast_door_1 into the 'unlocked' state.",
+      "key_objects": []
+    },
+    {
+      "id": "room_2",
+      "description": "The corridor hums with the dying vibration of rupturing pipes that leak a freezing mist, making your breath visible in the dim blue glow of exposed wiring. A heavy steel door looms ahead, sealed shut by a digital lock that demands biometric verification from a guard who has not moved in three hours.",
+      "adjacency": {
+        "west": "room_1",
+        "east": "room_3"
+      },
+      "goal": "Get steel_door_2 into the 'unlocked' state.",
+      "key_objects": []
+    },
+    {
+      "id": "room_3",
+      "description": "Fluorescent lights buzz violently overhead like trapped insects, casting erratic green patterns on walls stained with thick black oil and sweat. The air is soot-filled and choking, forcing you to rely on your newly forged mask while standing before a massive industrial grate that controls the ventilation flow to the entire wing.",
+      "adjacency": {
+        "west": "room_2",
+        "east": "room_4"
+      },
+      "goal": "Align the ventilation control levers according to the schematics retrieved from the guard's quarters to restore breathable air for the final escape route.",
+      "key_objects": []
+    },
+    {
+      "id": "room_4",
+      "description": "The final exit door groans under the weight of tons of concrete and rust, emitting a low mechanical whine that vibrates through the soles of your boots. Outside, the fresh air smells of rain and pine, but the massive iron slab remains welded shut by a complex combination lock requiring three distinct keys found deep within the prison's depths.",
+      "adjacency": {
+        "west": "room_3"
+      },
+      "goal": "Get final_exit_door into the 'unlocked' state.",
+      "goal_completion": {
+        "type": "object_state",
+        "object_id": "final_exit_door",
+        "state": "unlocked"
+      },
+      "key_objects": []
+    }
+  ],
+  "objects": [
+    {
+      "id": "emergency_light_flicker",
+      "location": "room_1",
+      "description": "A flickering red emergency light casting long shadows.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "cold_air_blast",
+      "location": "room_1",
+      "description": "A freezing mist curling around the ankles.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "damp_sock_bag",
+      "location": "room_1",
+      "description": "A canvas bag soaking up the freezing mist.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "contains_info": "code_clue_access",
+      "scenic": false
+    },
+    {
+      "id": "concrete_barrier",
+      "location": "room_1",
+      "description": "The reinforced blast door blocking the exit.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_tool": "crowbar_1",
+      "scenic": false
+    },
+    {
+      "id": "ventilation_hose",
+      "location": "room_1",
+      "description": "A heavy industrial hose snaking across the corridor.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "corridor_blueprint",
+      "location": "room_1",
+      "description": "A crumpled map of the prison corridors.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "contains_info": "ventilation_schematic",
+      "scenic": false
+    },
+    {
+      "id": "frozen_pipes_sound",
+      "location": "room_2",
+      "description": "The hum of rupturing pipes leaking freezing mist.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "exposed_wiring_glow",
+      "location": "room_2",
+      "description": "Blue glow from exposed wiring illuminating the room.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "biometric_lock_panel",
+      "location": "room_2",
+      "description": "A digital lock demanding biometric verification.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_code": "code_clue_access",
+      "code_digits": 4,
+      "scenic": false
+    },
+    {
+      "id": "muddy_footprints_pattern",
+      "location": "room_2",
+      "description": "Deep muddy footprints left by the guards.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "crowbar_1",
+      "location": "room_2",
+      "description": "A rusty crowbar found behind a loose brick.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "requires_code": "code_clue_sock",
+      "scenic": false
+    },
+    {
+      "id": "fog_machine_lens",
+      "location": "room_3",
+      "description": "The lens from a broken fog machine on the wall.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "contains_info": "code_clue_reflection",
+      "scenic": false
+    },
+    {
+      "id": "industrial_grate",
+      "location": "room_3",
+      "description": "A massive industrial grate controlling ventilation flow.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_tool": "fog_machine_lens",
+      "scenic": false
+    },
+    {
+      "id": "schematic_sheet",
+      "location": "room_3",
+      "description": "A sheet of paper with ventilation schematics.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "note": "Contains the alignment code.",
+      "scenic": false
+    },
+    {
+      "id": "choked_air_vortex",
+      "location": "room_3",
+      "description": "A swirling vortex of soot-filled choking air.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "oil_stained_floor",
+      "location": "room_3",
+      "description": "Thick black oil and sweat stains on the floor.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "final_exit_door",
+      "location": "room_4",
+      "description": "The final exit door groaning under tons of concrete.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_tool": "fog_machine_lens",
+      "scenic": false
+    },
+    {
+      "id": "fresh_air_smell",
+      "location": "room_4",
+      "description": "The faint smell of rain and pine from outside.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "rusty_hinges",
+      "location": "room_4",
+      "description": "Rusty hinges vibrating with the mechanical whine.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "extraction_sign",
+      "location": "room_4",
+      "description": "A faded sign indicating the extraction point.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "contains_info": "final_escape_code",
+      "scenic": false
+    },
+    {
+      "id": "scenic_filler_room_1_1",
+      "location": "room_1",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_1_2",
+      "location": "room_1",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_2_1",
+      "location": "room_2",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_2_2",
+      "location": "room_2",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_2_3",
+      "location": "room_2",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_3_1",
+      "location": "room_3",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_3_2",
+      "location": "room_3",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_3_3",
+      "location": "room_3",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_4_1",
+      "location": "room_4",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_4_2",
+      "location": "room_4",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_4_3",
+      "location": "room_4",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_4_4",
+      "location": "room_4",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    }
+  ],
+  "rules": [
+    "Agent only reveals information already discovered in the game state.",
+    "Codes and numbers must come from the game state, never invented.",
+    "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+    "Actions are only valid if the object is visible and within reach."
+  ],
+  "solution_path": [
+    "1. Navigate to room_1 and examine damp_sock_bag to reveal the code clue 'the object'.",
+    "2. Use the revealed code 'the object' on biometric_lock_panel in room_2 to unlock it.",
+    "3. Pass through room_2 and retrieve crowbar_1 (which requires accessing the sock bag via code).",
+    "4. Use crowbar_1 to pry open the concrete_barrier in room_1, revealing the passage to room_3.",
+    "5. Navigate to room_3, examine fog_machine_lens to reveal the code clue 'the object'.",
+    "6. Use the revealed code 'the object' on industrial_grate to align ventilation.",
+    "7. Once air is breathable, navigate to room_4 and use fog_machine_lens to unlock the object.",
+    "8. Exit through the unlocked final door."
+  ],
+  "win_condition": {
+    "object_id": "final_exit_door",
+    "state": "unlocked"
+  }
+  }
+  
+}

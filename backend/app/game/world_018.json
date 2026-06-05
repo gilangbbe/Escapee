@@ -1,0 +1,378 @@
+{
+  "world": {
+"scenario": "In the year 2084, after a failed cyber-terrorist attack, you are locked in Sector Zero of the Blackwood Penitentiary, a facility designed not just to hold prisoners but to surgically erase their will to escape. The air here tastes faintly of ozone and stale copper, while the hum of magnetic locking coils vibrates through your boots like a dying heartbeat. You must navigate the sterile corridors, bypass automated sentries, and dismantle the psychological conditioning keeping you trapped before the extraction drones breach your cell.",
+  "objective": "Escape Sector Zero by disabling the primary containment field and reaching the external launch bay.",
+  "rooms": [
+    {
+      "id": "room_1",
+      "description": "Your cell is a stark cube of matte-black polymer, illuminated only by the flickering red pulse of an overhead status light that casts long, shifting shadows against the sound-dampening walls. The air is thick with the smell of antiseptic and damp concrete, while the rhythmic thrumming of the perimeter fence outside whispers a countdown to your doom.",
+      "adjacency": {
+        "east": "cell_door"
+      },
+      "goal": "Disable the primary magnetic lock on the cell door to access the corridor.",
+      "key_objects": []
+    },
+    {
+      "id": "cell_door",
+      "description": "The heavy steel door is reinforced with a biometric scanner that scans your retinas, its blue light reflecting off the puddles of rain leaking from the roof seams above. The floor shudders with each passing patrol vehicle, and the smell of burning ozone intensifies as the system attempts to override your access request.",
+      "adjacency": {
+        "west": "room_1",
+        "east": "corridor_main"
+      },
+      "goal": "Bypass the biometric scanner and mechanical lock to enter the main corridor.",
+      "key_objects": []
+    },
+    {
+      "id": "corridor_main",
+      "description": "The hallway stretches endlessly into darkness, lined with rows of sleeping pods that breathe in unison, creating a rhythmic sound of rising and falling chests. Fluorescent strips overhead buzz violently, casting a sickly green hue on the polished floor where footprints of previous escapees are barely visible under layers of grime.",
+      "adjacency": {
+        "west": "cell_door",
+        "south": "corridor_main_south"
+      },
+      "goal": "Discover the hidden clue this room conceals.",
+      "goal_completion": {
+        "type": "known_info",
+        "info": "sentry_code_sequence"
+      },
+      "key_objects": []
+    },
+    {
+      "id": "corridor_main_south",
+      "description": "The southern corridor opens into a vast hangar bay where the extraction drones hover silently, their rotors creating a low-frequency vibration that rattles your teeth. The metallic tang of fuel oil mixes with the sterile air, and the cold light of the docked ships illuminates the warning signs etched deep into the metal grating.",
+      "adjacency": {
+        "north": "corridor_main"
+      },
+      "goal": "Get drone_controller_base into the 'unlocked' state.",
+      "goal_completion": {
+        "type": "object_state",
+        "object_id": "drone_controller_base",
+        "state": "unlocked"
+      },
+      "key_objects": []
+    }
+  ],
+  "objects": [
+    {
+      "id": "wall_mounted_comms",
+      "location": "room_1",
+      "description": "A heavy matte-black speaker mounted high on the cell wall, pulsing red. It displays static noise and a countdown timer.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "contains_info": "pulse_code_492",
+      "scenic": false
+    },
+    {
+      "id": "magnetic_cell_lock",
+      "location": "room_1",
+      "description": "The electromagnetic seal sealing your cell door. It requires a specific frequency code to disengage.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "requires_code": "pulse_code_492",
+      "code_digits": 3,
+      "scenic": false
+    },
+    {
+      "id": "wrench_tool",
+      "location": "room_1",
+      "description": "A small stowaway wrench found inside the base of the magnetic lock. It is portable but currently stuck.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "scenic": false
+    },
+    {
+      "id": "cell_chair",
+      "location": "room_1",
+      "description": "A sterile white chair bolted to the floor, covered in grime.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "data_terminal_cover",
+      "location": "room_1",
+      "description": "A flat panel covering a vent near the floor, marked with faded warning labels.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "floor_vent_cover",
+      "location": "room_1",
+      "description": "A circular grate in the floor near the vent cover.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "recycling_bin",
+      "location": "room_1",
+      "description": "A sealed plastic bin at the foot of the chair.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "sensor_array",
+      "location": "room_1",
+      "description": "A sensor node on the ceiling detecting movement.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "biometric_scanner",
+      "location": "cell_door",
+      "description": "The main entry interface for Sector Zero. It scans retinas and requires a sequence override.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_code": "sentry_sequence_884",
+      "scenic": false
+    },
+    {
+      "id": "security_log_chip",
+      "location": "cell_door",
+      "description": "A data chip found in the scanner housing. It contains the sentry sequence but is encrypted.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "requires_tool": "wrench_tool",
+      "scenic": false
+    },
+    {
+      "id": "drone_controller_base",
+      "location": "cell_door",
+      "description": "A maintenance terminal for the drones. It is locked until the biometric scanner is bypassed.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_tool": "magnetic_cell_lock",
+      "scenic": false
+    },
+    {
+      "id": "sentry_protocol_doc",
+      "location": "cell_door",
+      "description": "A printed document detailing the security protocol for the drones.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "contains_info": "sentry_sequence_884",
+      "scenic": false
+    },
+    {
+      "id": "patrol_vehicle_hatch",
+      "location": "cell_door",
+      "description": "The heavy door for the patrol vehicles, currently sealed.",
+      "state": "locked",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "floor_drain_grate",
+      "location": "cell_door",
+      "description": "A metal grate in the floor near the scanner.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "warning_sign_board",
+      "location": "cell_door",
+      "description": "A large sign warning of electrocution hazards.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "maintenance_cable_tie",
+      "location": "corridor_main",
+      "description": "A bundle of cables hanging from the ceiling. One contains a hidden manual for the sentry.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "contains_info": "sentry_code_sequence",
+      "scenic": false
+    },
+    {
+      "id": "sleeping_pod_row_south",
+      "location": "corridor_main",
+      "description": "A row of dormant pods emitting a low hum.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "fluorescent_light_strip_1",
+      "location": "corridor_main",
+      "description": "A buzzing fluorescent light casting a sickly green hue.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "footprint_mud_trace",
+      "location": "corridor_main",
+      "description": "Faint footprints in the grime leading south.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "manual_extraction_guide",
+      "location": "corridor_main",
+      "description": "A manual dropped in the cable bundle. It reveals the sentry code but is locked.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "requires_tool": "wrench_tool",
+      "scenic": false
+    },
+    {
+      "id": "ventilation_fan_unit",
+      "location": "corridor_main",
+      "description": "A large fan unit on the wall.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "floor_warp_marking",
+      "location": "corridor_main",
+      "description": "A painted line on the floor indicating safe zones.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "drone_hub_panel_v2",
+      "location": "corridor_main_south",
+      "description": "The main control panel for the extraction drones. It requires the sentry protocol to unlock.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "requires_code": "sentry_protocol_doc",
+      "scenic": false
+    },
+    {
+      "id": "drone_controller_base_v2",
+      "location": "corridor_main_south",
+      "description": "The base controller for the drones. It is locked until the hub panel is unlocked.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_tool": "drone_hub_panel_v2",
+      "scenic": false
+    },
+    {
+      "id": "hangar_floor_marking",
+      "location": "corridor_main_south",
+      "description": "Warning signs etched deep into the metal grating.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "docked_ship_hull",
+      "location": "corridor_main_south",
+      "description": "The metallic hull of a docked extraction ship.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "rotor_vibration_sensor",
+      "location": "corridor_main_south",
+      "description": "A sensor detecting the low-frequency vibration of the rotors.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "fuel_oil_container",
+      "location": "corridor_main_south",
+      "description": "A leaking fuel container on the floor.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "cold_light_source",
+      "location": "corridor_main_south",
+      "description": "The cold light of the docked ships illuminating the bay.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_cell_door_1",
+      "location": "cell_door",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_corridor_main_1",
+      "location": "corridor_main",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_corridor_main_south_1",
+      "location": "corridor_main_south",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    }
+  ],
+  "rules": [
+    "Agent only reveals information already discovered in the game state.",
+    "Codes and numbers must come from the game state, never invented.",
+    "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+    "Actions are only valid if the object is visible and within reach."
+  ],
+  "solution_path": [
+    "1. Examine wall_mounted_comms in room_1 to learn the object.",
+    "2. Use magnetic_cell_lock in room_1 with code from wall_mounted_comms to unlock it (releases wrench_tool).",
+    "3. Take wrench_tool from magnetic_cell_lock.",
+    "4. Examine security_log_chip in cell_door using wrench_tool to reveal the object.",
+    "5. Use biometric_scanner in cell_door with code the object (from security_log_chip) to bypass it and unlock drone_controller_base.",
+    "6. Use drone_controller_base in cell_door to open the path to corridor_main_south (or reveal hub).",
+    "7. Examine manual_extraction_guide in corridor_main using wrench_tool (obtained earlier) to reveal the hidden code content.",
+    "8. Use drone_hub_panel_v2 in corridor_main_south with code the hidden code to unlock it.",
+    "9. Use drone_controller_base_v2 in corridor_main_south (now unlocked via hub panel) to achieve final goal."
+  ],
+  "win_condition": {
+    "object_id": "drone_controller_base",
+    "state": "unlocked"
+  }
+  }
+  
+}

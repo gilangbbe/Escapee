@@ -123,6 +123,24 @@ class ActionPlanner:
         ranked.sort(key=lambda x: x.score, reverse=True)
         return PlannerDecision(best_action=ranked[0].action, ranked=ranked[:3])
 
+    def immediate_value(
+        self,
+        *,
+        player_id: str,
+        state: GameState,
+        action: GameAction,
+    ) -> float:
+        """One-step transition score for an arbitrary action.
+
+        Used by the orchestrator's progress gate to judge how much real progress
+        the agent's chosen action makes, even when that action is not among the
+        ranked top options (e.g. inspecting a decoy or a scenic filler). A high
+        value means the action is genuinely productive (a milestone, a solved
+        objective, a win); a value near zero or negative means it is busywork.
+        """
+        immediate, _next_state, _obs = self._simulate(state, player_id, action)
+        return immediate
+
     def _search(
         self,
         *,

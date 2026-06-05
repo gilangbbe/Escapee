@@ -176,3 +176,64 @@ def test_use_requires_item_and_target_ids():
     with pytest.raises(ValidationError):
         GameAction(action=A.USE, item_id="access_card", target_id=None)
 
+
+def test_opening_object_reveals_its_contained_info():
+    """Regression: solving an object via USE/ENTER_CODE must reveal its own
+    `contains_info`, just like inspecting it. Otherwise a downstream lock or
+    known_info gate that depends on that info can never be satisfied (the
+    world_020 failure: a console unlocked with a tool kept its code hidden).
+    """
+    setting = GameSetting.model_validate(
+        {
+            "scenario": "test",
+            "objective": "Open the final door.",
+            "rooms": ["room_1"],
+            "start_room": "room_1",
+            "objects": [
+                {
+                    "id": "console",
+                    "location": "room_1",
+                    "description": "A console.",
+                    "state": "locked",
+                    "interactable": True,
+                    "requires_tool": "keycard",
+                    "contains_info": "exit_code",
+                },
+                {
+                    "id": "keycard",
+                    "location": "room_1",
+                    "description": "A keycard.",
+                    "state": "visible",
+                    "interactable": True,
+                    "takeable": True,
+                },
+                {
+                    "id": "final_door",
+                    "location": "room_1",
+                    "description": "The final door.",
+                    "state": "locked",
+                    "interactable": True,
+                    "requires_code": "exit_code",
+                },
+            ],
+            "win_condition": {"object_id": "final_door", "state": "unlocked"},
+            "players": [{"id": "player_1", "name": "Tester", "role": "tester"}],
+        }
+    )
+    sim = GameSimulator(setting)
+    sim.step("player_1", GameAction(action=A.TAKE, target_id="keycard"))
+    obs = sim.step(
+        "player_1",
+        GameAction(action=A.USE, item_id="keycard", target_id="console"),
+    )
+    assert obs.success
+    # The code held inside the console is now known to the team.
+    assert "exit_code" in sim.state.discovered_info
+    # And it can be used to open the dependent lock.
+    obs = sim.step(
+        "player_1",
+        GameAction(action=A.ENTER_CODE, target_id="final_door", code="exit_code"),
+    )
+    assert obs.success
+    assert sim.state.won is True
+

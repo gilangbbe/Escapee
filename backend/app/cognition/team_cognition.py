@@ -619,8 +619,16 @@ class TeamCognition:
         for clue in state.setting.player_clues:
             if clue.player_id == player_id:
                 ingest(clue.clue)
+                # A single-token clue (no spaces) may itself be the literal code.
+                token = clue.clue.strip()
+                if token and " " not in token:
+                    phrases.append(token)
         for info in sorted(state.discovered_info):
             ingest(info)
+            # A discovered info token can BE the literal code a lock expects
+            # (e.g. requires_code == "airlock_sequence_code"). Surface it verbatim
+            # so length/substring extraction is not the only way a code is known.
+            phrases.append(info)
 
         def dedupe(values: list[str]) -> list[str]:
             out: list[str] = []
@@ -644,6 +652,10 @@ class TeamCognition:
         if obj.code_digits:
             filtered = [c for c in numeric_codes if len(c) == obj.code_digits]
             return filtered[:2]
+        # Exact-match wins: if the lock's literal code is already a known phrase
+        # (e.g. a discovered info token equal to requires_code), use it directly.
+        if obj.requires_code in phrase_codes:
+            return [obj.requires_code]
         # Textual/unknown-format lock: phrase first, then numeric fallback.
         return (phrase_codes + numeric_codes)[:2]
 
