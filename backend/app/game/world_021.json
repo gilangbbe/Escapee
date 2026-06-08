@@ -1,0 +1,323 @@
+{
+  "world": {
+    "scenario": "A botched heist has left the crew trapped inside the vault of the city's most secure bank. Flickering security lights cast jagged shadows across the floor, and the distant sound of approaching police sirens echoes through the corridors. The gang must escape before the police arrive and before the bank's automated defense system activates — a system designed to erase any trace of the robbery, including its perpetrators.",
+    "objective": "Escape the bank before the security system initiates a lockdown and erases all evidence.",
+    "rooms": [
+      {
+        "id": "entrance_corridor",
+        "description": "The air is thick with the metallic tang of old circuitry and the acrid scent of burnt wiring. Flickering fluorescent lights cast long, trembling shadows across the cracked tiles, revealing faint fingerprints smeared across the wall.",
+        "adjacency": {
+          "east": "security_room"
+        },
+        "goal": "Get security_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "security_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "security_door",
+          "fingerprint_scanner",
+          "distress_button"
+        ]
+      },
+      {
+        "id": "security_room",
+        "description": "A low hum of static fills the air, mingling with the rhythmic pulse of a malfunctioning server. The floor vibrates faintly beneath your feet, and the cold steel of the room radiates a chill that seeps into your bones.",
+        "adjacency": {
+          "west": "entrance_corridor",
+          "east": "control_room"
+        },
+        "goal": "Find and take biometric_keycard.",
+        "goal_completion": {
+          "type": "has_item",
+          "object_id": "biometric_keycard"
+        },
+        "key_objects": [
+          "biometric_lock",
+          "server_console",
+          "biometric_keycard",
+          "security_camera"
+        ]
+      },
+      {
+        "id": "control_room",
+        "description": "The room is filled with the sharp, sterile scent of ozone and the metallic echo of countless keystrokes. A single overhead light flickers in time with the distant beeping of the bank's central alarm system.",
+        "adjacency": {
+          "west": "security_room",
+          "east": "vault_hall"
+        },
+        "goal": "Bring the sekring_SEKR_ON power line online.",
+        "goal_completion": {
+          "type": "power_active",
+          "id": "sekring_SEKR_ON"
+        },
+        "key_objects": [
+          "central_terminal",
+          "lockdown_system",
+          "timer_display",
+          "disarm_key"
+        ]
+      },
+      {
+        "id": "vault_hall",
+        "description": "The air is unnaturally still, as if the vault itself holds its breath. The floor vibrates with the low, constant rumble of the vault door’s pressure seal, and the faint scent of gunpowder lingers in the air.",
+        "adjacency": {
+          "west": "control_room"
+        },
+        "goal": "Get vault_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "vault_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "vault_door",
+          "escape_sequence_terminal",
+          "police_siren_monitor",
+          "evidence_erasure_alert"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "security_door",
+        "location": "entrance_corridor",
+        "description": "A heavy steel door with a digital keypad and a red indicator light that pulses rhythmically.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "fingerprint_code",
+        "code_digits": 4,
+        "scenic": false
+      },
+      {
+        "id": "fingerprint_scanner",
+        "location": "entrance_corridor",
+        "description": "A biometric scanner mounted on the wall near the security door, with a faint glow from its lens.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "fingerprint_code",
+        "scenic": false
+      },
+      {
+        "id": "distress_button",
+        "location": "entrance_corridor",
+        "description": "A red emergency button mounted on the wall, slightly ajar and covered in dust.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "scenic": false
+      },
+      {
+        "id": "biometric_lock",
+        "location": "security_room",
+        "description": "A high-tech biometric lock with a glowing blue interface and a slot for the keycard.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "biometric_keycard",
+        "scenic": false
+      },
+      {
+        "id": "biometric_keycard",
+        "location": "security_room",
+        "description": "A small, black keycard with a faint holographic logo that flickers when touched.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "server_console",
+        "location": "security_room",
+        "description": "A large, blinking server console with a glowing screen and a keyboard covered in dust.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "server_password",
+        "scenic": false
+      },
+      {
+        "id": "security_camera",
+        "location": "security_room",
+        "description": "A security camera mounted on the ceiling, its lens cracked and unresponsive.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "central_terminal",
+        "location": "control_room",
+        "description": "A massive terminal with a glowing screen and a keyboard that emits a faint blue light.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "fuses": {
+          "SEKR": "OFF"
+        },
+        "scenic": false
+      },
+      {
+        "id": "lockdown_system",
+        "location": "control_room",
+        "description": "A red emergency lockdown panel with a series of switches and blinking lights.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "server_password",
+        "code_digits": 6,
+        "scenic": false
+      },
+      {
+        "id": "timer_display",
+        "location": "control_room",
+        "description": "A digital timer mounted on the wall, counting down in red digits.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "disarm_key",
+        "location": "control_room",
+        "description": "A small, metallic key with a unique pattern etched into its surface.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "vault_door",
+        "location": "vault_hall",
+        "description": "A massive, reinforced vault door with a glowing lock mechanism and a pressure seal.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "disarm_key",
+        "scenic": false
+      },
+      {
+        "id": "escape_sequence_terminal",
+        "location": "vault_hall",
+        "description": "A terminal with a glowing screen displaying an escape sequence interface.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "scenic": false
+      },
+      {
+        "id": "police_siren_monitor",
+        "location": "vault_hall",
+        "description": "A monitor displaying the sound waves of approaching police sirens.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "evidence_erasure_alert",
+        "location": "vault_hall",
+        "description": "A red warning light that flickers rapidly, signaling imminent evidence erasure.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "wooden_chair",
+        "location": "entrance_corridor",
+        "description": "A worn wooden chair pushed against the wall, slightly out of place.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "metal_shelf",
+        "location": "entrance_corridor",
+        "description": "A rusted metal shelf stacked with old circuit boards and tools.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "server_rack",
+        "location": "security_room",
+        "description": "A row of blinking servers and cables running across the floor.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "desk",
+        "location": "security_room",
+        "description": "A small, cluttered desk with papers, a coffee mug, and a broken keyboard.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "control_console",
+        "location": "control_room",
+        "description": "A large, black console with a glowing interface and a keyboard covered in dust.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "control_panel",
+        "location": "control_room",
+        "description": "A control panel with a series of switches and blinking lights.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "vault_shelf",
+        "location": "vault_hall",
+        "description": "A steel shelf with empty slots and a faint smell of oil.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "floor_grating",
+        "location": "vault_hall",
+        "description": "A steel floor grating with visible bolts and a faint humming sound.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. Examine the fingerprint_scanner in the entrance_corridor to obtain the hidden 4-digit code.",
+      "2. Use the code obtained from the fingerprint_scanner to unlock the security_door in the entrance_corridor.",
+      "3. Enter the security_room and take the biometric_keycard from the floor.",
+      "4. Use the biometric_keycard to unlock the biometric_lock in the security_room.",
+      "5. Examine the server_console in the security_room to obtain the 6-digit server password.",
+      "6. Use the server password to unlock the lockdown_system in the control_room.",
+      "7. Take the disarm_key from the control_room.",
+      "8. Use the disarm_key to unlock the vault_door in the vault_hall and escape before the evidence_erasure_alert activates."
+    ],
+    "win_condition": {
+      "object_id": "vault_door",
+      "state": "unlocked"
+    }
+  }
+}

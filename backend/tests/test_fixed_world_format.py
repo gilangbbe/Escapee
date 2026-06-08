@@ -12,7 +12,7 @@ from app.schemas.fixed_world import load_setting_compat
 
 
 FIXED_WORLD_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "app", "game", "world_020.json"
+    os.path.dirname(__file__), "..", "app", "game", "world_021.json"
 )
 
 # A structurally-specific world used by the wiring/progression tests below,
