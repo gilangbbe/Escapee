@@ -70,6 +70,26 @@ class OllamaClient:
         return data["message"]["content"]
 
 
+async def list_installed_models(
+    base_url: str = DEFAULT_OLLAMA_URL, *, timeout: float = 10.0
+) -> list[str]:
+    """Return the model names installed on the local Ollama server.
+
+    Best-effort: returns an empty list if Ollama is unreachable so the UI can
+    fall back to a free-text model field instead of failing.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            resp = await client.get(f"{base_url.rstrip('/')}/api/tags")
+            resp.raise_for_status()
+            data = resp.json()
+    except (httpx.HTTPError, ValueError):
+        return []
+
+    models = [m.get("name") for m in data.get("models", []) if m.get("name")]
+    return sorted(set(models))
+
+
 async def generate_blueprint(
     client: OllamaClient,
     *,

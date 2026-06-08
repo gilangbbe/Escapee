@@ -19,6 +19,7 @@ export function SetupPanel({ setup }: Props) {
         <div key={p.id} className="persona">
           <strong>{p.name}</strong> <span className="muted">({p.role})</span>
           <div className="muted">skills: {p.skills.join(", ")}</div>
+          {p.model ? <div className="muted">model: {p.model}</div> : null}
         </div>
       ))}
     </div>

@@ -122,13 +122,29 @@ class WinCondition(BaseModel):
 
 
 class PlayerPersona(BaseModel):
-    """A cooperating player (multi-agent extension over the raw world)."""
+    """A cooperating player (multi-agent extension over the raw world).
+
+    Besides flavor (name/role/skills/backstory), a persona may declare its own
+    LLM binding so a team can mix models — e.g. one player on ``qwen2.5:7b`` and
+    another on ``llama3.1:8b``. ``model``/``temperature`` are optional overrides;
+    when omitted the runner's defaults apply. ``personality`` is a short trait
+    line injected into the system prompt to differentiate how each agent behaves.
+    """
 
     id: str
     name: str
     role: str
     skills: list[str] = Field(default_factory=list)
     backstory: str = ""
+    personality: str = Field(
+        "", description="Short behavioral trait line for prompt flavor."
+    )
+    model: Optional[str] = Field(
+        None, description="Per-persona LLM model id; falls back to the runner default."
+    )
+    temperature: Optional[float] = Field(
+        None, description="Per-persona sampling temperature; falls back to the default."
+    )
 
 
 class PlayerClue(BaseModel):

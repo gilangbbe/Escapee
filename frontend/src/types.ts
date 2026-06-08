@@ -16,6 +16,8 @@ export interface PersonaInfo {
   role: string;
   skills: string[];
   backstory: string;
+  personality?: string;
+  model?: string | null;
 }
 
 export type EventKind = "speech" | "observation" | "system" | "planner" | "prompt" | "decision" | "narration";
@@ -91,3 +93,36 @@ export type ServerMessage =
   | StateMessage
   | ResultMessage
   | ErrorMessage;
+
+// Editable persona used by the pre-game crew configurator. Mirrors the fields
+// accepted by backend PlayerPersona (model/temperature are per-player overrides).
+export interface PersonaDraft {
+  id: string;
+  name: string;
+  role: string;
+  skills: string[];
+  backstory: string;
+  personality: string;
+  model: string;
+  temperature: number | null;
+}
+
+// Bootstrap payload from GET /api/personas.
+export interface PersonaCatalogEntry {
+  key: string;
+  name: string;
+  role: string;
+  skills: string[];
+  backstory: string;
+  personality: string;
+  model: string | null;
+  temperature: number | null;
+}
+
+export interface PersonasBootstrap {
+  default_model: string;
+  models: string[];
+  catalog: PersonaCatalogEntry[];
+  roster: PersonaInfo[];
+}
+

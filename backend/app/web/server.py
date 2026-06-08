@@ -24,8 +24,10 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.game.default_story import DEFAULT_STORY_PAYLOAD
+from app.game.personas import catalog_as_dicts
+from app.llm.ollama_client import DEFAULT_OLLAMA_URL, list_installed_models
 from app.schemas.fixed_world import load_setting_compat
-from app.schemas.game_setting import GameSetting
+from app.schemas.game_setting import GameSetting, PlayerPersona
 from app.web.runner import DEFAULT_MODEL, GameRunner, build_agents, build_narrator
 from app.web.serializers import setup_message
 
@@ -63,6 +65,55 @@ async def get_setting() -> dict:
     return setup_message(current_setting())
 
 
+@app.get("/api/personas")
+async def get_personas() -> dict:
+    """Persona-editor bootstrap data for the UI.
+
+    Returns the current default roster (so the editor opens pre-filled), the
+    catalog of reusable persona templates, and the list of models installed on
+    the local Ollama server (best-effort; empty if Ollama is unreachable).
+    """
+    setting = current_setting()
+    installed = await list_installed_models(DEFAULT_OLLAMA_URL)
+    # Always include the configured default so it is selectable even if the
+    # tags lookup failed or that model is pulled lazily.
+    models = sorted(set(installed) | {DEFAULT_MODEL})
+    return {
+        "default_model": DEFAULT_MODEL,
+        "models": models,
+        "catalog": catalog_as_dicts(),
+        "roster": setup_message(setting)["players"],
+    }
+
+
+def _personas_from_param(raw: str | None) -> list[PlayerPersona] | None:
+    """Parse a UI-supplied roster (URL JSON) into validated personas.
+
+    Ids are reassigned to a stable ``player_1..player_n`` sequence so a custom
+    cast can never collide or leave gaps. Returns None when no override is given
+    or the payload is unusable, in which case the authored roster is kept.
+    """
+    if not raw:
+        return None
+    try:
+        data = json.loads(raw)
+    except (ValueError, TypeError):
+        return None
+    if not isinstance(data, list) or not data:
+        return None
+
+    personas: list[PlayerPersona] = []
+    for index, entry in enumerate(data):
+        if not isinstance(entry, dict):
+            continue
+        payload = {**entry, "id": f"player_{len(personas) + 1}"}
+        try:
+            personas.append(PlayerPersona.model_validate(payload))
+        except Exception:
+            continue
+    return personas or None
+
+
 @app.websocket("/ws/game")
 async def game_socket(websocket: WebSocket) -> None:
     await websocket.accept()
@@ -77,10 +128,16 @@ async def game_socket(websocket: WebSocket) -> None:
 
     setting = current_setting()
 
+    # Optional UI-configured roster (add/edit personas + per-player models).
+    custom_personas = _personas_from_param(websocket.query_params.get("personas"))
+    if custom_personas:
+        setting.players = custom_personas
+
     async def send(message: dict) -> None:
         await websocket.send_text(json.dumps(message))
 
     try:
+        # Re-announce setup so the UI reflects the roster actually in play.
         agents = build_agents(setting, model=model)
         narrator = build_narrator(model=model) if narrate else None
         runner = GameRunner(setting, agents, max_rounds=rounds, narrator=narrator)

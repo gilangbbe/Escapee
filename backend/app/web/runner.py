@@ -41,19 +41,38 @@ def build_agents(
     base_url: Optional[str] = None,
     temperature: float = 0.4,
 ) -> list[GamePlayerAgent]:
-    """Construct one agent per persona, each bound to a local Ollama model."""
+    """Construct one agent per persona, honoring per-persona LLM bindings.
+
+    A persona may declare its own ``model``/``temperature`` (see the persona
+    catalog) so a single team can mix models. When a persona omits them, the
+    ``model``/``temperature`` arguments here are the team-wide fallback. One
+    `OllamaClient` is shared per distinct ``(model, base_url)`` pair so multiple
+    personas on the same model do not spin up redundant clients.
+    """
     if not setting.players:
         raise ValueError("This setting defines no players to drive.")
 
+    clients: dict[str, OllamaClient] = {}
+
+    def client_for(persona_model: str) -> OllamaClient:
+        if persona_model not in clients:
+            clients[persona_model] = (
+                OllamaClient(model=persona_model, base_url=base_url)
+                if base_url
+                else OllamaClient(model=persona_model)
+            )
+        return clients[persona_model]
+
     agents: list[GamePlayerAgent] = []
     for persona in setting.players:
-        client = (
-            OllamaClient(model=model, base_url=base_url)
-            if base_url
-            else OllamaClient(model=model)
-        )
+        persona_model = persona.model or model
+        persona_temp = persona.temperature if persona.temperature is not None else temperature
         agents.append(
-            GamePlayerAgent(persona=persona, client=client, temperature=temperature)
+            GamePlayerAgent(
+                persona=persona,
+                client=client_for(persona_model),
+                temperature=persona_temp,
+            )
         )
     return agents
 

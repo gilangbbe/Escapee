@@ -197,23 +197,17 @@ class FixedWorld(BaseModel):
             self._normalize_code(obj)
         self._wire_room_progression(objects)
 
-        # Default cooperative cast when personas are not authored in fixed format.
-        default_players = [
-            PlayerPersona(
-                id="player_1",
-                name="Alex Quinn",
-                role="Field Analyst",
-                skills=["observe", "reason", "decode"],
-                backstory="A methodical investigator who tracks clues under pressure.",
-            ).model_dump(),
-            PlayerPersona(
-                id="player_2",
-                name="Riley Sato",
-                role="Systems Operator",
-                skills=["repair", "override", "route_power"],
-                backstory="A pragmatic engineer who can restore failing systems quickly.",
-            ).model_dump(),
-        ]
+        # Personas: respect any cast authored in the fixed-world payload (the
+        # `players` field is allowed via extra="allow"); otherwise deal a default
+        # cooperative roster from the editable catalog. Defined in one place so
+        # the cast — and per-player LLM bindings — stay modular.
+        from app.game.personas import build_roster
+
+        authored = getattr(self, "players", None)
+        if authored:
+            players = [PlayerPersona.model_validate(p).model_dump() for p in authored]
+        else:
+            players = [p.model_dump() for p in build_roster(count=2)]
 
         return GameSetting.model_validate(
             {
@@ -225,7 +219,7 @@ class FixedWorld(BaseModel):
                 "rules": self.rules,
                 "solution_path": self.solution_path,
                 "win_condition": self.win_condition.model_dump(),
-                "players": default_players,
+                "players": players,
                 "player_clues": [],
             }
         )
