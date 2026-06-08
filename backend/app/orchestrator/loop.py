@@ -162,6 +162,9 @@ class GameOrchestrator:
         if self.narrator is not None:
             # Generate lore once from the world JSON before the game starts.
             await self.narrator.generate_lore(self.setting)
+            # First beat: emit the scenario text directly as context for the reader.
+            await self._emit(EventKind.NARRATION, None, self.setting.scenario, turn=0, record=False)
+            # Second beat: the crew wakes up.
             opening = await self.narrator.narrate_opening(self.setting)
             await self._emit(EventKind.NARRATION, None, opening, turn=0, record=False)
 

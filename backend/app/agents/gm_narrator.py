@@ -94,7 +94,24 @@ class GameMasterNarrator:
         return text
 
     def _remember(self, line: str) -> None:
+        """Store a bare prose line (for opening, milestone, system events)."""
         self._recent.append(line)
+        if len(self._recent) > self.recent_window:
+            self._recent = self._recent[-self.recent_window:]
+
+    def remember_turn(
+        self,
+        *,
+        actor_name: str,
+        action_text: str,
+        success: bool,
+        speech: str,
+        turn_no: int,
+    ) -> None:
+        """Store a structured turn record so narrator can see attribution + outcome + speech."""
+        status = "OK" if success else "FAIL"
+        record = f"[Turn {turn_no}] {actor_name} → {action_text} → {status}: \"{speech}\""
+        self._recent.append(record)
         if len(self._recent) > self.recent_window:
             self._recent = self._recent[-self.recent_window:]
 
@@ -181,7 +198,13 @@ class GameMasterNarrator:
             fallback=f'{actor_name}: "{outcome}"',
         )
         normalized = self._normalize_dialogue_line(line)
-        self._remember(normalized)
+        self.remember_turn(
+            actor_name=actor_name,
+            action_text=action_text,
+            success=success,
+            speech=normalized,
+            turn_no=turn,
+        )
         return normalized
 
     async def narrate_system_event(

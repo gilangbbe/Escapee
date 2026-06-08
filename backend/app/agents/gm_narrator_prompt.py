@@ -30,6 +30,9 @@ FORBIDDEN (never use):
 - Ellipsis: ...
 - Third-person narration ("she goes to", "he checks")
 - Calm, neutral tone
+- Teammate names when talking TO them directly. Use "you" or "we".
+  Only use a name when referring to someone not present (3+ players).
+  Good: "you got it, let's move"  Bad: "with Alex, let's move" (when Alex is your listener)
 
 You will receive a highly structured CONTEXT PACKAGE. Follow it exactly.
 
@@ -49,7 +52,11 @@ CONTENT RULES:
    - FRESH_ACTION_SUCCESS: relief, excitement, urgency ("yes! the door opened, get over here")
    - FRESH_ACTION_FAILURE: frustration, pivot ("nothing, we need a different angle")
    - REPEATED_ACTION_LOOP_CATCH: exasperation, demand new ideas ("we already did this, someone think of something else")
-4. If RECENT_GROUP_CHAT_BEATS shows a teammate just said something, react to it directly.
+4. Read CONVERSATION_THREAD carefully. If the last entry is from a DIFFERENT character,
+   react to what they said or did BEFORE describing your own action. This creates dialogue flow.
+   Example: last entry is "Alex Quinn → OK: 'try the key on the cabinet'"
+   → your reply: "on it, sliding the key in now, this has to be it"
+   NOT: "checking the cabinet with the key"
 5. Voice must match CHARACTER_SHEET personality and MOOD_GUIDANCE.
 
 GROUND-TRUTH RULES (never break):
@@ -59,17 +66,23 @@ GROUND-TRUTH RULES (never break):
 """
 
 NARRATOR_EVENT_SYSTEM_PROMPT = """\
-You are a NARRATOR writing short atmospheric prose for an escape-room story.
-React to what just happened with vivid, present-tense third-person narration.
-Tense. Visceral. Grounded in what actually occurred.
+You are a NARRATOR describing what happens in an escape room story.
+Write clearly and simply. Short sentences. Easy words. Like a news reporter, not a poet.
+The reader may not be a native English speaker.
 
 FORBIDDEN: — or – or -- or ... or ; or invented facts.
-FORBIDDEN: first-person pronouns (i, we, my, our). Always use character names or "they/the team".
+FORBIDDEN: "I", "we", "my", "our". Use character names or "they/the team".
+FORBIDDEN: complex literary phrases, metaphors, or dramatic descriptions.
 
 OUTPUT CONTRACT:
 1. One to two sentences only. No markdown. No prefixes.
-2. Present tense. Third person. Use character names, not "I" or "we".
-3. Ground every claim in the EVENT below. Invent nothing.
+2. Present tense. Third person. Simple, clear language.
+3. Only describe what actually happened. Do not invent anything.
+
+EXAMPLES of good style:
+- "Riley checks the control panel. It does not respond."
+- "The team finds a locked door at the end of the corridor."
+- "Alex picks up the keycard. The door ahead might need it."
 """
 
 
@@ -243,7 +256,7 @@ def build_dialogue_context_package(
 ) -> str:
     """Build a rigid, low-drift context package for local 7B dialogue models."""
     skills = ", ".join(actor_skills) if actor_skills else "general"
-    story = "\n".join(f"- {beat}" for beat in recent_story) or "- (session just started)"
+    story = "\n".join(f"- {beat}" for beat in recent_story) or "(session just started, no prior messages)"
     speech_text = speech.strip() if speech and speech.strip() else "(not stated)"
 
     lore_section = (
@@ -262,7 +275,7 @@ def build_dialogue_context_package(
         f"- SCENARIO: {scenario}\n"
         f"- OBJECTIVE: {objective}\n"
         f"- TURN: {turn}\n"
-        f"- RECENT_GROUP_CHAT_BEATS:\n{story}\n\n"
+        f"CONVERSATION_THREAD (most recent last — react to the last entry if it's a teammate):\n{story}\n\n"
         f"{lore_section}"
         f"{snapshot_section}"
         "CHARACTER_SHEET:\n"
@@ -288,13 +301,24 @@ def build_dialogue_context_package(
     )
 
 
+def build_scenario_user_prompt(setting: GameSetting) -> str:
+    """Prompt for the very first narration beat: describe the place and context."""
+    return (
+        "Describe this escape room setting to the reader as an establishing shot.\n\n"
+        f"SCENARIO: {setting.scenario}\n\n"
+        "Write 2-3 sentences describing the place itself: what it looks like, "
+        "sounds like, feels like. Third person. Present tense. No characters yet, "
+        "no actions. Just the world the reader is about to enter. No dashes."
+    )
+
+
 def build_opening_user_prompt(setting: GameSetting) -> str:
     return (
-        "Open the story. Set the scene as the crew comes to their senses.\n\n"
+        "Describe the moment the team wakes up and realizes where they are.\n\n"
         f"SETTING: {setting.scenario}\n"
         f"THEIR GOAL: {setting.objective}\n\n"
-        "Write 2-3 atmospheric sentences establishing the mood and the stakes. "
-        "Do not narrate any actions yet — just the opening scene."
+        "Write 1-2 short, clear sentences. Simple English. "
+        "Describe what they see and feel right now. No complex words. No metaphors."
     )
 
 

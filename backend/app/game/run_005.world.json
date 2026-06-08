@@ -1,0 +1,376 @@
+{
+  "scenario": "The year is 1984, and the Penitentiary of San Clemente has fallen into a paranoid silence following the disappearance of its warden. You are Dr. Aris Thorne, a renowned neurochemist captured for your work on experimental memory suppression serums. Now, three days past your scheduled execution date, you must navigate the decaying concrete halls, bypass lethal alarms and psychological traps, to reach the underground server room where the original prototype vials are kept—vials that could save your family or condemn humanity to lobotomized oblivion.",
+  "objective": "Navigate the four interconnected sectors of the prison to locate the prototype serum vials in the server room before the lockdown timer expires.",
+  "rooms": [
+    {
+      "id": "cell_block_alpha",
+      "description": "The air tastes of stale rust and unwashed bodies, thick enough to choke on, while the flickering fluorescent lights cast a sickly green pallor that makes the peeling paint look like bruised flesh. Your cell door is a heavy iron slab, currently sealed shut by an electronic lock that pulses with a rhythmic red glare.",
+      "adjacency": {
+        "east": "corridor_vault"
+      },
+      "goal": "Get cell_door_alpha into the 'unlocked' state.",
+      "key_objects": []
+    },
+    {
+      "id": "corridor_vault",
+      "description": "The corridor is a canyon of concrete shadow, illuminated only by the intermittent hum of ventilation fans that smell faintly of ozone and copper. A biometric scanner at the end of the hall glows blue, demanding your retinal scan to proceed toward the vaulted archives.",
+      "adjacency": {
+        "west": "cell_block_alpha",
+        "east": "medical_wing_beta"
+      },
+      "goal": "Discover the hidden clue this room conceals.",
+      "goal_completion": {
+        "type": "known_info",
+        "info": "warden_retina_hash"
+      },
+      "key_objects": []
+    },
+    {
+      "id": "medical_wing_beta",
+      "description": "The smell of antiseptic here is cloying and sickening, masking the underlying scent of decay from bodies that haven't been moved in weeks. Sterile white tiles are marred by crimson stains, and a heavy steel door leads to the restricted surgery suite where the vials are stored.",
+      "adjacency": {
+        "west": "corridor_vault",
+        "east": "server_catacombs_gamma"
+      },
+      "goal": "Disable the surgical suite's security mechanism to access the prototype storage.",
+      "key_objects": []
+    },
+    {
+      "id": "server_catacombs_gamma",
+      "description": "The air is freezing and smells of hot electronics mixed with the metallic tang of blood spilled on the cold tile floor. Rows of humming server racks cast long, digital shadows, leading to a reinforced blast door marked 'CONTAINMENT PROTOCOL: NULL' that blocks your final path.",
+      "adjacency": {
+        "west": "medical_wing_beta"
+      },
+      "goal": "Get mainframe_interface_panel into the 'unlocked' state.",
+      "goal_completion": {
+        "type": "object_state",
+        "object_id": "mainframe_interface_panel",
+        "state": "unlocked"
+      },
+      "key_objects": []
+    }
+  ],
+  "objects": [
+    {
+      "id": "cell_lock_panel",
+      "location": "cell_block_alpha",
+      "description": "A heavy-duty electronic lock on the cell door, pulsing red with a numeric keypad.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_code": "alpha_sequence_739",
+      "code_digits": 3,
+      "scenic": false
+    },
+    {
+      "id": "drift_journal_torn",
+      "location": "cell_block_alpha",
+      "description": "Tattered pages of Dr. Thorne's personal journal, stained with rust water.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "contains_info": "alpha_sequence_739",
+      "scenic": false
+    },
+    {
+      "id": "dust_bin_cell_alpha_locked",
+      "location": "cell_block_alpha",
+      "description": "The dust bin is currently sealed shut by a combination lock.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_code": "bin_combo_142",
+      "code_digits": 3,
+      "scenic": false
+    },
+    {
+      "id": "nurse_note_pad",
+      "location": "corridor_vault",
+      "description": "A discarded medical chart hidden behind a ventilation grate.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "contains_info": "warden_retina_hash",
+      "scenic": false
+    },
+    {
+      "id": "biometric_scanner_door",
+      "location": "corridor_vault",
+      "description": "A wall-mounted scanner demanding a retinal scan to proceed east.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_tool": "nurse_note_pad",
+      "scenic": false
+    },
+    {
+      "id": "wiper_handle_dirty",
+      "location": "medical_wing_beta",
+      "description": "A grimy metal handle on the surgery suite door, covered in dried antiseptic.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "scenic": false
+    },
+    {
+      "id": "syringe_case_sealed",
+      "location": "medical_wing_beta",
+      "description": "A locked metal case sitting on the surgical table, requiring a code to open.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_code": "syringe_code_890",
+      "code_digits": 3,
+      "scenic": false
+    },
+    {
+      "id": "vial_record_sheet",
+      "location": "medical_wing_beta",
+      "description": "A logbook detailing the experimental serum vials, now scattered on the floor.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "contains_info": "syringe_code_890",
+      "scenic": false
+    },
+    {
+      "id": "vent_grate_locked",
+      "location": "medical_wing_beta",
+      "description": "A heavy ventilation grate blocking access to the mainframe room's control panel.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "requires_tool": "wiper_handle_dirty",
+      "scenic": false
+    },
+    {
+      "id": "mainframe_interface_panel",
+      "location": "server_catacombs_gamma",
+      "description": "The central command interface for the server room blast doors.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_tool": "vent_grate_locked",
+      "scenic": false
+    },
+    {
+      "id": "thermal_sensor_frozen",
+      "location": "server_catacombs_gamma",
+      "description": "A sensor on the blast door reading 'NULL' in freezing digits.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "scenic": false
+    },
+    {
+      "id": "scenic_old_bed_cell",
+      "location": "cell_block_alpha",
+      "description": "A rotting bunk bed with sheets stained in old blood.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "contains_info": "bin_combo_142",
+      "scenic": true
+    },
+    {
+      "id": "scenic_rusty_table_cell",
+      "location": "cell_block_alpha",
+      "description": "A metal table bolted to the floor, covered in grime.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_broken_fan_cell",
+      "location": "cell_block_alpha",
+      "description": "A flickering ventilation fan spinning lazily above the bed.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_damp_sofa_corridor",
+      "location": "corridor_vault",
+      "description": "A waterlogged sofa soaked in sewage and mold.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_tiled_walls_corridor",
+      "location": "corridor_vault",
+      "description": "The corridor walls lined with peeling white tiles.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "screeching_alarm_corridor",
+      "location": "corridor_vault",
+      "description": "A fire alarm siren wailing intermittently in the distance.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_med_wing_gurney",
+      "location": "medical_wing_beta",
+      "description": "A rusted hospital gurney left in the middle of the aisle.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "stained_tile_floor_beta",
+      "location": "medical_wing_beta",
+      "description": "The floor tiles are marred by crimson stains from old procedures.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "humming_server_rack_beta",
+      "location": "medical_wing_beta",
+      "description": "Rows of server racks humming faintly near the surgery suite.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_freezing_floors_gamma",
+      "location": "server_catacombs_gamma",
+      "description": "The floor is covered in a thin sheet of ice from the cold air.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "digital_shadow_wall_gamma",
+      "location": "server_catacombs_gamma",
+      "description": "Shadows cast by the server racks stretch long across the wall.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "dripping_pipette_gamma",
+      "location": "server_catacombs_gamma",
+      "description": "A single pipette dripping condensation onto the frozen floor.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_cell_block_alpha_1",
+      "location": "cell_block_alpha",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_cell_block_alpha_2",
+      "location": "cell_block_alpha",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_corridor_vault_1",
+      "location": "corridor_vault",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_corridor_vault_2",
+      "location": "corridor_vault",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_corridor_vault_3",
+      "location": "corridor_vault",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_medical_wing_beta_1",
+      "location": "medical_wing_beta",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_server_catacombs_gamma_1",
+      "location": "server_catacombs_gamma",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_server_catacombs_gamma_2",
+      "location": "server_catacombs_gamma",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_server_catacombs_gamma_3",
+      "location": "server_catacombs_gamma",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    }
+  ],
+  "rules": [
+    "Agent only reveals information already discovered in the game state.",
+    "Codes and numbers must come from the game state, never invented.",
+    "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+    "Actions are only valid if the object is visible and within reach."
+  ],
+  "solution_path": [
+    "1. Go to cell_block_alpha and interact with dust_bin_cell_alpha_locked to examine it.",
+    "2. After examining, read 'drift_journal_torn' found inside the bin to learn code 'the object'.",
+    "3. Enter code 'the hidden code' into 'cell_lock_panel' in cell_block_alpha to unlock the door and retrieve 'drift_journal_torn'.",
+    "4. Go to corridor_vault and interact with biometric_scanner_door, using 'drift_journal_torn' as the credential.",
+    "5. After passing the scanner, read 'nurse_note_pad' in the vault to learn code 'the object' (used internally) and note 'the object'.",
+    "6. Go to medical_wing_beta and interact with syringe_case_sealed. Enter code 'the hidden code' derived from 'vial_record_sheet' to unlock it.",
+    "7. Take the tool acquired from 'syringe_case_sealed' (implied surgical cutter) to interact with vent_grate_locked in medical_wing_beta.",
+    "8. After cutting through the grate, access 'mainframe_interface_panel' in server_catacombs_gamma and unlock it using the sequence derived from previous interactions."
+  ],
+  "win_condition": {
+    "object_id": "mainframe_interface_panel",
+    "state": "unlocked"
+  }
+}

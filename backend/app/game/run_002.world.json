@@ -1,0 +1,373 @@
+{
+  "scenario": "A legendary pirate, Captain Blackthorn, has vanished without a trace, leaving behind a cryptic map to his hidden treasure. You are a crew of shipwrecked adventurers, lured by rumors of the treasure and the promise of escape from the cursed island. But the island is alive with traps, ancient curses, and a final trial that only the worthy may survive.",
+  "objective": "Reach the Captain’s Vault and claim the treasure before the island consumes you.",
+  "rooms": [
+    {
+      "id": "room_1",
+      "description": "The air is thick with the scent of brine and decay, the walls lined with rusted ship anchors that groan in the wind. A flickering oil lamp casts jagged shadows across the stone floor, revealing puddles of black, stagnant water that seem to pulse with a life of their own.",
+      "adjacency": {
+        "east": "room_2"
+      },
+      "goal": "Unlock the rusted gate to proceed east.",
+      "key_objects": []
+    },
+    {
+      "id": "room_2",
+      "description": "The room is filled with the metallic clang of an old ship’s bell that tolls every few seconds, its sound echoing through the narrow, damp corridor. A thick layer of salt encrusts the wooden floor, and the air is heavy with the smell of old rope and mildew.",
+      "adjacency": {
+        "west": "room_1",
+        "east": "room_3"
+      },
+      "goal": "Discover the hidden clue this room conceals.",
+      "goal_completion": {
+        "type": "known_info",
+        "info": "bell_code"
+      },
+      "key_objects": []
+    },
+    {
+      "id": "room_3",
+      "description": "The room is bathed in the cold blue glow of bioluminescent algae growing on the walls, casting eerie patterns on the stone floor. A faint whispering hum fills the air, as if the walls themselves are murmuring ancient secrets in a forgotten tongue.",
+      "adjacency": {
+        "west": "room_2",
+        "north": "room_4"
+      },
+      "goal": "Bring the sekring_SEKR_ON power line online.",
+      "goal_completion": {
+        "type": "power_active",
+        "id": "sekring_SEKR_ON"
+      },
+      "key_objects": [
+        "ancient_scroll_1"
+      ]
+    },
+    {
+      "id": "room_4",
+      "description": "The chamber is vast and circular, its domed ceiling disappearing into darkness. A single, massive treasure chest sits at the center, surrounded by a ring of skeletal remains and old pirate relics. The air is thick with the stench of rot and the sound of distant waves crashing against unseen cliffs.",
+      "adjacency": {
+        "south": "room_3"
+      },
+      "goal": "Get room_4_chest_lock into the 'unlocked' state.",
+      "goal_completion": {
+        "type": "object_state",
+        "object_id": "room_4_chest_lock",
+        "state": "unlocked"
+      },
+      "key_objects": []
+    }
+  ],
+  "objects": [
+    {
+      "id": "anchor_statue",
+      "location": "room_1",
+      "description": "A weathered statue of a pirate holding an anchor, its face half-buried in the stone wall.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "puddle_of_water",
+      "location": "room_1",
+      "description": "A dark, stagnant puddle on the floor that seems to pulse faintly, as if alive.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "salt_crusted_wall",
+      "location": "room_1",
+      "description": "A section of wall covered in thick salt deposits, resembling a fossilized ocean tide.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "ancient_carving",
+      "location": "room_1",
+      "description": "A mysterious carving on the wall showing a shipwreck with a skull and crossbones, its edges worn smooth by time.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "oil_lamp",
+      "location": "room_1",
+      "description": "A flickering oil lamp casting jagged shadows across the room, its flame barely holding against the wind.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "bell_rung_notes",
+      "location": "room_2",
+      "description": "A small, waterlogged journal lying on the floor, its pages covered in smudges of salt and ink.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "contains_info": "bell_code",
+      "scenic": false
+    },
+    {
+      "id": "old_ships_bell",
+      "location": "room_2",
+      "description": "A large, rusted ship's bell that tolls every few seconds, its sound echoing through the corridor.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "salt_crusted_floor",
+      "location": "room_2",
+      "description": "A wooden floor encrusted with salt, showing the signs of long exposure to the sea.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "old_ropes",
+      "location": "room_2",
+      "description": "A tangle of old, rotted rope hanging from the ceiling, its fibers brittle and dry.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "mildew_stained_wall",
+      "location": "room_2",
+      "description": "A section of wall stained with mildew, its surface rough and uneven.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "ancient_scroll_1",
+      "location": "room_3",
+      "description": "A brittle scroll hidden behind a loose stone, its edges curling and ink fading with age.",
+      "state": "hidden",
+      "interactable": true,
+      "takeable": false,
+      "contains_info": "sekring_code",
+      "scenic": false
+    },
+    {
+      "id": "bioluminescent_growth",
+      "location": "room_3",
+      "description": "A patch of glowing blue algae on the wall, its light casting eerie patterns on the floor.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "fuses": {
+        "SEKR": "OFF"
+      },
+      "scenic": true
+    },
+    {
+      "id": "whispering_wall",
+      "location": "room_3",
+      "description": "A section of wall that seems to hum with an ancient, forgotten language, its surface covered in strange symbols.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "bioluminescent_floor",
+      "location": "room_3",
+      "description": "A patch of glowing algae on the stone floor, its light pulsing faintly in rhythm with the hum of the room.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "ancient_symbol_wall",
+      "location": "room_4",
+      "description": "A wall covered in ancient pirate symbols and carvings, some of which appear to be part of a cipher.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "skeletal_remains",
+      "location": "room_4",
+      "description": "A set of old pirate skeletons arranged in a loose circle, their bones covered in rust and salt.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "room_4_chest_lock",
+      "location": "room_4",
+      "description": "A massive, iron-reinforced chest with a large, rusted lock that appears to be the final barrier to the treasure.",
+      "state": "locked",
+      "interactable": true,
+      "takeable": false,
+      "requires_tool": "crowbar",
+      "scenic": false
+    },
+    {
+      "id": "treasure_chest",
+      "location": "room_4",
+      "description": "A grand treasure chest at the center of the room, its lid sealed with a thick layer of dust and decay.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "dusty_floor",
+      "location": "room_4",
+      "description": "A stone floor covered in thick layers of dust and dirt, as if no one has entered this room in centuries.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "crowbar",
+      "location": "room_4",
+      "description": "A rusted crowbar leaning against the wall, its handle worn and its blade bent but still functional.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": true,
+      "scenic": false
+    },
+    {
+      "id": "ancient_scroll_2",
+      "location": "room_4",
+      "description": "A folded parchment tucked into the corner of the room, its surface covered in faded ink and sea salt.",
+      "state": "visible",
+      "interactable": true,
+      "takeable": false,
+      "contains_info": "chest_lock_code",
+      "scenic": false
+    },
+    {
+      "id": "scenic_filler_room_1_1",
+      "location": "room_1",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_1_2",
+      "location": "room_1",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_1_3",
+      "location": "room_1",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_2_1",
+      "location": "room_2",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_2_2",
+      "location": "room_2",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_2_3",
+      "location": "room_2",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_3_1",
+      "location": "room_3",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_3_2",
+      "location": "room_3",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_3_3",
+      "location": "room_3",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_3_4",
+      "location": "room_3",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    },
+    {
+      "id": "scenic_filler_room_4_1",
+      "location": "room_4",
+      "description": "Nondescript clutter that fills the space — of no use to anyone.",
+      "state": "visible",
+      "interactable": false,
+      "takeable": false,
+      "scenic": true
+    }
+  ],
+  "rules": [
+    "Agent only reveals information already discovered in the game state.",
+    "Codes and numbers must come from the game state, never invented.",
+    "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+    "Actions are only valid if the object is visible and within reach."
+  ],
+  "solution_path": [
+    "1. Examine the journal 'bell_rung_notes' in room_2 to discover 'the object'.",
+    "2. Use 'the object' on the rusted gate in room_1 to unlock it and proceed east to room_2.",
+    "3. Find the scroll 'ancient_scroll_1' in room_3 and inspect it to obtain 'the object'.",
+    "4. Use 'the object' on the electrical panel 'sekring_MECH_ON' in room_3 to activate power.",
+    "5. Retrieve the crowbar 'crowbar' from room_4 and use it on the treasure chest's lock 'room_4_chest_lock' to unlock it and claim the treasure."
+  ],
+  "win_condition": {
+    "object_id": "room_4_chest_lock",
+    "state": "unlocked"
+  }
+}
