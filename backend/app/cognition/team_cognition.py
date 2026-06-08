@@ -648,14 +648,18 @@ class TeamCognition:
         """Return only code candidates that match the lock's expected format."""
         if not obj.requires_code:
             return []
+        # Exact-match wins: if the lock's literal code is already a known phrase
+        # (e.g. a discovered info token equal to requires_code), use it directly.
+        # The engine compares requires_code literally, so this holds even when
+        # code_digits is set — AI-authored worlds often pair a symbolic code like
+        # "fingerprint_code" with a cosmetic code_digits, and a digits-only filter
+        # would wrongly discard the one code that actually opens the lock.
+        if obj.requires_code in phrase_codes:
+            return [obj.requires_code]
         # Numeric code lock: only suggest digit codes, length-matched when known.
         if obj.code_digits:
             filtered = [c for c in numeric_codes if len(c) == obj.code_digits]
             return filtered[:2]
-        # Exact-match wins: if the lock's literal code is already a known phrase
-        # (e.g. a discovered info token equal to requires_code), use it directly.
-        if obj.requires_code in phrase_codes:
-            return [obj.requires_code]
         # Textual/unknown-format lock: phrase first, then numeric fallback.
         return (phrase_codes + numeric_codes)[:2]
 
@@ -737,6 +741,27 @@ class TeamCognition:
                         GameAction(action=GameActionType.TAKE, target_id=focus_id),
                         "PROGRESS",
                     )
+
+        # Tool acquisition: a visible takeable item that some still-locked object
+        # requires as a tool/key is high-value progress even when that lock lives
+        # in another room (e.g. picking up a vault key one room before the vault).
+        # Surface it up front — ahead of decoy inspects — so beam search never
+        # drops the one item that unlocks a downstream goal past the beam width.
+        needed_tools = {
+            o.requires_tool
+            for o in state.setting.objects
+            if o.requires_tool and state.object_state.get(o.id) in _LOCKED_STATES
+        }
+        for oid in visible:
+            if oid not in needed_tools:
+                continue
+            obj = state.obj(oid)
+            if (
+                obj is not None
+                and obj.takeable
+                and state.object_state.get(oid) not in (ObjectState.TAKEN, ObjectState.HIDDEN)
+            ):
+                push(GameAction(action=GameActionType.TAKE, target_id=oid), "PROGRESS")
 
         # Movement through open exits is usually progress-making.
         for _door, to_room, is_open in state.exits_for(player_id):

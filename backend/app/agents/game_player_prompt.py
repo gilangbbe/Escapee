@@ -22,6 +22,7 @@ team, share what you learn, and agree on a plan before committing.
 
 YOUR SKILLS: {skills}
 YOUR BACKSTORY: {backstory}
+YOUR APPROACH: {personality}
 
 HOW YOU ACT:
 Each turn you produce ONE structured turn with these parts:
@@ -83,6 +84,7 @@ def build_player_system_prompt(persona: PlayerPersona) -> str:
         role=persona.role,
         skills=skills,
         backstory=persona.backstory or "an ordinary survivor",
+        personality=persona.personality or "level-headed and cooperative",
     )
 
 

@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/types.ts","./src/usegamesocket.ts","./src/vite-env.d.ts","./src/components/narrativefeed.tsx","./src/components/plannerpanel.tsx","./src/components/setuppanel.tsx","./src/components/statepanel.tsx"],"version":"5.9.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/types.ts","./src/usegamesocket.ts","./src/vite-env.d.ts","./src/components/narrativefeed.tsx","./src/components/personaconfigpanel.tsx","./src/components/plannerpanel.tsx","./src/components/setuppanel.tsx","./src/components/statepanel.tsx"],"version":"5.9.3"}

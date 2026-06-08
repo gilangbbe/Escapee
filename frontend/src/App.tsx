@@ -4,6 +4,8 @@ import { NarrativeFeed } from "./components/NarrativeFeed";
 import { PlannerPanel } from "./components/PlannerPanel";
 import { StatePanel } from "./components/StatePanel";
 import { SetupPanel } from "./components/SetupPanel";
+import { PersonaConfigPanel } from "./components/PersonaConfigPanel";
+import type { PersonaDraft } from "./types";
 
 const DEFAULT_WS = "ws://localhost:8000";
 
@@ -11,9 +13,11 @@ export default function App() {
   const [model, setModel] = useState("qwen2.5:7b");
   const [rounds, setRounds] = useState(30);
   const [narrate, setNarrate] = useState(true);
-  const { state, start, stop } = useGameSocket(DEFAULT_WS);
+  const [personas, setPersonas] = useState<PersonaDraft[]>([]);
+  const { state, start, stop, httpBase } = useGameSocket(DEFAULT_WS);
 
   const running = state.status === "running" || state.status === "connecting";
+
 
   return (
     <div className="app">
@@ -49,7 +53,7 @@ export default function App() {
             narrate
           </label>
           {!running ? (
-            <button onClick={() => start(model, rounds, narrate)}>Start game</button>
+            <button onClick={() => start(model, rounds, narrate, personas)}>Start game</button>
           ) : (
             <button onClick={stop}>Stop</button>
           )}
@@ -68,6 +72,13 @@ export default function App() {
 
       <main className="layout">
         <aside className="col-left">
+          <PersonaConfigPanel
+            httpBase={httpBase}
+            defaultModel={model}
+            disabled={running}
+            personas={personas}
+            onChange={setPersonas}
+          />
           <SetupPanel setup={state.setup} />
         </aside>
         <section className="col-center">

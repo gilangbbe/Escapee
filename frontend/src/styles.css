@@ -293,3 +293,113 @@ code { color: var(--accent); }
   font-size: 11px;
   text-transform: uppercase;
 }
+
+/* Persona configurator (pre-game crew editor) */
+.persona-config {
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.persona-config-toggle {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: var(--accent);
+  border: none;
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.persona-config-body {
+  padding: 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.persona-config-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.persona-config-actions button,
+.persona-config-actions select {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.persona-editor-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.persona-editor {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-2);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.persona-editor-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.persona-editor-row .grow { flex: 1; }
+.persona-editor-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+.persona-editor input,
+.persona-editor textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-family: inherit;
+  font-size: 12px;
+  width: 100%;
+}
+.persona-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  flex: 1;
+}
+.persona-field.temp { flex: 0 0 70px; }
+.persona-editor-text {
+  resize: vertical;
+}
+.persona-remove {
+  background: transparent;
+  color: var(--red);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.persona-remove:hover { background: rgba(248, 81, 73, 0.12); }
+

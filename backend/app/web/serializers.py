@@ -92,6 +92,8 @@ def setup_message(setting: GameSetting) -> dict:
                 "role": p.role,
                 "skills": list(p.skills),
                 "backstory": p.backstory,
+                "personality": p.personality,
+                "model": p.model,
             }
             for p in setting.players
         ],
