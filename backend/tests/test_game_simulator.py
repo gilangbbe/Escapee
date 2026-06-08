@@ -181,7 +181,7 @@ def test_opening_object_reveals_its_contained_info():
     """Regression: solving an object via USE/ENTER_CODE must reveal its own
     `contains_info`, just like inspecting it. Otherwise a downstream lock or
     known_info gate that depends on that info can never be satisfied (the
-    world_021 failure: a console unlocked with a tool kept its code hidden).
+    world_022 failure: a console unlocked with a tool kept its code hidden).
     """
     setting = GameSetting.model_validate(
         {

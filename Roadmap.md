@@ -112,7 +112,25 @@ Legend: ✅ done · 🚧 in progress · ⬜ not started
 
 ---
 
+---
+
+## Phase 11 — World Normalizer (deterministic repair layer for LLM-generated worlds) ✅
+- ✅ Root-cause analysis of structural inconsistencies across worlds 015–021
+- ✅ `app/engine/world_normalizer.py` — `normalize_world()` with 5 repair passes:
+  - R1: functional-scenic (interactable=False + functional fields → promote to interactable)
+  - R2: tool not takeable (requires_tool target not takeable → mark takeable)
+  - R3: requires_code = object_id (replace with target's contains_info token)
+  - R4: hidden with no reveal (state=hidden + no reveal pointer → promote to visible)
+  - R5: derived solution_path (BFS backward from win_condition → replaces LLM freetext)
+- ✅ `app/schemas/fixed_world.py` — `to_game_setting()` now calls `normalize_world()`
+  between numeric-code normalization and room-progression wiring; uses derived path
+- ✅ 34 new tests in `tests/test_world_normalizer.py` — all repairs individually,
+  combined scenarios, immutability, and parametrized loading of worlds 015–021
+- ✅ 143/143 tests pass (3 pre-existing failures unchanged)
+
+---
+
 ### Status
-- **Current phase:** Phase 10 complete — the team now debates a single shared escape plan up front and works against a deterministic OBJECTIVE BOARD (SOLVED / STILL-TO-DO) recomputed from authoritative state every turn, so it stops re-doing already-accomplished goals (goal-level no-repeat via `blocked_reason`/`already_done`), not just identical-world repeats. 89/89 tests green; frontend builds.
-- **Last updated:** 2026-06-10
+- **Current phase:** Phase 11 complete — the deterministic world normalizer repairs LLM-generated world JSON before the engine ever sees it. All 7 real worlds (015–021) now load and normalize cleanly. The derived solution_path correctly routes agents toward the actual win condition instead of the world-builder's hallucinated path. 143 tests pass.
+- **Last updated:** 2026-06-08
 - ⬜ Confirm local LLM serving approach → ✅ Ollama (`qwen2.5:7b`) confirmed working end-to-end.

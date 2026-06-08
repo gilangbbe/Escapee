@@ -1,0 +1,408 @@
+{
+  "world": {
+    "scenario": "A renowned art collector was found brutally murdered in their secluded mansion, leaving behind a trail of cryptic symbols and hidden chambers. The mansion is now a labyrinth of secrets, and the only way to uncover the truth is to piece together the clues scattered across the rooms — each one a fragment of a larger, sinister puzzle that may reveal the killer’s identity and motive.",
+    "objective": "Uncover the identity of the murderer before the final clue is destroyed by the ghost of the victim.",
+    "rooms": [
+      {
+        "id": "entry_hall",
+        "description": "The entry hall is thick with the scent of damp stone and old incense, lingering from a ritual long past. Flickering candlelight casts jagged shadows across the cracked marble floor, making every step feel like a trespass.",
+        "adjacency": {
+          "east": "study"
+        },
+        "goal": "Find the key to the study door by deciphering the ancient symbol etched into the wall and using the entry_hall_key.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "entry_hall_key",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "entry_wall_symbol",
+          "entry_hall_key",
+          "entry_candle"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "The study is dominated by the scent of aged parchment and spilled wine, mingling with the metallic tang of spilled blood. The heavy wooden desk is littered with half-written letters and a broken magnifying glass, as if someone was interrupted mid-investigation.",
+        "adjacency": {
+          "west": "entry_hall",
+          "east": "library"
+        },
+        "goal": "Reassemble the shattered magnifying glass to read the hidden message on the letter and use the study_letter to unlock the study desk.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "study_letter",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "study_letter",
+          "study_magnifying_glass_pieces",
+          "study_desk"
+        ]
+      },
+      {
+        "id": "library",
+        "description": "The library is cold and dry, filled with the musty smell of leather-bound tomes and the faint metallic scent of old locks. The floor is littered with scattered pages and a single, broken compass that still spins slowly, as if trying to point the way.",
+        "adjacency": {
+          "west": "study",
+          "east": "closet"
+        },
+        "goal": "Use the broken compass to align the bookshelves and reveal the hidden passage by interacting with the library_bookshelf.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "library_bookshelf",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "library_compass",
+          "library_bookshelf",
+          "library_passage_key"
+        ]
+      },
+      {
+        "id": "closet",
+        "description": "The closet is thick with the stench of rotting fabric and old perfume, the air heavy with the feeling of something long buried. A single light bulb flickers above, casting long, distorted shadows across the floor and a rusted locket that lies in the center of the room.",
+        "adjacency": {
+          "west": "library"
+        },
+        "goal": "Get closet_locket into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "closet_locket",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "closet_locket",
+          "closet_light_bulb",
+          "closet_letter"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "entry_wall_symbol",
+        "location": "entry_hall",
+        "description": "An ancient symbol etched into the stone wall, glowing faintly with an eerie blue light.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "symbol_code_123",
+        "scenic": false
+      },
+      {
+        "id": "entry_hall_key",
+        "location": "entry_hall",
+        "description": "A rusted key hanging from a chain on the wall, its surface covered in strange carvings.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "symbol_code_123",
+        "code_digits": 3,
+        "scenic": false
+      },
+      {
+        "id": "entry_candle",
+        "location": "entry_hall",
+        "description": "A flickering candle resting on a stone pedestal, its flame casting jagged shadows.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "candle_clue_5",
+        "scenic": false
+      },
+      {
+        "id": "scenic_wall_rust",
+        "location": "entry_hall",
+        "description": "Rust stains along the edges of the stone wall, peeling away in thin sheets.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_ancient_chair",
+        "location": "entry_hall",
+        "description": "An ancient wooden chair, its legs broken and its back splintered, pushed against the wall.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_blood_stain",
+        "location": "entry_hall",
+        "description": "A dark, dried bloodstain on the floor near the door, partially obscured by dust.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_cracked_marble",
+        "location": "entry_hall",
+        "description": "Cracks in the marble floor, some filled with dust and others revealing the stone beneath.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "study_letter",
+        "location": "study",
+        "description": "A crumpled letter on the desk, its edges torn and ink smudged.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "study_magnifying_glass",
+        "scenic": false
+      },
+      {
+        "id": "study_magnifying_glass_pieces",
+        "location": "study",
+        "description": "Scattered pieces of a shattered magnifying glass, some still glinting with reflective surfaces.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "glass_pieces_clue_8",
+        "scenic": false
+      },
+      {
+        "id": "study_magnifying_glass",
+        "location": "study",
+        "description": "A reassembled magnifying glass, now whole and functional.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "study_desk",
+        "location": "study",
+        "description": "A heavy wooden desk covered in dust, with a broken magnifying glass and scattered notes.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "desk_code_7",
+        "scenic": false
+      },
+      {
+        "id": "scenic_spilled_wine",
+        "location": "study",
+        "description": "A pool of spilled wine on the floor near the desk, its scent lingering in the air.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_broken_magnifying_glass",
+        "location": "study",
+        "description": "A broken magnifying glass lying on the desk, its frame cracked and lens shattered.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_aged_parchment",
+        "location": "study",
+        "description": "A stack of aged parchment lying on the desk, its edges yellowed and brittle.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "library_compass",
+        "location": "library",
+        "description": "A broken compass resting on the floor, its needle spinning endlessly.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "compass_code_9",
+        "scenic": false
+      },
+      {
+        "id": "library_bookshelf",
+        "location": "library",
+        "description": "A towering bookshelf filled with old tomes, its alignment slightly off-center.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "compass_code_9",
+        "code_digits": 1,
+        "scenic": false
+      },
+      {
+        "id": "library_passage_key",
+        "location": "library",
+        "description": "A small, ornate key resting on the floor near the bookshelf, its surface covered in dust.",
+        "state": "hidden",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "scenic_scattered_pages",
+        "location": "library",
+        "description": "A pile of scattered pages on the floor, some covered in faded ink and others blank.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_old_locks",
+        "location": "library",
+        "description": "A series of old locks mounted on the bookshelf, their mechanisms rusted and stiff.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_musty_air",
+        "location": "library",
+        "description": "A thick, musty air that clings to the walls and shelves of the library.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "closet_locket",
+        "location": "closet",
+        "description": "A small, rusted locket lying on the floor, its surface engraved with cryptic symbols.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "passage_key_code_2",
+        "scenic": false
+      },
+      {
+        "id": "closet_light_bulb",
+        "location": "closet",
+        "description": "A flickering light bulb hanging from the ceiling, casting long shadows across the floor.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "light_bulb_clue_4",
+        "scenic": false
+      },
+      {
+        "id": "closet_letter",
+        "location": "closet",
+        "description": "A folded letter hidden inside the locket, its text faded but still legible.",
+        "state": "hidden",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "scenic_rotting_fabric",
+        "location": "closet",
+        "description": "A pile of rotting fabric near the wall, its fibers disintegrating with each passing moment.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "passage_key_code_2",
+        "scenic": true
+      },
+      {
+        "id": "scenic_old_perfume",
+        "location": "closet",
+        "description": "A faint scent of old perfume lingering in the air, almost imperceptible.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_distorted_shadows",
+        "location": "closet",
+        "description": "Distorted shadows cast by the flickering bulb, stretching across the floor and walls.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_1",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_1",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_1",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_2",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_closet_1",
+        "location": "closet",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_closet_2",
+        "location": "closet",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. [entry_hall] examine entry_wall_symbol — examined entry_wall_symbol; learned symbol_code_123",
+      "2. [entry_hall] enter_code entry_hall_key — entered code symbol_code_123 → entry_hall_key unlocked",
+      "3. [entry_hall] go study — moved to study",
+      "4. [study] take study_magnifying_glass — took study_magnifying_glass",
+      "5. [study] use_tool study_letter — used study_magnifying_glass on study_letter → unlocked",
+      "6. [study] go library — moved to library",
+      "7. [library] examine library_compass — examined library_compass; learned compass_code_9",
+      "8. [library] enter_code library_bookshelf — entered code compass_code_9 → library_bookshelf unlocked",
+      "9. [library] go closet — moved to closet",
+      "10. [closet] examine scenic_rotting_fabric — examined scenic_rotting_fabric; learned passage_key_code_2",
+      "11. [closet] enter_code closet_locket — entered code passage_key_code_2 → closet_locket unlocked"
+    ],
+    "win_condition": {
+      "object_id": "closet_locket",
+      "state": "unlocked"
+    }
+  }
+}

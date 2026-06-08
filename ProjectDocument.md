@@ -59,7 +59,9 @@ LLM policy calls. Every turn follows this sequence:
 1. Content load and normalization:
    The server loads authored content (legacy `GameSetting` OR fixed
    `{"world": ...}` format), normalizes it through `load_setting_compat(...)`,
-   and validates a runtime `GameSetting`.
+   which runs the **World Normalizer** (`app/engine/world_normalizer.py`) to
+   repair structural inconsistencies before validating a runtime `GameSetting`.
+   See §2.4 for the normalizer's repair contract.
 2. Deterministic state initialization:
    `GameState.from_setting()` builds canonical state (object states/locations,
    player locations/inventory, accessible rooms, power flags, discovered info).
@@ -106,6 +108,30 @@ all persistence/progression correctness in code.
   schema-constrained decode.
 - Execution outcome contract:
   `Observation` (success/failure, grounded message, optional non-spoiler hint).
+
+### 2.4 World Normalizer — deterministic repair contract
+
+The world-building layer (multi-agent LLM) is stochastic by nature and will always
+produce some structurally inconsistent worlds. The normalizer (`app/engine/world_normalizer.py`)
+is a deterministic repair pass that runs on every world load, between `FixedWorldEnvelope`
+parsing and `GameSetting` validation:
+
+```
+raw JSON → FixedWorldEnvelope → [normalize_world()] → GameSetting → engine
+```
+
+Repairs applied in order (all are logged for audit):
+
+| ID  | Name                  | Trigger                                         | Action                                                 |
+|-----|-----------------------|-------------------------------------------------|--------------------------------------------------------|
+| R1  | Functional-scenic     | `interactable=False` + functional field present | Promote to `interactable=True`                         |
+| R2  | Tool not takeable     | `requires_tool=X` and X is not takeable         | Mark X `takeable=True`                                 |
+| R3  | requires_code=obj_id  | `requires_code` matches a known object id       | Replace with that object's `contains_info` token       |
+| R4  | Hidden no reveal      | `state=hidden`, no other object `reveals` it    | Promote to `state=visible`                             |
+| R5  | Derived solution_path | Always                                          | Replace LLM freetext path with BFS-derived actual path |
+
+The repair log is the long-term feedback channel: recurring repair patterns signal
+systematic errors in world-builder policy that can be addressed at the source.
 
 ### Core principle: the LLM is never the source of truth
 - The **State Machine** holds the only authoritative world state (rooms, inventory, lock statuses, variables, flags).

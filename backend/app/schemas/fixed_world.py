@@ -3,6 +3,11 @@
 The simulator runtime uses `GameSetting`. This module lets authored story files
 use the new stable format while preserving the existing deterministic engine by
 converting fixed-world payloads into `GameSetting`.
+
+World JSON produced by the multi-agent world-builder is structurally inconsistent
+by nature (LLM stochasticity). `to_game_setting()` passes all raw objects through
+`normalize_world()` before handing them to the engine — see
+`app.engine.world_normalizer` for the full list of repairs applied.
 """
 
 from __future__ import annotations
@@ -11,6 +16,7 @@ import re
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from app.engine.world_normalizer import normalize_world
 from app.schemas.game_setting import GameSetting, ObjectState, PlayerPersona
 
 
@@ -193,8 +199,23 @@ class FixedWorld(BaseModel):
         room_ids = [room.id for room in self.rooms]
         objects = [obj.model_dump(exclude_none=True) for obj in self.objects]
 
+        # Step 1: normalize symbolic numeric codes (e.g. "door_code_842" → "842").
         for obj in objects:
             self._normalize_code(obj)
+
+        # Step 2: deterministic repair pass — fixes structural inconsistencies
+        # produced by the LLM world-builder (see app.engine.world_normalizer).
+        win_cond = self.win_condition.model_dump()
+        result = normalize_world(
+            objects,
+            win_cond,
+            room_ids,
+            original_solution_path=list(self.solution_path),
+        )
+        objects = result.objects
+        derived_solution_path = result.solution_path
+
+        # Step 3: wire room-to-room progression gates from adjacency + goals.
         self._wire_room_progression(objects)
 
         # Personas: respect any cast authored in the fixed-world payload (the
@@ -217,7 +238,7 @@ class FixedWorld(BaseModel):
                 "start_room": room_ids[0] if room_ids else None,
                 "objects": objects,
                 "rules": self.rules,
-                "solution_path": self.solution_path,
+                "solution_path": derived_solution_path,
                 "win_condition": self.win_condition.model_dump(),
                 "players": players,
                 "player_clues": [],

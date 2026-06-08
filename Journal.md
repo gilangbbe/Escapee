@@ -4,6 +4,70 @@
 
 ---
 
+## 2026-06-08 — World Normalizer: deterministic repair layer for LLM-generated worlds
+
+**Problem identified:**
+The multi-agent world-building layer consistently produces structurally inconsistent
+world JSON — scenic objects that carry functional engine fields, requires_code values
+pointing at object ids instead of info tokens, hidden objects with no reveal trigger,
+non-takeable tools that cannot reach player inventory, and hallucinated solution paths
+that route agents toward dead-end branches instead of the actual win condition.
+
+**Decision:**
+Rather than tightening world-builder policy (which can only reduce errors, never
+eliminate them) or adding defensive fallbacks inside the engine (which would make
+the engine complex and harder to trust), insert a **deterministic repair layer**
+(`app/engine/world_normalizer.py`) between world loading and game start:
+
+    raw JSON → FixedWorldEnvelope → [WorldNormalizer] → GameSetting → engine
+
+**What changed:**
+- New module: `app/engine/world_normalizer.py`
+  - `normalize_world(objects, win_condition, room_ids, ...)` → `NormalizeResult`
+  - **R1 Functional-scenic**: objects with `interactable=False` but carrying
+    `contains_info`, `fuses`, `requires_*`, `reveals`, or `provides_power` are
+    promoted to `interactable=True`. The engine gates all player interaction on
+    `interactable`; without this, functionally required objects tagged scenic by
+    the world-builder are permanently inaccessible.
+  - **R2 Tool not takeable**: if object A declares `requires_tool=B` and B is not
+    `takeable`, B is marked `takeable=True`. The engine requires the tool in the
+    player's inventory (via USE); a non-takeable tool can never reach inventory.
+  - **R3 requires_code = object_id**: if `requires_code` is a known object id, it
+    is replaced with that object's `contains_info` token — the actual info string
+    the engine's exact-match check expects. If the referenced object has no
+    `contains_info`, the repair is flagged as UNRESOLVED in the repair log.
+  - **R4 Hidden with no reveal**: objects with `state=hidden` that no other object's
+    `reveals` field points at are promoted to `state=visible`. Without this they are
+    permanently inaccessible.
+  - **R5 Derived solution_path**: the actual minimal action sequence to win is
+    computed via backward recursive dependency resolution through the object
+    requirement graph. This replaces the LLM-authored freetext `solution_path`
+    (which frequently uses placeholder text, references non-existent objects, or
+    routes through dead-end branches). The derived path is what `_plan_phase` uses
+    as a fallback and what the action planner uses as guidance.
+  - All repairs are logged at INFO level for audit/feedback.
+- Updated: `app/schemas/fixed_world.py` → `to_game_setting()` now calls
+  `normalize_world()` between `_normalize_code()` and `_wire_room_progression()`,
+  using the derived solution_path instead of the LLM-authored one.
+- New tests: `tests/test_world_normalizer.py`
+  - 34 tests covering every repair individually, combined scenarios, immutability,
+    and parametrized loading of all real world files (015–021).
+
+**Verification:**
+- 34/34 new normalizer tests pass.
+- All 7 world JSON files (world_015 through world_021) load cleanly through the
+  full pipeline without crash; all produce non-empty derived solution paths.
+- Full suite: 143 passed (3 pre-existing failures unrelated to this change).
+
+**Design principle:**
+The world-builder's job is creative content (scenario, objects, atmosphere). The
+normalizer's job is structural soundness. The engine's job is deterministic execution.
+These are three separate concerns. Repair logs are the feedback mechanism: patterns
+of common repairs can be fed back into world-builder policy over time to reduce
+generator errors at the source.
+
+---
+
 ## 2026-06-02 — Migrated to fixed authored story format via compatibility adapter
 
 Added support for the new canonical authored game format wrapped as

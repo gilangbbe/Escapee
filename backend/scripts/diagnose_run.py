@@ -1,7 +1,7 @@
 """Diagnostic live run: capture a compact per-turn transcript of a world file.
 
 Usage (from backend/):
-    ../.venv/bin/python -m scripts.diagnose_run --world world_021 --rounds 14
+    ../.venv/bin/python -m scripts.diagnose_run --world world_022 --rounds 14
 """
 
 from __future__ import annotations
@@ -62,7 +62,7 @@ async def _main(world: str, rounds: int, model: str) -> int:
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("--world", default="world_021")
+    p.add_argument("--world", default="world_022")
     p.add_argument("--rounds", type=int, default=14)
     p.add_argument("--model", default="qwen2.5:7b")
     args = p.parse_args()
