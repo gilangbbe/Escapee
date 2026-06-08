@@ -51,6 +51,7 @@ function rosterParam(personas: PersonaDraft[]): string | null {
       skills: p.skills,
       backstory: p.backstory,
       personality: p.personality,
+      gender: p.gender.trim(),
     };
     if (p.model.trim()) entry.model = p.model.trim();
     if (p.temperature != null) entry.temperature = p.temperature;

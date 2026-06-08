@@ -39,6 +39,7 @@ class PersonaSpec:
     skills: Sequence[str]
     backstory: str = ""
     personality: str = ""
+    gender: str = ""
     model: Optional[str] = None
     temperature: Optional[float] = None
 
@@ -57,6 +58,7 @@ class PersonaSpec:
             skills=list(self.skills),
             backstory=self.backstory,
             personality=self.personality,
+            gender=self.gender,
             model=model if model is not None else self.model,
             temperature=temperature if temperature is not None else self.temperature,
         )
@@ -72,6 +74,7 @@ CATALOG: dict[str, PersonaSpec] = {
         skills=["observe", "reason", "decode"],
         backstory="A methodical investigator who tracks clues under pressure.",
         personality="Careful and deductive; reads every clue before committing.",
+        gender="female",
     ),
     "operator": PersonaSpec(
         name="Riley Sato",
@@ -79,6 +82,7 @@ CATALOG: dict[str, PersonaSpec] = {
         skills=["repair", "override", "route_power"],
         backstory="A pragmatic engineer who can restore failing systems quickly.",
         personality="Hands-on and decisive; favors fixing and powering things.",
+        gender="non-binary",
     ),
     "scout": PersonaSpec(
         name="Mara Vance",
@@ -86,6 +90,7 @@ CATALOG: dict[str, PersonaSpec] = {
         skills=["search", "navigate", "spot_hidden"],
         backstory="A restless explorer who maps unknown spaces fast.",
         personality="Bold and mobile; pushes into new rooms to widen options.",
+        gender="female",
     ),
     "specialist": PersonaSpec(
         name="Theo Nakamura",
@@ -93,6 +98,7 @@ CATALOG: dict[str, PersonaSpec] = {
         skills=["bypass", "lockpick", "analyze_locks"],
         backstory="A former locksmith who treats every lock as a puzzle.",
         personality="Patient and precise; focuses on codes, keys, and locks.",
+        gender="male",
     ),
 }
 
@@ -115,6 +121,7 @@ def catalog_as_dicts() -> list[dict]:
             "skills": list(spec.skills),
             "backstory": spec.backstory,
             "personality": spec.personality,
+            "gender": spec.gender,
             "model": spec.model,
             "temperature": spec.temperature,
         }

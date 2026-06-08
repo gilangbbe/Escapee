@@ -245,6 +245,7 @@ def build_dialogue_context_package(
     actor_role: str,
     actor_skills: list[str],
     actor_backstory: str,
+    actor_gender: str = "",
     action_text: str,
     speech: str | None,
     outcome: str,
@@ -281,6 +282,7 @@ def build_dialogue_context_package(
         "CHARACTER_SHEET:\n"
         f"- NAME: {actor_name}\n"
         f"- ROLE: {actor_role}\n"
+        f"- GENDER: {actor_gender or 'unspecified'}\n"
         f"- SKILLS: {skills}\n"
         f"- BACKSTORY_HINT: {actor_backstory or 'ordinary survivor under pressure'}\n"
         f"- MOOD_GUIDANCE: {_mood_for(status, success=success)}\n\n"
@@ -335,6 +337,7 @@ def build_turn_user_prompt(
     objective: str,
     actor_skills: list[str],
     actor_backstory: str,
+    actor_gender: str = "",
     turn: int,
     recent_story: list[str],
     lore_excerpt: str = "",
@@ -348,6 +351,7 @@ def build_turn_user_prompt(
         actor_role=actor_role,
         actor_skills=actor_skills,
         actor_backstory=actor_backstory,
+        actor_gender=actor_gender,
         action_text=action_text,
         speech=speech,
         outcome=outcome,

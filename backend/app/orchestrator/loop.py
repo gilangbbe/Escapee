@@ -626,6 +626,7 @@ class GameOrchestrator:
                 actor_role=agent.persona.role,
                 actor_skills=list(agent.persona.skills),
                 actor_backstory=agent.persona.backstory,
+                actor_gender=agent.persona.gender,
                 action_text=describe_action(turn.action, agent.persona.name),
                 speech=turn.intent,
                 outcome=obs.message,

@@ -139,6 +139,9 @@ class PlayerPersona(BaseModel):
     personality: str = Field(
         "", description="Short behavioral trait line for prompt flavor."
     )
+    gender: str = Field(
+        "", description="Self-described gender, used for richer dialogue/pronouns."
+    )
     model: Optional[str] = Field(
         None, description="Per-persona LLM model id; falls back to the runner default."
     )

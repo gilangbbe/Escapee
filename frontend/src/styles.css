@@ -389,6 +389,7 @@ code { color: var(--accent); }
   flex: 1;
 }
 .persona-field.temp { flex: 0 0 70px; }
+.persona-gender { flex: 0 0 110px; }
 .persona-editor-text {
   resize: vertical;
 }

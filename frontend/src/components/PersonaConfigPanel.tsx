@@ -27,6 +27,7 @@ function blankPersona(model: string): PersonaDraft {
     skills: [],
     backstory: "",
     personality: "",
+    gender: "",
     model,
     temperature: null,
   };
@@ -40,6 +41,7 @@ function fromCatalog(entry: PersonaCatalogEntry, model: string): PersonaDraft {
     skills: [...entry.skills],
     backstory: entry.backstory,
     personality: entry.personality,
+    gender: entry.gender ?? "",
     model: entry.model ?? model,
     temperature: entry.temperature,
   };
@@ -81,6 +83,7 @@ export function PersonaConfigPanel({
               skills: [...(p.skills ?? [])],
               backstory: p.backstory ?? "",
               personality: p.personality ?? "",
+              gender: p.gender ?? "",
               model: p.model ?? data.default_model ?? defaultModel,
               temperature: null,
             }))
@@ -191,6 +194,14 @@ export function PersonaConfigPanel({
                     disabled={disabled}
                     onChange={(e) => update(p.id, { role: e.target.value })}
                   />
+                  <input
+                    list="persona-gender-options"
+                    className="persona-gender"
+                    value={p.gender}
+                    placeholder="gender"
+                    disabled={disabled}
+                    onChange={(e) => update(p.id, { gender: e.target.value })}
+                  />
                 </div>
 
                 <div className="persona-editor-row">
@@ -260,6 +271,14 @@ export function PersonaConfigPanel({
               <option key={m} value={m} />
             ))}
           </datalist>
+
+          <datalist id="persona-gender-options">
+            <option value="female" />
+            <option value="male" />
+            <option value="non-binary" />
+            <option value="unspecified" />
+          </datalist>
+
         </div>
       )}
     </section>

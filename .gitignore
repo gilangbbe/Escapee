@@ -48,3 +48,6 @@ frontend/coverage/
 
 # Optional generated game outputs
 backend/app/game/output*.json
+
+# Locally-edited persona catalog (seeded from code at runtime)
+backend/app/game/personas_store.json

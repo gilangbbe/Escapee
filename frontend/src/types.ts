@@ -17,6 +17,7 @@ export interface PersonaInfo {
   skills: string[];
   backstory: string;
   personality?: string;
+  gender?: string;
   model?: string | null;
 }
 
@@ -103,6 +104,7 @@ export interface PersonaDraft {
   skills: string[];
   backstory: string;
   personality: string;
+  gender: string;
   model: string;
   temperature: number | null;
 }
@@ -115,6 +117,7 @@ export interface PersonaCatalogEntry {
   skills: string[];
   backstory: string;
   personality: string;
+  gender: string;
   model: string | null;
   temperature: number | null;
 }

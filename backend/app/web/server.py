@@ -19,12 +19,14 @@ produces. CORS is open to the Vite dev server origins for local development.
 from __future__ import annotations
 
 import json
+from typing import Optional
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Response, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
 
+from app.game import persona_store
 from app.game.default_story import DEFAULT_STORY_PAYLOAD
-from app.game.personas import catalog_as_dicts
 from app.llm.ollama_client import DEFAULT_OLLAMA_URL, list_installed_models
 from app.schemas.fixed_world import load_setting_compat
 from app.schemas.game_setting import GameSetting, PlayerPersona
@@ -43,6 +45,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class PersonaPayload(BaseModel):
+    """Editable persona fields accepted by the REST persona endpoints.
+
+    Designed to be consumed by any client (web UI, iOS app, ...). ``key`` is only
+    honored on create as a slug hint; updates address the persona by URL path.
+    """
+
+    name: str
+    role: str = "Crew"
+    gender: str = ""
+    skills: list[str] = Field(default_factory=list)
+    backstory: str = ""
+    personality: str = ""
+    model: Optional[str] = None
+    temperature: Optional[float] = None
+    key: Optional[str] = None
+
 
 
 def current_setting() -> GameSetting:
@@ -67,11 +88,11 @@ async def get_setting() -> dict:
 
 @app.get("/api/personas")
 async def get_personas() -> dict:
-    """Persona-editor bootstrap data for the UI.
+    """Persona-editor bootstrap data for any client.
 
-    Returns the current default roster (so the editor opens pre-filled), the
-    catalog of reusable persona templates, and the list of models installed on
-    the local Ollama server (best-effort; empty if Ollama is unreachable).
+    Returns the current default roster (so an editor opens pre-filled), the
+    persistent catalog of reusable persona templates, and the list of models
+    installed on the local Ollama server (best-effort; empty if unreachable).
     """
     setting = current_setting()
     installed = await list_installed_models(DEFAULT_OLLAMA_URL)
@@ -81,9 +102,51 @@ async def get_personas() -> dict:
     return {
         "default_model": DEFAULT_MODEL,
         "models": models,
-        "catalog": catalog_as_dicts(),
+        "catalog": persona_store.list_personas(),
         "roster": setup_message(setting)["players"],
     }
+
+
+# --------------------------------------------------------------------------- #
+# Persona catalog CRUD — a plain REST resource any client (iOS, web) can use.
+# --------------------------------------------------------------------------- #
+@app.get("/api/personas/catalog")
+async def list_persona_catalog() -> list[dict]:
+    """Every stored persona template (seeded from code on first run)."""
+    return persona_store.list_personas()
+
+
+@app.get("/api/personas/catalog/{key}")
+async def get_persona_template(key: str) -> dict:
+    persona = persona_store.get_persona(key)
+    if persona is None:
+        raise HTTPException(status_code=404, detail=f"persona '{key}' not found")
+    return persona
+
+
+@app.post("/api/personas/catalog", status_code=201)
+async def create_persona_template(payload: PersonaPayload) -> dict:
+    """Add a new persona to the catalog and persist it."""
+    return persona_store.create_persona(payload.model_dump())
+
+
+@app.put("/api/personas/catalog/{key}")
+async def update_persona_template(key: str, payload: PersonaPayload) -> dict:
+    """Edit an existing persona in place."""
+    data = payload.model_dump(exclude={"key"}, exclude_unset=True)
+    updated = persona_store.update_persona(key, data)
+    if updated is None:
+        raise HTTPException(status_code=404, detail=f"persona '{key}' not found")
+    return updated
+
+
+@app.delete("/api/personas/catalog/{key}", status_code=204)
+async def delete_persona_template(key: str) -> Response:
+    """Remove a persona from the catalog."""
+    if not persona_store.delete_persona(key):
+        raise HTTPException(status_code=404, detail=f"persona '{key}' not found")
+    return Response(status_code=204)
+
 
 
 def _personas_from_param(raw: str | None) -> list[PlayerPersona] | None:
