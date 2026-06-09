@@ -49,6 +49,30 @@ Repairs applied (in order):
       _plan_phase uses as a fallback and what the action planner uses as
       guidance.
 
+  R6  Functional-first object ordering
+      The ActionPlanner evaluates only the first beam_width=5 candidates from
+      policy_candidates(). policy_candidates() iterates visible_objects_for()
+      which follows the order of setting.objects. When many scenic filler
+      objects precede functional ones in the world JSON, info-producers like
+      scenic_rotting_fabric (contains_info) are pushed past position 5 and
+      the planner never considers inspecting them — so it keeps recommending
+      wrong ENTER_CODE attempts. This repair sorts objects so that info-
+      producers come first (tier 0), then other functional objects (tier 1),
+      then takeable items (tier 2), then pure decoration (tier 3). The sort is
+      stable: relative order within each tier is preserved.
+
+  R7  Numeric requires_code with no info-chain → relink to info token
+      The world-builder sometimes writes requires_code as a bare number (e.g.
+      "321") while the only discoverable clue is an info token ending in that
+      number (e.g. "symbol_code_321"). Agents learn "symbol_code_321" from
+      inspecting the source object but the engine exact-matches against "321"
+      — a guaranteed failure. Detected by checking whether any contains_info
+      token's numeric suffix (the part after the last "_") matches the bare
+      number. When exactly one such token exists, requires_code is updated to
+      the full token so agents enter what they discover and the match
+      succeeds. Also fixes the derived solution_path which could not trace the
+      info-chain without the full token.
+
 All repairs are logged so you can audit what the generator got wrong and
 feed patterns back into the world-building layer's policy over time.
 """
@@ -126,6 +150,11 @@ def normalize_world(
     _repair_tool_not_takeable(objs, by_id, repairs)
     _repair_requires_code_is_object_id(objs, by_id, repairs)
     _repair_hidden_no_reveal(objs, by_id, repairs)
+    _repair_numeric_code_no_info_chain(objs, by_id, repairs)
+
+    # R6: reorder so info-producers appear before consumers before pure scenery.
+    # by_id values are the same dict objects — lookup remains valid after sort.
+    objs = _sort_objects_for_beam(objs, repairs)
 
     solution_path = _derive_solution_path(objs, win_condition, by_id, room_id_set)
 
@@ -226,6 +255,111 @@ def _repair_hidden_no_reveal(
                 f"R4 '{obj['id']}': promoted from state=hidden to state=visible "
                 f"(no object reveals it — would be permanently inaccessible)"
             )
+
+
+def _repair_numeric_code_no_info_chain(
+    objs: list[dict], by_id: dict[str, dict], repairs: list[str]
+) -> None:
+    """R7: Bare-digit requires_code with no direct info-chain → relink to info token.
+
+    The world-builder sometimes writes `requires_code = "321"` (a plain number)
+    while the only discoverable clue is `contains_info = "symbol_code_321"`. Agents
+    learn "symbol_code_321" but the engine exact-matches against "321" — failure.
+
+    Detection: for each object whose requires_code is purely digits and has no
+    contains_info producer that exposes that exact string, scan all info tokens for
+    one whose numeric suffix (part after the last "_") equals the plain code.
+
+    If exactly one token matches → update requires_code to the full token.
+    If multiple tokens match → ambiguous, log and leave unchanged.
+    If none match → leave unchanged (genuinely stand-alone code, no info chain).
+    """
+    # Build suffix → info tokens map: e.g. "321" → ["symbol_code_321"]
+    suffix_to_tokens: dict[str, list[str]] = {}
+    for obj in objs:
+        token = obj.get("contains_info")
+        if not isinstance(token, str):
+            continue
+        parts = token.rsplit("_", 1)
+        if len(parts) == 2 and parts[1].isdigit():
+            suffix_to_tokens.setdefault(parts[1], []).append(token)
+
+    # Build direct-chain set: info tokens already used verbatim as requires_code.
+    direct_chain: set[str] = {o["contains_info"] for o in objs if o.get("contains_info")}
+
+    for obj in objs:
+        req_code = obj.get("requires_code")
+        if not isinstance(req_code, str) or not req_code.isdigit():
+            continue
+        # Chain already coherent: some object has contains_info == req_code verbatim.
+        if req_code in direct_chain:
+            continue
+        matching = suffix_to_tokens.get(req_code, [])
+        if len(matching) == 1:
+            new_code = matching[0]
+            obj["requires_code"] = new_code
+            repairs.append(
+                f"R7 '{obj['id']}': requires_code '{req_code}' is a bare number with no "
+                f"direct info-chain; relinked to info token '{new_code}' "
+                f"(agents discover and enter the full token)"
+            )
+        elif len(matching) > 1:
+            repairs.append(
+                f"R7 '{obj['id']}': requires_code '{req_code}' matches multiple info "
+                f"tokens {matching} — ambiguous, left unchanged (manual review needed)"
+            )
+        # Zero matches → stand-alone digit code, no action needed.
+
+
+# ------------------------------------------------------------------ #
+# R6 — Functional-first object ordering
+# ------------------------------------------------------------------ #
+
+def _sort_objects_for_beam(
+    objs: list[dict], repairs: list[str]
+) -> list[dict]:
+    """R6: Sort objects so info-producers appear before consumers before pure scenery.
+
+    The ActionPlanner beam (width=5) only evaluates the first 5 candidates from
+    policy_candidates(). policy_candidates() iterates visible_objects_for() which
+    follows setting.objects order. Functional objects (especially info-producers
+    like scenic_rotting_fabric that carry contains_info) buried under many scenic
+    fillers are pushed past position 5 and the planner never considers them.
+
+    Tier 0 — info producers (contains_info): must be inspected to reveal codes;
+              highest priority so the planner discovers them before attempting
+              wrong ENTER_CODE candidates.
+    Tier 1 — other functional objects (requires_*, fuses, reveals, provides_power):
+              puzzles, containers, power sources.
+    Tier 2 — takeable items with no functional fields: potential tools.
+    Tier 3 — pure decoration: no functional fields, not takeable.
+
+    The sort is stable: relative order within each tier is preserved.
+    """
+    def _tier(obj: dict) -> int:
+        if obj.get("contains_info"):
+            return 0
+        if any(obj.get(f) for f in _FUNCTIONAL_FIELDS):
+            return 1
+        if obj.get("takeable", False):
+            return 2
+        return 3
+
+    sorted_objs = sorted(objs, key=_tier)
+
+    # Log only if the order actually changed.
+    original_order = [o["id"] for o in objs]
+    new_order = [o["id"] for o in sorted_objs]
+    if new_order != original_order:
+        promoted = [oid for oid in new_order if _tier(objs[original_order.index(oid)]) < 3
+                    and original_order.index(oid) != new_order.index(oid)]
+        repairs.append(
+            f"R6 reordered objects for planner beam: {len(promoted)} functional "
+            f"object(s) moved before scenic fillers"
+            + (f" (e.g. {promoted[:3]})" if promoted else "")
+        )
+
+    return sorted_objs
 
 
 # ------------------------------------------------------------------ #

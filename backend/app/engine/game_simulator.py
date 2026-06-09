@@ -138,7 +138,11 @@ class GameSimulator:
         self.state.object_location[tid] = player_id
         self.state.object_state[tid] = ObjectState.TAKEN
         self.state.player_inventories[player_id].append(tid)
-        return self._ok(player_id, f"You pick up {self._name(tid)}.")
+        msg = f"You pick up {self._name(tid)}"
+        if obj.contains_info and obj.contains_info not in self.state.discovered_info:
+            self.state.discovered_info.add(obj.contains_info)
+            msg += f"; you notice {obj.contains_info.replace('_', ' ')}"
+        return self._ok(player_id, msg + ".")
 
     def _enter_code(self, player_id: str, a: GameAction) -> Observation:
         tid = a.target_id

@@ -181,7 +181,7 @@ def test_opening_object_reveals_its_contained_info():
     """Regression: solving an object via USE/ENTER_CODE must reveal its own
     `contains_info`, just like inspecting it. Otherwise a downstream lock or
     known_info gate that depends on that info can never be satisfied (the
-    world_022 failure: a console unlocked with a tool kept its code hidden).
+    world_034 failure: a console unlocked with a tool kept its code hidden).
     """
     setting = GameSetting.model_validate(
         {
@@ -236,4 +236,50 @@ def test_opening_object_reveals_its_contained_info():
     )
     assert obs.success
     assert sim.state.won is True
+
+
+def test_taking_item_reveals_its_contained_info():
+    """Regression: TAKE must auto-reveal contains_info so agents never need a
+    separate INSPECT step for a taken item (which becomes invisible post-TAKE).
+
+    Mirrors the world_034 pattern: ancient_bone is both a takeable tool and the
+    only source of chamber_password, which gates the door to final_chamber via a
+    known_info progression condition. Agents took the bone but could never inspect
+    it (TAKEN items are invisible), so the gate never opened.
+    """
+    setting = GameSetting.model_validate(
+        {
+            "scenario": "test",
+            "objective": "Open the final door.",
+            "rooms": ["room_1"],
+            "start_room": "room_1",
+            "objects": [
+                {
+                    "id": "ancient_bone",
+                    "location": "room_1",
+                    "description": "A weathered bone with a symbol scratched into it.",
+                    "state": "visible",
+                    "interactable": True,
+                    "takeable": True,
+                    "contains_info": "chamber_password",
+                },
+                {
+                    "id": "final_lock",
+                    "location": "room_1",
+                    "description": "The final lock.",
+                    "state": "locked",
+                    "interactable": True,
+                    "requires_tool": "ancient_bone",
+                },
+            ],
+            "win_condition": {"object_id": "final_lock", "state": "unlocked"},
+            "players": [{"id": "player_1", "name": "Tester", "role": "tester"}],
+        }
+    )
+    sim = GameSimulator(setting)
+    obs = sim.step("player_1", GameAction(action=A.TAKE, target_id="ancient_bone"))
+    assert obs.success
+    # Info revealed immediately on take — no separate INSPECT required.
+    assert "chamber_password" in sim.state.discovered_info
+    assert "chamber_password" in obs.message or "chamber password" in obs.message
 

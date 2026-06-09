@@ -1,0 +1,500 @@
+{
+  "world": {
+    "scenario": "In the decaying manor of Lord Alistair Vayne, a brutal murder has left the halls cloaked in silence and shadows. The butler, the maid, the gardener, and the mysterious visitor—all are suspects, yet none are willing to speak. You are the only one who can uncover the truth before the killer strikes again.",
+    "objective": "Uncover the identity of the murderer and prevent the next killing.",
+    "rooms": [
+      {
+        "id": "entry_hall",
+        "description": "A long, dimly lit corridor lined with portraits of the Vayne family, their faces frozen in expressions of cold detachment. The air is thick with the scent of old parchment and decay, and the floor creaks underfoot with each step.",
+        "adjacency": {
+          "east": "parlor"
+        },
+        "goal": "Find and take bloodstained_note.",
+        "goal_completion": {
+          "type": "has_item",
+          "object_id": "bloodstained_note"
+        },
+        "key_objects": [
+          "bloodstained_note",
+          "rusted_iron_gate",
+          "portrait_of_vayne"
+        ]
+      },
+      {
+        "id": "parlor",
+        "description": "A grand room filled with heavy velvet drapes that muffle sound and the faint scent of perfume lingers in the air like a ghost. A grand piano sits in the corner, its keys stained with dark, dried liquid.",
+        "adjacency": {
+          "west": "entry_hall",
+          "north": "study"
+        },
+        "goal": "Get study_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "study_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "piano_with_code",
+          "study_door",
+          "perfumed_drapes"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "A small, cramped room with bookshelves overflowing with tomes that have been clawed open and pages torn. A single candle flickers on the desk, casting jagged shadows over a map of the estate marked with crimson ink.",
+        "adjacency": {
+          "south": "parlor",
+          "east": "library"
+        },
+        "goal": "Get library_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "library_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "torn_diary",
+          "candle",
+          "map_with_crimson_marks",
+          "library_door"
+        ]
+      },
+      {
+        "id": "library",
+        "description": "A vast, dusty room with towering bookshelves that seem to lean inward as if whispering secrets to one another. The air is thick with the scent of mildew and old leather, and the faint hum of a hidden mechanism echoes from somewhere in the walls.",
+        "adjacency": {
+          "west": "study",
+          "north": "dungeon"
+        },
+        "goal": "Trigger the mechanism to reveal the hidden passage that leads to the final room.",
+        "key_objects": [
+          "dusty_books",
+          "mechanism_panel",
+          "dungeon_door",
+          "hidden_passage"
+        ]
+      },
+      {
+        "id": "dungeon",
+        "description": "A damp, windowless chamber with walls that seem to bleed a faint iron scent. The floor is slick with moisture, and the only light comes from a single, flickering bulb hanging from a frayed wire above a stone altar.",
+        "adjacency": {
+          "south": "library"
+        },
+        "goal": "Get altar_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "altar_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "stone_altar",
+          "flickering_bulb",
+          "murder_note",
+          "altar_door"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "bloodstained_note",
+        "location": "entry_hall",
+        "description": "A small, crumpled note covered in dark, dried blood. It reads: 'The truth lies in the parlor.'",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "note_parlor_clue",
+        "scenic": false
+      },
+      {
+        "id": "rusted_iron_gate",
+        "location": "entry_hall",
+        "description": "A rusted iron gate leading to the parlor, its hinges stiff with age.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "note_parlor_clue",
+        "code_digits": 1,
+        "scenic": false
+      },
+      {
+        "id": "portrait_of_vayne",
+        "location": "entry_hall",
+        "description": "A gilded portrait of Lord Alistair Vayne, his eyes seeming to follow the viewer. A small crack runs across his mouth.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_chair_entry",
+        "location": "entry_hall",
+        "description": "A creaking wooden chair, long abandoned, with a broken leg.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_wall_entry",
+        "location": "entry_hall",
+        "description": "A cracked wall with peeling paint and a faint smell of dampness.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_floor_entry",
+        "location": "entry_hall",
+        "description": "A creaking wooden floor, warped and splintered in places.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "piano_with_code",
+        "location": "parlor",
+        "description": "A grand piano, its keys stained with dark liquid. The top has a faded inscription: 'Find the map in the study.'",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "piano_study_map_clue",
+        "scenic": false
+      },
+      {
+        "id": "study_door",
+        "location": "parlor",
+        "description": "A heavy wooden door with a rusted lock. The handle is cold to the touch.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "piano_study_map_clue",
+        "code_digits": 1,
+        "scenic": false
+      },
+      {
+        "id": "perfumed_drapes",
+        "location": "parlor",
+        "description": "Heavy velvet drapes that still carry the scent of perfume. They are slightly stained.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_wall_parlor",
+        "location": "parlor",
+        "description": "A faded wallpaper with floral patterns, peeling in places.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_chair_parlor",
+        "location": "parlor",
+        "description": "An ornate armchair, its fabric torn and stained.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_floor_parlor",
+        "location": "parlor",
+        "description": "A thick carpet that hides the wooden floor beneath, worn and frayed.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "torn_diary",
+        "location": "study",
+        "description": "A tattered diary with bloodstained pages. Inside is a faded note: 'The secret lies in the library.'",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "diary_library_clue",
+        "scenic": false
+      },
+      {
+        "id": "candle",
+        "location": "study",
+        "description": "A flickering candle, its wax pooling onto the desk. A small, hidden compartment is visible beneath.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "map_with_crimson_marks",
+        "location": "study",
+        "description": "A map of the estate marked with crimson ink, outlining a hidden passage.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "map_library_code",
+        "scenic": false
+      },
+      {
+        "id": "library_door",
+        "location": "study",
+        "description": "A heavy wooden door with a bolt lock. A small keyhole is visible.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "candle",
+        "scenic": false
+      },
+      {
+        "id": "scenic_wall_study",
+        "location": "study",
+        "description": "A bookshelf with claw marks and splintered wood.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_desk_study",
+        "location": "study",
+        "description": "A wooden desk with a broken chair pushed up against it.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_floor_study",
+        "location": "study",
+        "description": "A splintered wooden floor with claw marks and spilled ink.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_books",
+        "location": "library",
+        "description": "A stack of dusty books, their spines cracked and their pages brittle.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "book_dungeon_clue",
+        "scenic": false
+      },
+      {
+        "id": "mechanism_panel",
+        "location": "library",
+        "description": "A hidden mechanism panel, its gears and levers tarnished with age.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "requires_code": "map_library_code",
+        "code_digits": 3,
+        "scenic": false
+      },
+      {
+        "id": "dungeon_door",
+        "location": "library",
+        "description": "A heavy iron door with a rusted handle and a small slot for a key.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "mechanism_panel",
+        "scenic": false
+      },
+      {
+        "id": "hidden_passage",
+        "location": "library",
+        "description": "A hidden passage concealed behind a bookshelf, its entrance barely visible.",
+        "state": "hidden",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "mechanism_panel",
+        "scenic": false
+      },
+      {
+        "id": "scenic_wall_library",
+        "location": "library",
+        "description": "A towering bookshelf with books stacked precariously.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_floor_library",
+        "location": "library",
+        "description": "A worn wooden floor covered in dust and spilled ink.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_chair_library",
+        "location": "library",
+        "description": "An old wooden chair, its legs broken and its fabric torn.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "flickering_bulb",
+        "location": "dungeon",
+        "description": "A flickering bulb hanging from the ceiling, its light casting long shadows.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "murder_note",
+        "location": "dungeon",
+        "description": "A small, bloodstained note hidden behind a loose stone. It reads: 'The killer is in the study.'",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "note_study_clue",
+        "scenic": false
+      },
+      {
+        "id": "altar_door",
+        "location": "dungeon",
+        "description": "A heavy wooden door with a rusted bolt and a small keyhole.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "note_study_clue",
+        "code_digits": 1,
+        "scenic": false
+      },
+      {
+        "id": "scenic_wall_dungeon",
+        "location": "dungeon",
+        "description": "A stone wall covered in cracks and dampness.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_floor_dungeon",
+        "location": "dungeon",
+        "description": "A cold, stone floor, wet in places with a faint smell of decay.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_chair_dungeon",
+        "location": "dungeon",
+        "description": "An old wooden chair, its legs broken and its fabric torn.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_1",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_2",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_1",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_2",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_1",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_1",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dungeon_1",
+        "location": "dungeon",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dungeon_2",
+        "location": "dungeon",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. [entry_hall] take bloodstained_note — took bloodstained_note",
+      "2. [entry_hall] go parlor — moved to parlor",
+      "3. [parlor] examine piano_with_code — examined piano_with_code; learned piano_study_map_clue",
+      "4. [parlor] enter_code study_door — entered code piano_study_map_clue → study_door unlocked",
+      "5. [parlor] go study — moved to study",
+      "6. [study] take candle — took candle",
+      "7. [study] use_tool library_door — used candle on library_door → unlocked",
+      "8. [study] go library — moved to library",
+      "9. [library] go dungeon — moved to dungeon",
+      "10. [dungeon] examine murder_note — examined murder_note; learned note_study_clue",
+      "11. [dungeon] enter_code altar_door — entered code note_study_clue → altar_door unlocked"
+    ],
+    "win_condition": {
+      "object_id": "altar_door",
+      "state": "unlocked"
+    }
+  }
+}

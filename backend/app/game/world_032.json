@@ -1,0 +1,491 @@
+{
+  "world": {
+    "scenario": "A renowned art collector has been found dead in their mansion, surrounded by cryptic symbols and a trail of clues that point to a long-buried secret. You are a private investigator, tasked with uncovering the truth behind the murder and finding the killer before the next victim is chosen.",
+    "objective": "Uncover the truth behind the murder and identify the killer before the next death occurs.",
+    "rooms": [
+      {
+        "id": "entry_hall",
+        "description": "The entry hall is thick with the scent of old parchment and mildew, the air heavy with the silence of forgotten guests. A single flickering chandelier casts jagged shadows across the cracked marble floor, revealing faint, blood-like stains in the corners.",
+        "adjacency": {
+          "north": "study"
+        },
+        "goal": "Find and take bloodstained_letter.",
+        "goal_completion": {
+          "type": "has_item",
+          "object_id": "bloodstained_letter"
+        },
+        "key_objects": [
+          "bloodstained_letter",
+          "rusted_bloodied_door",
+          "cracked_marble_floor",
+          "flickering_chandelier"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "The study is dim and cold, filled with the musty scent of old books and the acrid tang of ink. A grand desk sits in the center, its surface marred by deep scratches and a single, broken quill that appears to have been used in a desperate struggle.",
+        "adjacency": {
+          "south": "entry_hall",
+          "east": "library"
+        },
+        "goal": "Discover the hidden clue this room conceals.",
+        "goal_completion": {
+          "type": "known_info",
+          "info": "killer_signature"
+        },
+        "key_objects": [
+          "broken_quill",
+          "shattered_glass",
+          "musty_books",
+          "scratched_desk"
+        ]
+      },
+      {
+        "id": "library",
+        "description": "The library is a cavernous space, echoing with the sound of your own footsteps and the distant creak of unseen doors. The scent of aged leather and ink lingers in the air, and a single candle flickers on a shelf, casting long shadows over rows of books that seem to lean toward the center of the room.",
+        "adjacency": {
+          "west": "study",
+          "north": "sitting_room"
+        },
+        "goal": "Find and take final_journal_entry.",
+        "goal_completion": {
+          "type": "has_item",
+          "object_id": "final_journal_entry"
+        },
+        "key_objects": [
+          "aged_books",
+          "flickering_candle",
+          "leaning_shelves",
+          "final_journal_entry"
+        ]
+      },
+      {
+        "id": "sitting_room",
+        "description": "The sitting room is filled with the scent of burnt coffee and the lingering perfume of a long-dead woman. The walls are lined with portraits that seem to watch you as you pass, and the floorboards creak underfoot as if whispering secrets of the past.",
+        "adjacency": {
+          "south": "library",
+          "east": "murder_chamber"
+        },
+        "goal": "Discover the hidden clue this room conceals.",
+        "goal_completion": {
+          "type": "known_info",
+          "info": "killer_identity"
+        },
+        "key_objects": [
+          "burnt_coffee_scent",
+          "whispering_floorboards",
+          "watching_portraits",
+          "puzzle_portrait"
+        ]
+      },
+      {
+        "id": "murder_chamber",
+        "description": "The murder chamber is a cold, sterile space, the air thick with the metallic tang of blood and the acrid stench of chemicals. A single, broken mirror lies on the floor, its shattered pieces reflecting the dim light from a single overhead bulb.",
+        "adjacency": {
+          "west": "sitting_room"
+        },
+        "goal": "Get murder_chamber_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "murder_chamber_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "broken_mirror",
+          "metallic_air",
+          "overhead_bulb",
+          "murder_chamber_door"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "bloodstained_letter",
+        "location": "entry_hall",
+        "description": "A yellowed letter stained with dark, dried blood, tucked beneath a loose floorboard.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "killer_signature",
+        "scenic": false
+      },
+      {
+        "id": "rusted_bloodied_door",
+        "location": "entry_hall",
+        "description": "A rusted, blood-streaked door standing slightly ajar, its hinges creaking with every movement.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "scenic": false
+      },
+      {
+        "id": "cracked_marble_floor",
+        "location": "entry_hall",
+        "description": "A cracked marble floor, marred by deep gashes and dark stains that seem to form an almost legible pattern.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "flickering_chandelier",
+        "location": "entry_hall",
+        "description": "A grand chandelier that flickers with a sickly yellow light, casting erratic shadows across the room.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "shattered_glass",
+        "location": "study",
+        "description": "A large pane of shattered glass scattered across the floor, with a faint, smudged handprint on one of the pieces.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "killer_signature",
+        "scenic": false
+      },
+      {
+        "id": "broken_quill",
+        "location": "study",
+        "description": "A broken quill, its nib split and ink-stained, lying on the desk with a small puddle of dried ink nearby.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "musty_books",
+        "location": "study",
+        "description": "A stack of musty old books, their spines cracked and pages brittle, resting on a shelf.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scratched_desk",
+        "location": "study",
+        "description": "A grand, old desk with deep scratches running across its surface, as if someone had dragged their nails across it in anger.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "aged_books",
+        "location": "library",
+        "description": "A collection of aged books, their pages yellowed and brittle, arranged on a tall shelf.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "flickering_candle",
+        "location": "library",
+        "description": "A flickering candle, its wax pooling on the shelf, casting long, flickering shadows across the room.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "leaning_shelves",
+        "location": "library",
+        "description": "A set of towering shelves that lean slightly toward the center of the room, as if being pulled by some unseen force.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "final_journal_entry",
+        "location": "library",
+        "description": "A single journal entry tucked inside the last book of the shelf, its pages filled with frantic, almost illegible writing.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "killer_identity",
+        "scenic": false
+      },
+      {
+        "id": "burnt_coffee_scent",
+        "location": "sitting_room",
+        "description": "The lingering scent of burnt coffee in the air, as if someone had left a cup of coffee to cool long ago.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "whispering_floorboards",
+        "location": "sitting_room",
+        "description": "Floorboards that creak and groan with each step, as if whispering secrets to those who dare to listen.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "watching_portraits",
+        "location": "sitting_room",
+        "description": "A row of portraits that seem to shift and change as you move, their eyes following your every step.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "puzzle_portrait",
+        "location": "sitting_room",
+        "description": "A single, large portrait that appears to be the focus of the room, its subject obscured by a mysterious, swirling pattern.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "killer_identity",
+        "scenic": false
+      },
+      {
+        "id": "broken_mirror",
+        "location": "murder_chamber",
+        "description": "A shattered mirror on the floor, its broken pieces reflecting the dim light from the overhead bulb.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "metallic_air",
+        "location": "murder_chamber",
+        "description": "A thick, metallic tang in the air, as if the very walls are laced with chemicals and blood.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "overhead_bulb",
+        "location": "murder_chamber",
+        "description": "A single overhead bulb, its light flickering intermittently, casting long, jagged shadows across the room.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "murder_chamber_door",
+        "location": "murder_chamber",
+        "description": "A heavy, reinforced door with a small, rusted lock on its center. It appears to be bolted from the inside.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "broken_quill",
+        "scenic": false
+      },
+      {
+        "id": "scenic_filler_entry_hall_1",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_2",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_3",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_4",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_1",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_2",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_3",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_4",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_1",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_2",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_3",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_4",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_sitting_room_1",
+        "location": "sitting_room",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_sitting_room_2",
+        "location": "sitting_room",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_sitting_room_3",
+        "location": "sitting_room",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_sitting_room_4",
+        "location": "sitting_room",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_murder_chamber_1",
+        "location": "murder_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_murder_chamber_2",
+        "location": "murder_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_murder_chamber_3",
+        "location": "murder_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_murder_chamber_4",
+        "location": "murder_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. [entry_hall] take bloodstained_letter — took bloodstained_letter",
+      "2. [entry_hall] examine bloodstained_letter — examined bloodstained_letter; learned killer_signature",
+      "3. [entry_hall] go study — moved to study",
+      "4. [study] take broken_quill — took broken_quill",
+      "5. [study] go library — moved to library",
+      "6. [library] take final_journal_entry — took final_journal_entry",
+      "7. [library] examine final_journal_entry — examined final_journal_entry; learned killer_identity",
+      "8. [library] go sitting_room — moved to sitting_room",
+      "9. [sitting_room] go murder_chamber — moved to murder_chamber",
+      "10. [murder_chamber] use_tool murder_chamber_door — used broken_quill on murder_chamber_door → unlocked"
+    ],
+    "win_condition": {
+      "object_id": "murder_chamber_door",
+      "state": "unlocked"
+    }
+  }
+}

@@ -330,8 +330,8 @@ class TestCombinedRepairs:
         # R4: promoted to visible
         assert key["state"] == "visible"
 
-    def test_world_022_scenario(self):
-        """Simulates the exact structural issues found in world_022.json."""
+    def test_world_034_scenario(self):
+        """Simulates the exact structural issues found in world_034.json."""
         objs = [
             # room_1
             _obj("wall_mounted_comms", contains_info="pulse_code_492"),
@@ -388,6 +388,218 @@ class TestCombinedRepairs:
 
 
 # ------------------------------------------------------------------ #
+# R6 — Functional-first object ordering
+# ------------------------------------------------------------------ #
+
+class TestR6FunctionalFirst:
+    def test_info_producer_sorted_before_scenic_filler(self):
+        """contains_info object buried after scenic fillers is moved to front."""
+        objs = [
+            _obj("scenic_filler_1", interactable=False),
+            _obj("scenic_filler_2", interactable=False),
+            _obj("scenic_filler_3", interactable=False),
+            _obj("final_lock", state="locked", requires_code="passage_code"),
+            _obj("info_source", contains_info="passage_code"),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        ids = [o["id"] for o in result.objects]
+        assert ids.index("info_source") < ids.index("scenic_filler_1")
+
+    def test_functional_object_sorted_before_pure_decoration(self):
+        """An object with requires_code (tier 1) comes before decoration (tier 3)."""
+        objs = [
+            _obj("deco_a", interactable=False),
+            _obj("deco_b", interactable=False),
+            _obj("final_lock", state="locked", requires_code="x"),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        ids = [o["id"] for o in result.objects]
+        assert ids.index("final_lock") < ids.index("deco_a")
+
+    def test_info_producer_before_consumer(self):
+        """contains_info (tier 0) sorts before requires_code (tier 1)."""
+        objs = [
+            _obj("final_lock", state="locked", requires_code="code_x"),
+            _obj("clue_card", contains_info="code_x"),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        ids = [o["id"] for o in result.objects]
+        assert ids.index("clue_card") < ids.index("final_lock")
+
+    def test_stable_within_tier(self):
+        """Objects within the same tier keep their relative original order."""
+        objs = [
+            _obj("info_a", contains_info="c1"),
+            _obj("info_b", contains_info="c2"),
+            _obj("deco_x", interactable=False),
+            _obj("deco_y", interactable=False),
+            _obj("final_lock", state="locked", requires_code="c1"),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        ids = [o["id"] for o in result.objects]
+        # info_a before info_b (same tier, original order preserved)
+        assert ids.index("info_a") < ids.index("info_b")
+        # deco_x before deco_y (same tier, original order preserved)
+        assert ids.index("deco_x") < ids.index("deco_y")
+
+    def test_r6_repair_logged_when_order_changes(self):
+        objs = [
+            _obj("deco", interactable=False),
+            _obj("info_source", contains_info="code_z"),
+            _obj("final_lock", state="locked", requires_code="code_z"),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        assert any("R6" in r for r in result.repairs)
+
+    def test_r6_no_repair_logged_when_already_ordered(self):
+        """No R6 repair when functional objects are already before decoration."""
+        objs = [
+            _obj("info_source", contains_info="code_z"),
+            _obj("final_lock", state="locked", requires_code="code_z"),
+            _obj("deco", interactable=False),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        assert not any("R6" in r for r in result.repairs)
+
+    def test_world_034_scenic_rotting_fabric_in_beam_position(self):
+        """Simulates the world_034 beam-miss: scenic_rotting_fabric must be sorted
+        before scenic fillers so it lands within the 5-candidate planner beam."""
+        objs = [
+            # closet objects in their original world_034 order
+            _obj("closet_locket",    location="closet", state="locked",
+                 requires_code="passage_key_code_2"),
+            _obj("closet_light_bulb", location="closet", contains_info="light_bulb_clue_4"),
+            _obj("closet_letter",    location="closet", state="hidden", takeable=True),
+            _obj("scenic_rotting_fabric", location="closet", contains_info="passage_key_code_2",
+                 scenic=True),
+            _obj("scenic_old_perfume",   location="closet", interactable=False, scenic=True),
+            _obj("scenic_distorted",     location="closet", interactable=False, scenic=True),
+            _obj("scenic_filler_1",      location="closet", interactable=False, scenic=True),
+            _obj("scenic_filler_2",      location="closet", interactable=False, scenic=True),
+        ]
+        win = {"object_id": "closet_locket", "state": "unlocked"}
+        result = normalize_world(objs, win, ["closet"])
+        ids = [o["id"] for o in result.objects]
+        # scenic_rotting_fabric (tier 0: contains_info) must come before the
+        # locked consumer (tier 1: requires_code) and all pure scenic fillers.
+        rf_pos = ids.index("scenic_rotting_fabric")
+        locket_pos = ids.index("closet_locket")
+        filler_pos = ids.index("scenic_filler_1")
+        assert rf_pos < locket_pos, "info producer must precede code consumer"
+        assert rf_pos < filler_pos, "info producer must precede scenic filler"
+
+
+# ------------------------------------------------------------------ #
+# R7 — Numeric requires_code relinked to info token
+# ------------------------------------------------------------------ #
+
+class TestR7NumericCodeRelink:
+    def test_bare_digit_code_relinked_to_matching_info_token(self):
+        """requires_code="321" with no direct chain → relinked to "symbol_code_321"."""
+        objs = [
+            _obj("final_symbol", contains_info="symbol_code_321"),
+            _obj("final_lock", state="locked", requires_code="321"),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        lock = next(o for o in result.objects if o["id"] == "final_lock")
+        assert lock["requires_code"] == "symbol_code_321"
+
+    def test_r7_repair_logged(self):
+        objs = [
+            _obj("note", contains_info="music_code_972"),
+            _obj("final_lock", state="locked", requires_code="972"),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        assert any("R7" in r and "final_lock" in r and "music_code_972" in r for r in result.repairs)
+
+    def test_ambiguous_multiple_matching_tokens_left_unchanged(self):
+        """Two info tokens share the same suffix → ambiguous, code left as-is."""
+        objs = [
+            _obj("clue_a", contains_info="door_code_321"),
+            _obj("clue_b", contains_info="box_code_321"),
+            _obj("final_lock", state="locked", requires_code="321"),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        lock = next(o for o in result.objects if o["id"] == "final_lock")
+        assert lock["requires_code"] == "321"
+        assert any("R7" in r and "ambiguous" in r for r in result.repairs)
+
+    def test_no_matching_suffix_left_unchanged(self):
+        """No info token ends with the digit suffix → stand-alone code, no action."""
+        objs = [
+            _obj("clue", contains_info="other_code_999"),
+            _obj("final_lock", state="locked", requires_code="321"),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        lock = next(o for o in result.objects if o["id"] == "final_lock")
+        assert lock["requires_code"] == "321"
+        assert not any("R7" in r for r in result.repairs)
+
+    def test_direct_chain_intact_not_touched(self):
+        """If some object has contains_info == requires_code already, leave as-is."""
+        objs = [
+            _obj("clue", contains_info="321"),  # verbatim digit token
+            _obj("final_lock", state="locked", requires_code="321"),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        lock = next(o for o in result.objects if o["id"] == "final_lock")
+        assert lock["requires_code"] == "321"
+        assert not any("R7" in r for r in result.repairs)
+
+    def test_token_style_requires_code_not_affected(self):
+        """Token-style requires_code (not all digits) is never touched by R7."""
+        objs = [
+            _obj("clue", contains_info="compass_code_9"),
+            _obj("final_lock", state="locked", requires_code="compass_code_9"),
+        ]
+        result = normalize_world(objs, WIN, ROOMS)
+        lock = next(o for o in result.objects if o["id"] == "final_lock")
+        assert lock["requires_code"] == "compass_code_9"
+        assert not any("R7" in r for r in result.repairs)
+
+    def test_world_034_all_code_locks_relinked(self):
+        """Simulates the exact world_034 pattern: all pure-digit codes relinked to tokens."""
+        objs = [
+            _obj("torn_map",                contains_info="map_code_128"),
+            _obj("bloodstained_music_sheet",contains_info="music_code_972"),
+            _obj("yellowed_letters",        contains_info="letter_code_543"),
+            _obj("cracked_mirror",          contains_info="mirror_code_789"),
+            _obj("final_symbol",            contains_info="symbol_code_321"),
+            _obj("parlor_door",  state="locked", requires_tool="rusty_key"),
+            _obj("study_door",   state="locked", requires_code="972"),
+            _obj("attic_door",   state="locked", requires_code="543"),
+            _obj("hidden_lock",  state="locked", requires_code="789"),
+            _obj("crypt_exit",   state="locked", requires_code="321"),
+            _obj("rusty_key",    takeable=True),
+        ]
+        win = {"object_id": "crypt_exit", "state": "unlocked"}
+        result = normalize_world(objs, win, ROOMS)
+
+        by_id = {o["id"]: o for o in result.objects}
+        assert by_id["study_door"]["requires_code"] == "music_code_972"
+        assert by_id["attic_door"]["requires_code"] == "letter_code_543"
+        assert by_id["hidden_lock"]["requires_code"] == "mirror_code_789"
+        assert by_id["crypt_exit"]["requires_code"] == "symbol_code_321"
+        # map_code_128 has no lock pointing to it — should be unaffected
+        r7_repairs = [r for r in result.repairs if r.startswith("R7")]
+        assert len(r7_repairs) == 4
+
+    def test_world_034_solution_path_traces_info_chain(self):
+        """After R7 relinking, _derive_solution_path correctly traces crypt_exit → final_symbol."""
+        objs = [
+            _obj("final_symbol", contains_info="symbol_code_321"),
+            _obj("crypt_exit", state="locked", requires_code="321"),
+        ]
+        win = {"object_id": "crypt_exit", "state": "unlocked"}
+        result = normalize_world(objs, win, ROOMS)
+        path_text = " ".join(result.solution_path)
+        # After R7: requires_code is "symbol_code_321" so path traces to final_symbol
+        assert "final_symbol" in path_text, "solution path must reference the info source"
+        assert "symbol_code_321" in path_text
+        assert "source unknown" not in path_text
+
+
+# ------------------------------------------------------------------ #
 # Integration: full world JSON files load and normalize cleanly
 # ------------------------------------------------------------------ #
 
@@ -396,7 +608,8 @@ GAME_DIR = os.path.join(os.path.dirname(__file__), "..", "app", "game")
 
 @pytest.mark.parametrize("world_file", [
     "world_015.json", "world_016.json", "world_017.json",
-    "world_022.json", "world_022.json", "world_022.json", "world_021.json",
+    "world_018.json", "world_019.json", "world_020.json",
+    "world_021.json", "world_034.json",
 ])
 def test_world_loads_and_normalizes_without_crash(world_file):
     """Each world should load through load_setting_compat without exception."""

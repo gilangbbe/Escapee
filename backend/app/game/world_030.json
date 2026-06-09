@@ -1,0 +1,485 @@
+{
+  "world": {
+    "scenario": "You wake up in a crumbling estate, the air thick with the scent of decay and old blood. The walls whisper of a long-forgotten murder, and the echoes of a desperate past cling to every surface. Each room you enter is a step closer to uncovering the truth — but also a step deeper into the shadows of the killer’s mind. The last will be the final reckoning, and only the truth will set you free.",
+    "objective": "Uncover the identity of the murderer before the curse claims you as its next victim.",
+    "rooms": [
+      {
+        "id": "entry_hall",
+        "description": "The entry hall reeks of damp stone and mildew, as if the walls themselves are breathing with rot. A flickering chandelier casts jagged shadows over the cracked marble floor, its light revealing a trail of bloodstains that lead deeper into the house.",
+        "adjacency": {
+          "east": "library"
+        },
+        "goal": "Get bloodstained_floorboards into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "bloodstained_floorboards",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "bloodstained_floorboards",
+          "flickering_chandelier"
+        ]
+      },
+      {
+        "id": "library",
+        "description": "The library is heavy with the scent of aged paper and decayed wood, as if the very books are whispering secrets to one another. Flickering candlelight dances across the faces of portraits whose eyes seem to follow you as you move.",
+        "adjacency": {
+          "west": "entry_hall",
+          "east": "study"
+        },
+        "goal": "Get whispering_portraits into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "whispering_portraits",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "whispering_portraits",
+          "candlelit_shelves"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "The study is cloaked in the scent of aged ink and burning incense, mingling in the air like the ghosts of the dead. A massive desk is strewn with yellowed letters, and a shattered mirror on the wall reflects only shadows.",
+        "adjacency": {
+          "west": "library",
+          "east": "dining_hall"
+        },
+        "goal": "Get shattered_mirror into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "shattered_mirror",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "shattered_mirror",
+          "yellowed_letters"
+        ]
+      },
+      {
+        "id": "dining_hall",
+        "description": "The dining hall is thick with the scent of old wine and dried meat, the air heavy with the weight of forgotten feasts. Chandeliers hang from the ceiling, their glass bulbs cracked and blackened, casting eerie shadows across a long, bloodstained table.",
+        "adjacency": {
+          "west": "study",
+          "east": "attic"
+        },
+        "goal": "Get bloodstained_table into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "bloodstained_table",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "bloodstained_table",
+          "cracked_chandelier"
+        ]
+      },
+      {
+        "id": "attic",
+        "description": "The attic is filled with the scent of dust and decay, as if time itself has forgotten to move here. Rusted chains dangle from the ceiling, and a single, cracked lantern flickers with a pale, dying light.",
+        "adjacency": {
+          "west": "dining_hall"
+        },
+        "goal": "Get cracked_lantern into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "cracked_lantern",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "rusted_chains",
+          "cracked_lantern"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "bloodstained_floorboards",
+        "location": "entry_hall",
+        "description": "A section of the floor where the bloodstains are particularly deep and dark, seemingly concealing something beneath.",
+        "state": "unlocked",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "floorboards_code_789",
+        "scenic": false
+      },
+      {
+        "id": "flickering_chandelier",
+        "location": "entry_hall",
+        "description": "A massive chandelier hanging from the ceiling, its crystals cracked and flickering with inconsistent light.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "old_bloodstain",
+        "location": "entry_hall",
+        "description": "A dried bloodstain on the floor, faint and aged, but still unmistakable.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_bookshelf",
+        "location": "entry_hall",
+        "description": "A tall wooden bookshelf covered in dust, its books long since lost to time.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "whispering_portraits",
+        "location": "library",
+        "description": "A set of portraits hanging on the wall, their eyes seem to shift and follow you as you move.",
+        "state": "unlocked",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "portrait_code_123",
+        "scenic": false
+      },
+      {
+        "id": "candlelit_shelves",
+        "location": "library",
+        "description": "Shelves lined with books, illuminated by flickering candlelight that dances across their spines.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "faded_wall_clock",
+        "location": "library",
+        "description": "An old wall clock with its hands frozen at 3:00 AM, its ticking long since ceased.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "cracked_floor_tile",
+        "location": "library",
+        "description": "A single floor tile in the library that is cracked and loose, as if it were disturbed recently.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "shattered_mirror",
+        "location": "study",
+        "description": "A large mirror that lies in pieces on the floor, reflecting only shadows and darkness.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "yellowed_letters",
+        "contains_info": "mirror_code_456",
+        "scenic": false
+      },
+      {
+        "id": "yellowed_letters",
+        "location": "study",
+        "description": "A stack of yellowed letters on the desk, their edges curling and ink fading with age.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "letters_key_01",
+        "scenic": false
+      },
+      {
+        "id": "ink_stained_desk",
+        "location": "study",
+        "description": "A large wooden desk, its surface covered in ink stains and dried wax from long ago.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "aged_incense_burner",
+        "location": "study",
+        "description": "An incense burner on the desk, its metal worn and covered in soot from years of use.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "bloodstained_table",
+        "location": "dining_hall",
+        "description": "A large dining table stained with dried blood, its surface cracked and warped with age.",
+        "state": "unlocked",
+        "interactable": true,
+        "takeable": false,
+        "scenic": false
+      },
+      {
+        "id": "cracked_chandelier",
+        "location": "dining_hall",
+        "description": "A chandelier hanging from the ceiling, its glass bulbs cracked and blackened with age.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "old_wine_rack",
+        "location": "dining_hall",
+        "description": "A wine rack covered in dust and cobwebs, its bottles long since emptied and broken.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dried_meat_hangings",
+        "location": "dining_hall",
+        "description": "A row of dried meat hanging from the ceiling, their meat long since turned to leather and dust.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "cracked_lantern",
+        "location": "attic",
+        "description": "A cracked lantern hanging from the ceiling, its light flickering with a pale, dying glow.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "789",
+        "code_digits": 3,
+        "scenic": false
+      },
+      {
+        "id": "rusted_chains",
+        "location": "attic",
+        "description": "A set of rusted chains dangling from the ceiling, their links heavy and thick with rust.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_wooden_box",
+        "location": "attic",
+        "description": "A small wooden box covered in dust and cobwebs, its lid slightly ajar.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_floorboards",
+        "location": "attic",
+        "description": "Old floorboards in the attic, their surfaces worn and splintered with age.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_1",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_2",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_3",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_4",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_1",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_2",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_3",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_4",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_1",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_2",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_3",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_4",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_1",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_2",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_3",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_4",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_1",
+        "location": "attic",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_2",
+        "location": "attic",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_3",
+        "location": "attic",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_4",
+        "location": "attic",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. [entry_hall] examine bloodstained_floorboards — examined bloodstained_floorboards; learned floorboards_code_789",
+      "2. [entry_hall] go library — moved to library",
+      "3. [library] go study — moved to study",
+      "4. [study] take yellowed_letters — took yellowed_letters",
+      "5. [study] use_tool shattered_mirror — used yellowed_letters on shattered_mirror → unlocked",
+      "6. [study] go dining_hall — moved to dining_hall",
+      "7. [dining_hall] go attic — moved to attic",
+      "8. [attic] enter_code cracked_lantern — entered code 789 → cracked_lantern unlocked"
+    ],
+    "win_condition": {
+      "object_id": "cracked_lantern",
+      "state": "unlocked"
+    }
+  }
+}

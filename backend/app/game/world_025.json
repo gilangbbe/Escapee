@@ -1,0 +1,498 @@
+{
+  "world": {
+    "scenario": "You wake up in a crumbling manor deep in the woods, the air thick with the scent of decay and the distant echo of a clock that has long since stopped. The house is a relic of a forgotten murder trial, where a prominent family was accused of a heinous crime, and their fate was sealed in a series of locked rooms. Now, you must uncover the truth before the curse of the house consumes you.",
+    "objective": "Uncover the identity of the murderer and break the curse of the manor.",
+    "rooms": [
+      {
+        "id": "entry_hall",
+        "description": "The entry hall is cloaked in the musty scent of damp stone and old leather, mingling with the metallic tang of rusted iron. A single flickering sconce casts jagged shadows across the cracked floor, revealing faint footprints that seem to lead deeper into the house.",
+        "adjacency": {
+          "east": "parlor"
+        },
+        "goal": "Get rusted_iron_lockbox into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "rusted_iron_lockbox",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "rusted_iron_lockbox",
+          "cracked_floor_tile"
+        ]
+      },
+      {
+        "id": "parlor",
+        "description": "The parlor reeks of burning incense and something far more sinister — a faint, acrid chemical scent lingers in the air. A heavy velvet curtain shudders as if disturbed by unseen hands, and the floorboards creak under your weight like they are whispering secrets.",
+        "adjacency": {
+          "west": "entry_hall",
+          "south": "study"
+        },
+        "goal": "Get etched_fireplace into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "etched_fireplace",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "etched_fireplace",
+          "ancient_incense_burner"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "The study is cold and musty, the scent of old paper and ink overpowering the faint metallic scent of blood. A broken desk sits in the center, its drawers jammed shut, and the floor is littered with shattered glass that still glints under the dim light.",
+        "adjacency": {
+          "north": "parlor",
+          "east": "library"
+        },
+        "goal": "Get shattered_glass_pieces into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "shattered_glass_pieces",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "shattered_glass_pieces",
+          "jammed_desk"
+        ]
+      },
+      {
+        "id": "library",
+        "description": "The library is thick with the scent of aged parchment and something more elusive — a sharp, almost electric smell like ozone after a storm. Shelves groan under the weight of books that seem to lean inward, their spines cracked and their pages whispering as you pass.",
+        "adjacency": {
+          "west": "study",
+          "south": "dining_hall"
+        },
+        "goal": "Get whispering_bookshelf into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "whispering_bookshelf",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "whispering_bookshelf",
+          "riddled_book"
+        ]
+      },
+      {
+        "id": "dining_hall",
+        "description": "The dining hall is heavy with the scent of stale wine and decay, as if a feast was abandoned mid-meal. The long table is covered in a thick layer of dust, and the chandelier above hangs precariously, its crystals dulled and cracked like frozen tears.",
+        "adjacency": {
+          "north": "library"
+        },
+        "goal": "Get cracked_chandelier into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "cracked_chandelier",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "cracked_chandelier",
+          "dusty_table"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "rusted_iron_lockbox",
+        "location": "entry_hall",
+        "description": "A rusted iron lockbox is embedded in the wall, its surface covered in tarnished engravings of a family crest. It appears to be secured with a heavy bolt.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "screwdriver",
+        "scenic": false
+      },
+      {
+        "id": "cracked_floor_tile",
+        "location": "entry_hall",
+        "description": "A single cracked floor tile lies in the center of the room, its edges uneven and its surface worn smooth by time.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "tile_code_456",
+        "scenic": false
+      },
+      {
+        "id": "ancient_incense_burner",
+        "location": "parlor",
+        "description": "A brass incense burner sits atop a pedestal, its surface tarnished and etched with cryptic symbols. A faint, acrid scent drifts from it.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "burner_clue_1",
+        "scenic": false
+      },
+      {
+        "id": "etched_fireplace",
+        "location": "parlor",
+        "description": "The fireplace is lined with etched stone, its surface covered in intricate patterns and a single, locked panel that seems to be a hidden compartment.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "839",
+        "code_digits": 3,
+        "scenic": false
+      },
+      {
+        "id": "old_chair_1",
+        "location": "parlor",
+        "description": "An old wooden chair sits near the fireplace, its legs slightly warped and its fabric worn thin.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "839",
+        "scenic": true
+      },
+      {
+        "id": "old_chair_2",
+        "location": "parlor",
+        "description": "Another old wooden chair sits near the fireplace, its legs slightly warped and its fabric worn thin.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "shattered_glass_pieces",
+        "location": "study",
+        "description": "A mosaic of shattered glass pieces lies on the floor, some of them still glowing faintly with an eerie light.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "glass_cleaner",
+        "scenic": false
+      },
+      {
+        "id": "jammed_desk",
+        "location": "study",
+        "description": "A desk is jammed in the center of the room, its drawers stuck and its surface covered in a thin layer of dust.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "desk_code_782",
+        "scenic": false
+      },
+      {
+        "id": "riddled_book",
+        "location": "library",
+        "description": "An ancient book sits on a pedestal, its cover worn and its pages filled with riddles and cryptic notes.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "book_code_112",
+        "scenic": false
+      },
+      {
+        "id": "whispering_bookshelf",
+        "location": "library",
+        "description": "A towering bookshelf groans with the weight of its contents, its surface etched with strange symbols and a locked door.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "346",
+        "code_digits": 3,
+        "scenic": false
+      },
+      {
+        "id": "dusty_table",
+        "location": "dining_hall",
+        "description": "A long, dusty table runs the length of the room, its surface covered in thick layers of dust and forgotten relics.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "table_code_057",
+        "scenic": false
+      },
+      {
+        "id": "cracked_chandelier",
+        "location": "dining_hall",
+        "description": "A grand chandelier hangs from the ceiling, its crystals cracked and its chains rusted with age. It seems to hold a hidden mechanism.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "wrench",
+        "scenic": false
+      },
+      {
+        "id": "screwdriver",
+        "location": "entry_hall",
+        "description": "A rusty screwdriver lies on the floor, its blade worn but still usable.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "glass_cleaner",
+        "location": "study",
+        "description": "A glass cleaner sits on a shelf, its bottle slightly cracked and its contents still usable.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "wrench",
+        "location": "dining_hall",
+        "description": "A heavy wrench is lying on the floor, its handle worn and its teeth still sharp.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "old_lamp",
+        "location": "entry_hall",
+        "description": "An old oil lamp stands in the corner, its glass bulb cracked but still emitting a faint glow.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "broken_clock",
+        "location": "entry_hall",
+        "description": "A large, broken clock hangs on the wall, its hands frozen and its face cracked.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "old_portrait",
+        "location": "parlor",
+        "description": "An old portrait hangs on the wall, its frame gilded and its subject's face obscured by a layer of dust.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "ancient_vase",
+        "location": "parlor",
+        "description": "An ancient vase sits on a shelf, its surface cracked and its interior empty.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "empty_cupboard",
+        "location": "study",
+        "description": "An empty cupboard sits in the corner, its doors slightly ajar and its interior dark and empty.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "tattered_carpet",
+        "location": "study",
+        "description": "A tattered carpet covers the floor, its edges frayed and its surface stained with age.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_shelf",
+        "location": "library",
+        "description": "A dusty shelf lines the wall, its surface covered in layers of dust and old books.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "346",
+        "scenic": true
+      },
+      {
+        "id": "old_chair_3",
+        "location": "library",
+        "description": "An old wooden chair sits near the bookshelf, its legs slightly warped and its fabric worn thin.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "empty_chair",
+        "location": "dining_hall",
+        "description": "An empty chair sits at the head of the table, its surface worn and its fabric tattered.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "old_ornament",
+        "location": "dining_hall",
+        "description": "An old ornament sits on a side table, its surface tarnished and its details worn by time.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "cracked_mirror",
+        "location": "dining_hall",
+        "description": "A cracked mirror hangs on the wall, its surface broken and its frame gilded.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_1",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_2",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_3",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_1",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_2",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_1",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_2",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_3",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_1",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_2",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_3",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_4",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_1",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_2",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. [entry_hall] take screwdriver — took screwdriver",
+      "2. [entry_hall] use_tool rusted_iron_lockbox — used screwdriver on rusted_iron_lockbox → unlocked",
+      "3. [entry_hall] go parlor — moved to parlor",
+      "4. [parlor] examine old_chair_1 — examined old_chair_1; learned 839",
+      "5. [parlor] enter_code etched_fireplace — entered code 839 → etched_fireplace unlocked",
+      "6. [parlor] go study — moved to study",
+      "7. [study] take glass_cleaner — took glass_cleaner",
+      "8. [study] use_tool shattered_glass_pieces — used glass_cleaner on shattered_glass_pieces → unlocked",
+      "9. [study] go library — moved to library",
+      "10. [library] examine dusty_shelf — examined dusty_shelf; learned 346",
+      "11. [library] enter_code whispering_bookshelf — entered code 346 → whispering_bookshelf unlocked",
+      "12. [library] go dining_hall — moved to dining_hall",
+      "13. [dining_hall] take wrench — took wrench",
+      "14. [dining_hall] use_tool cracked_chandelier — used wrench on cracked_chandelier → unlocked"
+    ],
+    "win_condition": {
+      "object_id": "cracked_chandelier",
+      "state": "unlocked"
+    }
+  }
+}

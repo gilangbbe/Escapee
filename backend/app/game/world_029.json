@@ -1,0 +1,463 @@
+{
+  "world": {
+    "scenario": "You wake in a dimly lit, abandoned manor, the air thick with the scent of decay and old blood. A murdered aristocrat lies in the grand hall, and the walls whisper secrets of betrayal and greed. You are not the first to arrive, but you may be the last. As the clock strikes midnight, the house will close its doors forever — and you must uncover the truth before it's too late.",
+    "objective": "Uncover the identity of the killer and escape the house before midnight.",
+    "rooms": [
+      {
+        "id": "entrance_hall",
+        "description": "The floor creaks underfoot with each step, and the scent of old wine and mildew clings to the air. Flickering candlelight casts jagged shadows over the cracked marble tiles, revealing faint, smeared fingerprints on the walls.",
+        "adjacency": {
+          "north": "library"
+        },
+        "goal": "Find the key to the locked door that leads to the library.",
+        "key_objects": [
+          "bloodstained_statue",
+          "cracked_marble_key"
+        ]
+      },
+      {
+        "id": "library",
+        "description": "The scent of old paper and damp wood fills the air, mingling with the faint metallic tang of rusted book bindings. Dust motes swirl lazily in the dim light of a single broken chandelier, casting long, flickering shadows across rows of forgotten tomes.",
+        "adjacency": {
+          "south": "entrance_hall",
+          "east": "study"
+        },
+        "goal": "Decipher the hidden message in the locked bookcase to unlock the passage to the study.",
+        "key_objects": [
+          "locked_bookcase",
+          "dusty_incantation_book"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "The air is heavy with the scent of burning incense and aged leather. A single cracked mirror on the wall reflects a dimly lit room filled with books, but the reflection is slightly out of sync with the room itself, as if the mirror shows a different time.",
+        "adjacency": {
+          "west": "library",
+          "north": "dining_room"
+        },
+        "goal": "Solve the mirror's riddle to unlock the hidden drawer containing the next clue.",
+        "key_objects": [
+          "cracked_mirror",
+          "ancient_brass_drawer"
+        ]
+      },
+      {
+        "id": "dining_room",
+        "description": "The scent of spoiled wine and burnt candle wax hangs heavily in the air. A long, shattered table lies at the center of the room, its surface stained with dark, congealed blood that glints faintly under the flickering chandelier light.",
+        "adjacency": {
+          "south": "study",
+          "east": "attic"
+        },
+        "goal": "Reassemble the shattered wine glass to reveal the location of the murder weapon.",
+        "key_objects": [
+          "shattered_wine_glass",
+          "stained_table"
+        ]
+      },
+      {
+        "id": "attic",
+        "description": "The air is cold and still, filled with the musty scent of old fabric and the faint smell of gunpowder. A single hanging bulb flickers overhead, casting long shadows over a rusted iron gate that seems to pulse faintly with unseen energy.",
+        "adjacency": {
+          "west": "dining_room"
+        },
+        "goal": "Get rusted_iron_gate into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "rusted_iron_gate",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "rusted_iron_gate",
+          "shattered_clock_face"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "bloodstained_statue",
+        "location": "entrance_hall",
+        "description": "A lifeless statue of a robed figure, its face smeared with dark red substance that seems to pulse faintly in the flickering candlelight.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "statue_blood_clue",
+        "scenic": false
+      },
+      {
+        "id": "cracked_marble_key",
+        "location": "entrance_hall",
+        "description": "A jagged piece of marble, worn smooth in places but still bearing the faint outline of a keyhole shape.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "faded_wall_carving",
+        "location": "entrance_hall",
+        "description": "A faded engraving on the wall depicting a serpent coiled around a sword, with the words 'truth reveals the path' etched beneath it.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "flickering_candle",
+        "location": "entrance_hall",
+        "description": "A candle that flickers erratically, casting shifting shadows that seem to move of their own accord.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "smeared_fingerprint_wall",
+        "location": "entrance_hall",
+        "description": "A section of the wall where smeared fingerprints form the shape of a twisted crown, slightly glowing in the candlelight.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "broken_marble_tile",
+        "location": "entrance_hall",
+        "description": "A cracked tile on the floor that appears to be recently broken, the edges sharp and jagged.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_incantation_book",
+        "location": "library",
+        "description": "An old book covered in dust, its pages yellowed and brittle, with a single sentence underlined in red: 'The library holds the key to the next chamber.'",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "library_key_clue",
+        "scenic": false
+      },
+      {
+        "id": "locked_bookcase",
+        "location": "library",
+        "description": "A heavy wooden bookcase that appears to be locked, with a small keypad on its side that requires a code to open.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "mirror_riddle_answer",
+        "scenic": false
+      },
+      {
+        "id": "dusty_book_shelf",
+        "location": "library",
+        "description": "A shelf cluttered with yellowed books and loose parchment, many of which appear to have been hastily removed.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_chandelier",
+        "location": "library",
+        "description": "A broken chandelier hanging from the ceiling, its crystals cracked and its light flickering with a strange, uneven rhythm.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "cobweb_covered_statue",
+        "location": "library",
+        "description": "A dusty statue of a noble figure, half-hidden beneath a thick layer of cobwebs and dust.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "shattered_incantation_scroll",
+        "location": "library",
+        "description": "A torn and crumpled scroll resting on a table, its text partially legible and containing the phrase: 'Time is the mirror's master.'",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "mirror_riddle_answer",
+        "scenic": false
+      },
+      {
+        "id": "cracked_mirror",
+        "location": "study",
+        "description": "A cracked mirror hanging on the wall, its surface warped and reflecting a vision that seems to be a few moments ahead of the actual room.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "shattered_incantation_scroll",
+        "scenic": false
+      },
+      {
+        "id": "ancient_brass_drawer",
+        "location": "study",
+        "description": "A small, ornate drawer embedded in the wall, its brass surface tarnished and its handle worn from years of use.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "mirror_riddle_answer",
+        "scenic": false
+      },
+      {
+        "id": "dusty_incense_burner",
+        "location": "study",
+        "description": "An old incense burner resting on a table, its metal surface tarnished and its base filled with the remnants of burned incense.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "worn_leather_chair",
+        "location": "study",
+        "description": "A worn leather chair pushed against the wall, its cushions flattened and its arms scratched from use.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_wall_rack",
+        "location": "study",
+        "description": "A dusty wooden rack on the wall, holding a collection of mismatched books and papers, many of which appear to have been hastily removed.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "shattered_wine_glass",
+        "location": "dining_room",
+        "description": "A broken wine glass lying on the shattered table, its jagged edges still glistening with dark, congealed blood.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "stained_table",
+        "location": "dining_room",
+        "description": "A long, shattered table at the center of the room, its surface covered in dark, congealed blood that glints faintly under the flickering chandelier light.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "bloodied_chandelier",
+        "location": "dining_room",
+        "description": "A chandelier that hangs above the table, its crystals cracked and its light flickering with a strange, uneven rhythm.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "shattered_glass_bottle",
+        "location": "dining_room",
+        "description": "A broken bottle of wine on the floor, its contents long since spilled and dried, but still bearing the faint shape of a crest.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_chair",
+        "location": "dining_room",
+        "description": "A chair pushed aside on the floor, its fabric torn and its frame creaking under the weight of years of neglect.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "blood_stained_wall",
+        "location": "dining_room",
+        "description": "A section of the wall that has been smeared with dark, congealed blood, forming the shape of a twisted crown.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "rusted_iron_gate",
+        "location": "attic",
+        "description": "A massive rusted iron gate that seems to pulse faintly with unseen energy, its surface covered in strange symbols and its hinges thick with rust.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "shattered_clock_face",
+        "scenic": false
+      },
+      {
+        "id": "shattered_clock_face",
+        "location": "attic",
+        "description": "A broken clock face resting on a table, its hands frozen in a strange position and its glass cracked and broken.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "dusty_wooden_box",
+        "location": "attic",
+        "description": "A dusty wooden box resting on a shelf, its surface covered in cobwebs and its edges worn from years of neglect.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "broken_chair",
+        "location": "attic",
+        "description": "A broken chair resting in the corner, its legs missing and its frame twisted from years of neglect.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_bench",
+        "location": "attic",
+        "description": "A worn wooden bench pushed against the wall, its surface cracked and its legs slightly uneven.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entrance_hall_1",
+        "location": "entrance_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entrance_hall_2",
+        "location": "entrance_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_1",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_2",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_1",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_2",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_3",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_room_1",
+        "location": "dining_room",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_room_2",
+        "location": "dining_room",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_1",
+        "location": "attic",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_2",
+        "location": "attic",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_3",
+        "location": "attic",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. [entrance_hall] go library — moved to library",
+      "2. [library] go study — moved to study",
+      "3. [study] go dining_room — moved to dining_room",
+      "4. [dining_room] go attic — moved to attic",
+      "5. [attic] take shattered_clock_face — took shattered_clock_face",
+      "6. [attic] use_tool rusted_iron_gate — used shattered_clock_face on rusted_iron_gate → unlocked"
+    ],
+    "win_condition": {
+      "object_id": "rusted_iron_gate",
+      "state": "unlocked"
+    }
+  }
+}

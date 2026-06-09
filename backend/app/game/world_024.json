@@ -1,0 +1,501 @@
+{
+  "world": {
+    "scenario": "You wake in a decaying mansion, the air thick with the scent of old blood and damp wood. A murder has been committed, and the house is cursed — its corridors twist unnaturally, its doors open only to those who solve its riddles. As the final heir to the family, you must uncover the truth behind the murder before the house consumes you forever.",
+    "objective": "Uncover the truth of the murder and escape the cursed mansion before the house claims your soul.",
+    "rooms": [
+      {
+        "id": "entry_hall",
+        "description": "The entry hall is cold and still, the scent of mildew clinging to the air like a forgotten memory. A single chandelier hangs from the ceiling, its crystals dark and cracked, casting jagged shadows across the stone floor.",
+        "adjacency": {
+          "east": "parlor"
+        },
+        "goal": "Get parlor_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "parlor_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "torn_map",
+          "candlestick_with_blood",
+          "parlor_door"
+        ]
+      },
+      {
+        "id": "parlor",
+        "description": "The parlor is dim and heavy with the scent of aged wine and something more acrid — something metallic. A grand piano sits in the center, its lid slightly open, revealing a sheet of music stained with what looks like dried blood.",
+        "adjacency": {
+          "west": "entry_hall",
+          "east": "study"
+        },
+        "goal": "Get study_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "study_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "bloodstained_music_sheet",
+          "study_bookcase",
+          "study_door"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "The study is silent except for the whisper of wind through a cracked window, carrying the scent of burnt paper and old ink. A desk sits center stage, its drawers all locked, but one drawer is slightly ajar, revealing a stack of yellowed letters.",
+        "adjacency": {
+          "west": "parlor",
+          "east": "attic"
+        },
+        "goal": "Get attic_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "attic_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "yellowed_letters",
+          "hidden_mechanism",
+          "attic_door"
+        ]
+      },
+      {
+        "id": "attic",
+        "description": "The attic is a graveyard of forgotten things — the air is thick with the smell of mildew and old leather. A chandelier dangles from the ceiling, its chains rusted and dangling, and a broken mirror hangs askew, reflecting distorted shadows.",
+        "adjacency": {
+          "west": "study",
+          "east": "crypt"
+        },
+        "goal": "Get crypt_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "crypt_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "cracked_mirror",
+          "hidden_lock",
+          "crypt_door"
+        ]
+      },
+      {
+        "id": "crypt",
+        "description": "The crypt is cold and silent, lit only by a single flickering candle. The walls are lined with stone coffins, their lids sealed with rusted iron clasps. A heavy iron door stands at the far end, its surface engraved with the family crest and a symbol you do not recognize.",
+        "adjacency": {
+          "west": "attic"
+        },
+        "goal": "Get crypt_exit into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "crypt_exit",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "engraved_door",
+          "final_symbol",
+          "crypt_exit"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "torn_map",
+        "location": "entry_hall",
+        "description": "A tattered map of the mansion, with parts of it missing and ink smeared across its surface. It shows a path leading to the study, but the way is blocked by a red X.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "map_code_128",
+        "scenic": false
+      },
+      {
+        "id": "candlestick_with_blood",
+        "location": "entry_hall",
+        "description": "A candlestick stained with dark, dried blood. The wick is still intact, and the wax has hardened into a jagged shape.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "parlor_door",
+        "location": "entry_hall",
+        "description": "A heavy oak door leading into the parlor, its surface engraved with a family crest and a small, rusted keyhole.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "rusty_key",
+        "scenic": false
+      },
+      {
+        "id": "bloodstained_music_sheet",
+        "location": "parlor",
+        "description": "A torn sheet of music, its notes smeared with dried blood. The title reads 'Elegy for a Fallen Heir'.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "music_code_972",
+        "scenic": false
+      },
+      {
+        "id": "study_bookcase",
+        "location": "parlor",
+        "description": "An ornate wooden bookcase filled with dusty tomes. One book is missing, leaving a noticeable gap.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "study_door",
+        "location": "parlor",
+        "description": "A tall, iron door leading into the study, its surface pitted and rusted. A small keyhole is visible near the bottom.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "972",
+        "scenic": false
+      },
+      {
+        "id": "yellowed_letters",
+        "location": "study",
+        "description": "A stack of yellowed letters, written in an elegant but shaky hand. The last letter is dated the day of the murder.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "letter_code_543",
+        "scenic": false
+      },
+      {
+        "id": "hidden_mechanism",
+        "location": "study",
+        "description": "A hidden panel in the wall, slightly ajar. Inside, a small iron key is visible, partially obscured by dust.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "attic_door",
+        "location": "study",
+        "description": "A reinforced wooden door with a rusted iron lock and a slot for a key. The surface is covered in peeling paint.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "543",
+        "scenic": false
+      },
+      {
+        "id": "cracked_mirror",
+        "location": "attic",
+        "description": "A large, ornate mirror with a crack running diagonally across its surface. The reflection is distorted and seems to move independently of the player.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "mirror_code_789",
+        "scenic": false
+      },
+      {
+        "id": "hidden_lock",
+        "location": "attic",
+        "description": "A small, hidden lock embedded in the wall. It appears to be a puzzle lock with a sequence of numbers.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "789",
+        "scenic": false
+      },
+      {
+        "id": "crypt_door",
+        "location": "attic",
+        "description": "A heavy iron door engraved with the family crest and a mysterious symbol. It is locked and appears to be reinforced with thick metal bars.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "symbol_key",
+        "scenic": false
+      },
+      {
+        "id": "engraved_door",
+        "location": "crypt",
+        "description": "A tall, iron door engraved with the family crest and a mysterious symbol. A small keyhole is visible near the top.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "symbol_key",
+        "scenic": false
+      },
+      {
+        "id": "final_symbol",
+        "location": "crypt",
+        "description": "A carved symbol on the wall, resembling the one on the crypt door. It appears to be a hidden clue to the family's secret.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "symbol_code_321",
+        "scenic": false
+      },
+      {
+        "id": "crypt_exit",
+        "location": "crypt",
+        "description": "A narrow, stone door leading out of the crypt. It is locked and appears to be the final exit from the mansion.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "321",
+        "scenic": false
+      },
+      {
+        "id": "rusty_key",
+        "location": "entry_hall",
+        "description": "A small, rusty key found hidden behind a loose brick in the wall. It appears to be old and worn.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "symbol_key",
+        "location": "attic",
+        "description": "A small, ornate key found hidden behind the mirror. It is engraved with the same mysterious symbol as the crypt door.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "chair_in_entry_hall",
+        "location": "entry_hall",
+        "description": "A worn wooden chair pushed against the wall. It is cracked and covered in dust.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "old_chandelier_entry",
+        "location": "entry_hall",
+        "description": "A large, old chandelier hanging from the ceiling. Its crystals are dark and cracked, casting jagged shadows.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "grand_piano",
+        "location": "parlor",
+        "description": "A grand piano with a slightly open lid, revealing a sheet of music stained with dried blood. It appears to be a centerpiece in the room.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "aged_wall_clock",
+        "location": "parlor",
+        "description": "An ornate wall clock with a broken pendulum and a cracked face. The numbers are faded and difficult to read.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "study_desk",
+        "location": "study",
+        "description": "A large wooden desk with a stack of yellowed letters on its surface. The desk is cluttered with old books and papers.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "burnt_paper_scents",
+        "location": "study",
+        "description": "A faint smell of burnt paper lingers in the air. There are several charred pieces of paper scattered on the floor.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "attic_chandelier",
+        "location": "attic",
+        "description": "A chandelier dangling from the ceiling, its chains rusted and dangling. The light is off, and the crystals are covered in dust.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "attic_rug",
+        "location": "attic",
+        "description": "A tattered rug on the floor, covered in dust and old stains. It appears to be very old and worn.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "crypt_statue",
+        "location": "crypt",
+        "description": "A stone statue of a figure holding a book. It is cracked and covered in dust, but the details are still visible.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "crypt_bench",
+        "location": "crypt",
+        "description": "A small, stone bench near the crypt door. It is worn and covered in dust, but it still appears sturdy.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_1",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_2",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_1",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_2",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_3",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_1",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_2",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_3",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_1",
+        "location": "attic",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_2",
+        "location": "attic",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_crypt_1",
+        "location": "crypt",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_crypt_2",
+        "location": "crypt",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_crypt_3",
+        "location": "crypt",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. [entry_hall] take rusty_key — took rusty_key",
+      "2. [entry_hall] use_tool parlor_door — used rusty_key on parlor_door → unlocked",
+      "3. [entry_hall] go parlor — moved to parlor",
+      "4. [parlor] examine bloodstained_music_sheet — examined bloodstained_music_sheet; learned music_code_972",
+      "5. [parlor] enter_code study_door — entered code 972 → study_door unlocked",
+      "6. [parlor] go study — moved to study",
+      "7. [study] examine yellowed_letters — examined yellowed_letters; learned letter_code_543",
+      "8. [study] enter_code attic_door — entered code 543 → attic_door unlocked",
+      "9. [study] go attic — moved to attic",
+      "10. [attic] take symbol_key — took symbol_key",
+      "11. [attic] use_tool crypt_door — used symbol_key on crypt_door → unlocked",
+      "12. [attic] go crypt — moved to crypt",
+      "13. [crypt] examine final_symbol — examined final_symbol; learned symbol_code_321",
+      "14. [crypt] enter_code crypt_exit — entered code 321 → crypt_exit unlocked"
+    ],
+    "win_condition": {
+      "object_id": "crypt_exit",
+      "state": "unlocked"
+    }
+  }
+}

@@ -1,0 +1,469 @@
+{
+  "world": {
+    "scenario": "A storm has trapped a group of guests in a crumbling manor, where a long-buried murder has resurfaced. The house is a labyrinth of guilt, hidden secrets, and a killer who still walks its halls. Every room holds a clue to the past, but also a barrier to the future — and the only way out is to uncover the truth before the killer strikes again.",
+    "objective": "Uncover the identity of the murderer and prevent their next victim from being killed.",
+    "rooms": [
+      {
+        "id": "foyer_entry",
+        "description": "The air is thick with the scent of damp wood and old perfume, as if the house still clings to the memories of those who once lived here. Flickering sconces cast jagged shadows across the cracked marble floor, revealing faint scuff marks that seem to lead deeper into the mansion.",
+        "adjacency": {
+          "north": "parlor_room"
+        },
+        "goal": "Discover the hidden passage behind the ornate mirror and unlock the foyer entrance.",
+        "key_objects": [
+          "ornate_mirror",
+          "cracked_marble_floor",
+          "faded_scarf"
+        ]
+      },
+      {
+        "id": "parlor_room",
+        "description": "The scent of burnt tea and aged leather fills the air, mingling with the musty odor of forgotten books. A candelabra sits on a side table, its candles long melted, leaving only smears of wax and the faint smell of smoke.",
+        "adjacency": {
+          "south": "foyer_entry",
+          "east": "study_corridor"
+        },
+        "goal": "Solve the cipher on the bookshelf to reveal the location of a hidden key and unlock the parlor door.",
+        "key_objects": [
+          "burnt_candelabra",
+          "cipher_bookshelf",
+          "hidden_key_locket"
+        ]
+      },
+      {
+        "id": "study_corridor",
+        "description": "The scent of ink and decay lingers in the air, as if the room itself has been writing its own tragic tale. Faint traces of blood are visible on the wooden floorboards, and the flickering light of a single hanging bulb reveals a portrait that seems to watch the intruder with hollow eyes.",
+        "adjacency": {
+          "west": "parlor_room",
+          "north": "library_chamber"
+        },
+        "goal": "Use the hidden key to unlock the desk and retrieve the diary of the missing guest, then unlock the study door.",
+        "key_objects": [
+          "bloodstained_floor",
+          "hollow_portrait",
+          "locked_desk",
+          "hidden_key"
+        ]
+      },
+      {
+        "id": "library_chamber",
+        "description": "Dusty tomes and the faint whisper of turning pages create an eerie atmosphere, as if the books themselves are speaking in hushed tones. The scent of old paper and lavender lingers in the air, mixing with the musty dampness that seeps through the cracks in the floor.",
+        "adjacency": {
+          "south": "study_corridor",
+          "east": "attic_stairwell"
+        },
+        "goal": "Decipher the diary to uncover the name of the murderer and the location of the final clue, then unlock the library door.",
+        "key_objects": [
+          "dusty_tomes",
+          "whispering_books",
+          "diary_of_guest",
+          "murderer_surname"
+        ]
+      },
+      {
+        "id": "attic_stairwell",
+        "description": "A cold draft whistles through the broken boards of the attic floor, carrying the scent of rust and decay. The faint echo of footsteps seems to come from nowhere, and the wooden planks beneath your feet creak as if the house is warning you of what lies ahead.",
+        "adjacency": {
+          "west": "library_chamber"
+        },
+        "goal": "Get hidden_chamber into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "hidden_chamber",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "creaking_planks",
+          "hidden_chamber",
+          "murderer_mask",
+          "final_victim"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "ornate_mirror",
+        "location": "foyer_entry",
+        "description": "A large, ornate mirror with intricate carvings that seem to shift when looked at too closely.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "mirror_code_124",
+        "scenic": false
+      },
+      {
+        "id": "cracked_marble_floor",
+        "location": "foyer_entry",
+        "description": "A cracked marble floor with faint scuff marks leading toward the mirror.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "faded_scarf",
+        "location": "foyer_entry",
+        "description": "A faded scarf lying on the floor near the mirror, as if someone left it in a hurry.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "burnt_candelabra",
+        "location": "parlor_room",
+        "description": "A candelabra with melted candles, still smelling faintly of smoke.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "cipher_bookshelf",
+        "location": "parlor_room",
+        "description": "A bookshelf with a hidden cipher engraved into its wood, visible only under certain light.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "cipher_code_124",
+        "scenic": false
+      },
+      {
+        "id": "hidden_key_locket",
+        "location": "parlor_room",
+        "description": "A small locket hidden behind a loose book, containing a key inside.",
+        "state": "hidden",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "bloodstained_floor",
+        "location": "study_corridor",
+        "description": "A wooden floorboard stained with what appears to be old blood, now dry and crusted.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "hollow_portrait",
+        "location": "study_corridor",
+        "description": "A portrait with hollow eyes, hanging slightly askew on the wall.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "locked_desk",
+        "location": "study_corridor",
+        "description": "An old desk with a locked drawer, seemingly holding important documents.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "hidden_key",
+        "scenic": false
+      },
+      {
+        "id": "hidden_key",
+        "location": "study_corridor",
+        "description": "A small key hidden under the bloodstained floorboard.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "dusty_tomes",
+        "location": "library_chamber",
+        "description": "A row of dusty tomes on a tall shelf, their spines cracked and faded.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "whispering_books",
+        "location": "library_chamber",
+        "description": "A book that seems to whisper secrets to those who listen closely.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "murderer_surname",
+        "scenic": false
+      },
+      {
+        "id": "diary_of_guest",
+        "location": "library_chamber",
+        "description": "An old diary hidden inside a hollow book, containing entries from the missing guest.",
+        "state": "hidden",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "murderer_surname",
+        "location": "library_chamber",
+        "description": "A name carved into the back of a book, written in a hurried and trembling hand.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": false
+      },
+      {
+        "id": "creaking_planks",
+        "location": "attic_stairwell",
+        "description": "Old wooden planks that creak with every step, as if warning of what lies ahead.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "hidden_chamber",
+        "location": "attic_stairwell",
+        "description": "A hidden wooden panel in the attic wall, slightly ajar and revealing a dark void beyond.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "murderer_mask",
+        "scenic": false
+      },
+      {
+        "id": "murderer_mask",
+        "location": "attic_stairwell",
+        "description": "A dark mask hanging on the wall, appearing to be made of the same material as the portrait.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "final_victim",
+        "location": "attic_stairwell",
+        "description": "A person silently standing in the corner, their face hidden behind a veil of shadows.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "mirror_clue_note",
+        "location": "foyer_entry",
+        "description": "A note left behind on the floor near the mirror, hinting at its hidden secret.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "parlor_scenic_wooden_chair",
+        "location": "parlor_room",
+        "description": "A worn wooden chair pushed against the wall in the parlor.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "study_scenic_ink_bottle",
+        "location": "study_corridor",
+        "description": "An empty ink bottle resting on the desk, with faint traces of dried ink.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "library_scenic_lavender_scented_candle",
+        "location": "library_chamber",
+        "description": "A candle with a faint lavender scent, sitting on a bookshelf.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "attic_scenic_rusty_ladder",
+        "location": "attic_stairwell",
+        "description": "A rusty old ladder leaning against the wall, its rungs worn and loose.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_foyer_entry_1",
+        "location": "foyer_entry",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_foyer_entry_2",
+        "location": "foyer_entry",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_foyer_entry_3",
+        "location": "foyer_entry",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_foyer_entry_4",
+        "location": "foyer_entry",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_room_1",
+        "location": "parlor_room",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_room_2",
+        "location": "parlor_room",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_room_3",
+        "location": "parlor_room",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_room_4",
+        "location": "parlor_room",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_corridor_1",
+        "location": "study_corridor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_corridor_2",
+        "location": "study_corridor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_corridor_3",
+        "location": "study_corridor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_chamber_1",
+        "location": "library_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_chamber_2",
+        "location": "library_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_chamber_3",
+        "location": "library_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_stairwell_1",
+        "location": "attic_stairwell",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_stairwell_2",
+        "location": "attic_stairwell",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_attic_stairwell_3",
+        "location": "attic_stairwell",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. [foyer_entry] go parlor_room — moved to parlor_room",
+      "2. [parlor_room] go study_corridor — moved to study_corridor",
+      "3. [study_corridor] go library_chamber — moved to library_chamber",
+      "4. [library_chamber] go attic_stairwell — moved to attic_stairwell",
+      "5. [attic_stairwell] take murderer_mask — took murderer_mask",
+      "6. [attic_stairwell] use_tool hidden_chamber — used murderer_mask on hidden_chamber → unlocked"
+    ],
+    "win_condition": {
+      "object_id": "hidden_chamber",
+      "state": "unlocked"
+    }
+  }
+}

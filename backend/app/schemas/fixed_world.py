@@ -185,11 +185,20 @@ class FixedWorld(BaseModel):
                 existing_ids.add(gate_id)
 
     @staticmethod
-    def _normalize_code(obj: dict) -> None:
-        """Normalize symbolic codes like `door_code_842` -> `842` when numeric."""
+    def _normalize_code(obj: dict, info_tokens: set[str] | None = None) -> None:
+        """Normalize symbolic codes like `door_code_842` -> `842` when numeric.
+
+        Skips normalization when the code is already a known contains_info token.
+        Those codes are discovered by agents and entered literally; stripping them
+        to their numeric suffix would break the info-chain (agents learn "compass_code_9"
+        but the engine would then expect "9" — an exact-match failure).
+        """
         code = obj.get("requires_code")
         digits = obj.get("code_digits")
         if not isinstance(code, str) or not digits:
+            return
+        # If this code IS an info token, agents discover and enter it verbatim.
+        if info_tokens and code in info_tokens:
             return
         numbers = re.findall(r"[0-9]{1,8}", code)
         if len(numbers) == 1 and len(numbers[0]) == int(digits):
@@ -200,8 +209,15 @@ class FixedWorld(BaseModel):
         objects = [obj.model_dump(exclude_none=True) for obj in self.objects]
 
         # Step 1: normalize symbolic numeric codes (e.g. "door_code_842" → "842").
+        # Build the info-token set first so _normalize_code can skip codes that ARE
+        # info tokens — those should be entered literally by agents, not shortened.
+        info_tokens: set[str] = {
+            o.get("contains_info")
+            for o in objects
+            if o.get("contains_info")
+        }
         for obj in objects:
-            self._normalize_code(obj)
+            self._normalize_code(obj, info_tokens)
 
         # Step 2: deterministic repair pass — fixes structural inconsistencies
         # produced by the LLM world-builder (see app.engine.world_normalizer).

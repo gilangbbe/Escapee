@@ -1,0 +1,501 @@
+{
+  "world": {
+    "scenario": "A renowned art collector was found dead in their secluded estate, the murder staged to look like an accident. Now, the estate is locked from the outside, and the only way out is through the rooms that led to the collector’s final moments. As the sole suspect, you must uncover the truth before the killer returns to silence you forever.",
+    "objective": "Uncover the identity of the murderer before they strike again.",
+    "rooms": [
+      {
+        "id": "entry_hall",
+        "description": "The entry hall is thick with the scent of mildew and old perfume, as if the walls themselves remember the last time they hosted a guest. A single chandelier hangs from the ceiling, its crystals cracked and dull, casting jagged shadows across the marble floor.",
+        "adjacency": {
+          "north": "parlor"
+        },
+        "goal": "Find and take bloodstained_rug.",
+        "goal_completion": {
+          "type": "has_item",
+          "object_id": "bloodstained_rug"
+        },
+        "key_objects": [
+          "bloodstained_rug",
+          "dusty_chandelier",
+          "shattered_mirror"
+        ]
+      },
+      {
+        "id": "parlor",
+        "description": "The parlor reeks of burnt incense and gunpowder, the air thick with the lingering metallic tang of a recent struggle. A grand piano stands in the center, its keys stained with something dark and dried, as though it had been used as a makeshift altar.",
+        "adjacency": {
+          "south": "entry_hall",
+          "east": "study"
+        },
+        "goal": "Get study_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "study_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "stained_piano_keys",
+          "burnt_incense_bowl",
+          "study_door"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "The study is cold and damp, the walls lined with bookshelves that reek of mildew and old paper. A single desk sits in the center, its surface cluttered with a typewriter, a shattered glass, and a ledger filled with cryptic symbols.",
+        "adjacency": {
+          "west": "parlor",
+          "north": "library"
+        },
+        "goal": "Get library_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "library_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "shattered_glass",
+          "cryptic_ledger",
+          "typewriter",
+          "library_door"
+        ]
+      },
+      {
+        "id": "library",
+        "description": "The library is filled with the scent of aged leather and ink, the air heavy with the weight of secrets. The bookshelves loom like sentinels, and a single candle flickers atop a desk, casting long, shifting shadows across the floor.",
+        "adjacency": {
+          "south": "study",
+          "east": "dining_hall"
+        },
+        "goal": "Find and take locked_diary_compartment.",
+        "goal_completion": {
+          "type": "has_item",
+          "object_id": "locked_diary_compartment"
+        },
+        "key_objects": [
+          "aged_books",
+          "flickering_candle",
+          "hidden_diary",
+          "locked_diary_compartment"
+        ]
+      },
+      {
+        "id": "dining_hall",
+        "description": "The dining hall is silent, save for the faint drip of water from a cracked ceiling. The long table is covered in a thick layer of dust, but in the center lies a bloodstained dinner plate, its edges still warm to the touch.",
+        "adjacency": {
+          "west": "library"
+        },
+        "goal": "Get final_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "final_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "bloodstained_plate",
+          "dusty_table",
+          "final_door"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "bloodstained_rug",
+        "location": "entry_hall",
+        "description": "A large, tattered rug stained with dark liquid, its fibers matted and sticky to the touch.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "bloodstain_code_01",
+        "scenic": false
+      },
+      {
+        "id": "dusty_chandelier",
+        "location": "entry_hall",
+        "description": "A chandelier covered in layers of dust, its crystals cracked and dull.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "shattered_mirror",
+        "location": "entry_hall",
+        "description": "A mirror hanging crookedly on the wall, its surface shattered and reflecting jagged fragments of the room.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "stained_piano_keys",
+        "location": "parlor",
+        "description": "A section of the piano's keys stained with a dark, dried substance that looks like blood.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "piano_stain_code_02",
+        "scenic": false
+      },
+      {
+        "id": "burnt_incense_bowl",
+        "location": "parlor",
+        "description": "A small ceramic bowl filled with ash and the remnants of incense that has been burnt to nothing.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "0102",
+        "scenic": true
+      },
+      {
+        "id": "study_door",
+        "location": "parlor",
+        "description": "A heavy wooden door with a brass handle, currently locked.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "0102",
+        "code_digits": 4,
+        "scenic": false
+      },
+      {
+        "id": "shattered_glass",
+        "location": "study",
+        "description": "A large shard of glass lying on the floor, its edge sharp and reflective.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "shattered_glass_code_03",
+        "scenic": false
+      },
+      {
+        "id": "cryptic_ledger",
+        "location": "study",
+        "description": "A leather-bound ledger filled with strange symbols and numbers, its pages slightly water-damaged.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "ledger_code_04",
+        "scenic": false
+      },
+      {
+        "id": "typewriter",
+        "location": "study",
+        "description": "An old, rusted typewriter resting on the desk, its keys stained and its carriage jammed.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "library_door",
+        "location": "study",
+        "description": "A large iron door with a complex lock, currently locked.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "shattered_glass",
+        "scenic": false
+      },
+      {
+        "id": "aged_books",
+        "location": "library",
+        "description": "A stack of thick, leather-bound books that smell of dust and aged paper.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "030405",
+        "scenic": true
+      },
+      {
+        "id": "flickering_candle",
+        "location": "library",
+        "description": "A candle that flickers weakly, casting long, shifting shadows across the room.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "hidden_diary",
+        "location": "library",
+        "description": "A small, worn leather diary tucked behind a book on the shelf, its cover cracked and faded.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "diary_code_05",
+        "scenic": false
+      },
+      {
+        "id": "locked_diary_compartment",
+        "location": "library",
+        "description": "A small, locked compartment hidden within the bookcase, its surface engraved with a strange symbol.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "requires_code": "030405",
+        "code_digits": 6,
+        "contains_info": "060708",
+        "scenic": false
+      },
+      {
+        "id": "bloodstained_plate",
+        "location": "dining_hall",
+        "description": "A dinner plate with a large, dark stain, its edges still warm to the touch.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "plate_stain_code_06",
+        "scenic": false
+      },
+      {
+        "id": "dusty_table",
+        "location": "dining_hall",
+        "description": "A long, wooden table covered in thick layers of dust and debris.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "final_door",
+        "location": "dining_hall",
+        "description": "A heavy metal door covered in rust, its handle cold to the touch and currently locked.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "locked_diary_compartment",
+        "scenic": false
+      },
+      {
+        "id": "scenic_filler_entry_hall_1",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_2",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_3",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_4",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_5",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_1",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_2",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_3",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_4",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_parlor_5",
+        "location": "parlor",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_1",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_2",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_3",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_4",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_1",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_2",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_3",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_4",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_1",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_2",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_3",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_4",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_5",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. [entry_hall] take bloodstained_rug — took bloodstained_rug",
+      "2. [entry_hall] go parlor — moved to parlor",
+      "3. [parlor] examine burnt_incense_bowl — examined burnt_incense_bowl; learned 0102",
+      "4. [parlor] enter_code study_door — entered code 0102 → study_door unlocked",
+      "5. [parlor] go study — moved to study",
+      "6. [study] take shattered_glass — took shattered_glass",
+      "7. [study] use_tool library_door — used shattered_glass on library_door → unlocked",
+      "8. [study] go library — moved to library",
+      "9. [library] take locked_diary_compartment — took locked_diary_compartment",
+      "10. [library] go dining_hall — moved to dining_hall",
+      "11. [dining_hall] use_tool final_door — used locked_diary_compartment on final_door → unlocked"
+    ],
+    "win_condition": {
+      "object_id": "final_door",
+      "state": "unlocked"
+    }
+  }
+}

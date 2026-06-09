@@ -1,0 +1,526 @@
+{
+  "world": {
+    "scenario": "You awaken in a decaying manor, long abandoned after the brutal murder of its enigmatic owner. The air is thick with the scent of damp wood and old blood, and the walls whisper of a past filled with lies, betrayal, and a killer who never left. To escape, you must uncover the truth of the murder — but the house is not empty, and it will not let you leave without solving its darkest secrets.",
+    "objective": "Discover the identity of the murderer and escape the haunted manor before the spirit of the victim claims another soul.",
+    "rooms": [
+      {
+        "id": "entry_hall",
+        "description": "The entry hall is dimly lit by a flickering chandelier, its glass shards catching the faint scent of burnt incense and old wine. The floor is slick with a thin layer of moisture, and the air is heavy with the smell of decay and something sweetly metallic, like blood.",
+        "adjacency": {
+          "east": "library"
+        },
+        "goal": "Get entry_hall_door into the 'unlocked' state.",
+        "key_objects": [
+          "bloodstained_mirror",
+          "rusted_key_hole",
+          "shattered_vase",
+          "entry_hall_door"
+        ]
+      },
+      {
+        "id": "library",
+        "description": "The library is lined with towering shelves, their wooden frames warped and stained with age. The scent of old paper and mildew clings to the air, and the faint sound of pages rustling echoes from unseen corners, as though the books themselves are whispering secrets.",
+        "adjacency": {
+          "west": "entry_hall",
+          "east": "dining_room"
+        },
+        "goal": "Get library_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "library_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "warped_bookshelf",
+          "cracked_brass_key",
+          "forgotten_diary",
+          "library_door"
+        ]
+      },
+      {
+        "id": "dining_room",
+        "description": "The dining room is frozen in time, its table still set with untouched dishes and a single glass of wine, its surface glistening with condensation. The faint metallic tang of rust lingers in the air, mingling with the bitter aroma of old wine that has long since turned to vinegar.",
+        "adjacency": {
+          "west": "library",
+          "east": "study"
+        },
+        "goal": "Get dining_room_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "dining_room_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "dining_table_drawer",
+          "cracked_map",
+          "empty_wine_glass",
+          "dining_room_door"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "The study is cluttered with broken quills, spilled ink, and a desk that reeks of burnt parchment and old perfume. The faint crackling of a dying candle casts flickering shadows across the walls, and the scent of something acrid and floral clings stubbornly to the air.",
+        "adjacency": {
+          "west": "dining_room",
+          "east": "final_chamber"
+        },
+        "goal": "Get study_door into the 'unlocked' state.",
+        "key_objects": [
+          "burnt_journal",
+          "ink_stained_desk",
+          "cracked_candle",
+          "study_door"
+        ]
+      },
+      {
+        "id": "final_chamber",
+        "description": "The final chamber is a small, circular room with a single, ornate chair at its center. The air is thick with the scent of incense and something older — something like the earth after a storm. The walls are covered in symbols that seem to pulse faintly, as if they are alive.",
+        "adjacency": {
+          "west": "study"
+        },
+        "goal": "Get final_chamber_exit into the 'unlocked' state.",
+        "key_objects": [
+          "pulsing_wall_symbols",
+          "ghostly_chair",
+          "shattered_rose",
+          "final_chamber_exit"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "bloodstained_mirror",
+        "location": "entry_hall",
+        "description": "A shattered mirror, its glass edges dark with dried blood, reflecting only shadows. The surface is cracked and warped, as if someone tried to break it with a hammer.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "mirror_code_137",
+        "scenic": false
+      },
+      {
+        "id": "rusted_key_hole",
+        "location": "entry_hall",
+        "description": "A rusted keyhole embedded in the wall, its surface pitted with corrosion. The hole is narrow and uninviting, as if it hasn't seen a key in decades.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "brass_key",
+        "scenic": false
+      },
+      {
+        "id": "shattered_vase",
+        "location": "entry_hall",
+        "description": "A shattered vase, its ceramic fragments scattered across the floor. Some of the shards are still stained with a deep red liquid, like dried blood.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "vase_code_824",
+        "scenic": false
+      },
+      {
+        "id": "entry_hall_door",
+        "location": "entry_hall",
+        "description": "A heavy, iron-plated door that seals the entry hall. The handle is rusted and unyielding, with no visible keyhole or lock mechanism.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "entry_hall_key",
+        "scenic": false
+      },
+      {
+        "id": "dusty_floor",
+        "location": "entry_hall",
+        "description": "The wooden floor is slick with moisture and flecked with dust and dark stains that seem to spread toward the center of the room.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "flickering_chandelier",
+        "location": "entry_hall",
+        "description": "A chandelier with broken glass shards hanging from its frayed chains. The light flickers weakly, casting long, flickering shadows across the walls.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "burnt_incense",
+        "location": "entry_hall",
+        "description": "A pile of burnt incense remnants scattered on the floor, their scent still faintly lingering in the air.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "old_wine_scent",
+        "location": "entry_hall",
+        "description": "A faint, metallic scent lingers in the air, tinged with the smell of old wine. It is barely perceptible but unmistakably present.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "warped_bookshelf",
+        "location": "library",
+        "description": "A towering bookshelf with warped and bowed wooden frames. The shelves sag slightly, and the books within are cracked and falling apart.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "cracked_brass_key",
+        "location": "library",
+        "description": "A cracked brass key resting on the floor, its surface tarnished and pitted. The key appears to be ancient and barely functional.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "forgotten_diary",
+        "location": "library",
+        "description": "An old, leather-bound diary found wedged between two books on the shelf. The cover is cracked and the pages are yellowed with age.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "diary_code_059",
+        "scenic": false
+      },
+      {
+        "id": "library_door",
+        "location": "library",
+        "description": "A heavy wooden door covered in dust and grime. It appears to be locked, with a faint outline of a keyhole visible near the center of the door.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "library_key",
+        "scenic": false
+      },
+      {
+        "id": "dusty_books",
+        "location": "library",
+        "description": "A pile of old, dusty books scattered across the floor, their pages brittle and falling apart.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "whispers_from_books",
+        "location": "library",
+        "description": "A faint, rustling sound echoes from the bookshelves, as if the books themselves are whispering secrets to one another.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "mildew_scent",
+        "location": "library",
+        "description": "A musty, damp scent lingers in the air, mingling with the scent of old paper and mildew.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "faded_wall_carving",
+        "location": "library",
+        "description": "A faded wall carving that depicts an ancient symbol, its edges worn and barely legible.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dining_table_drawer",
+        "location": "dining_room",
+        "description": "A dusty drawer hidden beneath the dining table. The drawer is slightly ajar, and its contents are visible through the gap.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "drawer_code_206",
+        "scenic": false
+      },
+      {
+        "id": "cracked_map",
+        "location": "dining_room",
+        "description": "A partially torn map found on the floor near the table. The map appears to be a sketch of the manor, with certain areas marked in red ink.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "map_code_453",
+        "scenic": false
+      },
+      {
+        "id": "empty_wine_glass",
+        "location": "dining_room",
+        "description": "An empty wine glass resting on the table. The glass is stained with rust and dried wine, and a faint trail of liquid can be seen on the table.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "glass_code_912",
+        "scenic": false
+      },
+      {
+        "id": "dining_room_door",
+        "location": "dining_room",
+        "description": "A heavy wooden door that appears to be locked. The handle is rusted and unyielding, with no visible keyhole or lock mechanism.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "dining_room_key",
+        "scenic": false
+      },
+      {
+        "id": "rusty_table",
+        "location": "dining_room",
+        "description": "A long, rusted dining table covered in dust. It appears to have been used many years ago, with several scratches and dents visible on its surface.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "old_red_liquid",
+        "location": "dining_room",
+        "description": "A faint, red liquid can be seen on the floor near the table. It is dry and crusted, forming a dark stain that seems to spread toward the center of the room.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dining_room_scent",
+        "location": "dining_room",
+        "description": "A faint, metallic scent lingers in the air, tinged with the smell of old wine. It is barely perceptible but unmistakably present.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "table_scar",
+        "location": "dining_room",
+        "description": "A deep scar runs across the table, as if something heavy was dragged across its surface. The scar is still visible despite the years that have passed.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "burned_candle",
+        "location": "dining_room",
+        "description": "A burned candle resting on the table. The wax is hardened and the wick is blackened, as if it was lit many years ago and never extinguished.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "brass_key",
+        "location": "library",
+        "description": "A cracked brass key resting on the floor, its surface tarnished and pitted. The key appears to be ancient and barely functional.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "entry_hall_key",
+        "location": "entry_hall",
+        "description": "A rusted key hidden behind a loose brick in the wall. It appears to be the key that fits the entry hall door.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "library_key",
+        "location": "library",
+        "description": "A small key hidden inside the forgotten diary. It appears to be the key that fits the library door.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "dining_room_key",
+        "location": "dining_room",
+        "description": "A small, tarnished key found inside the empty wine glass. It appears to be the key that fits the dining room door.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "scenic_filler_study_1",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_2",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_3",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_4",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_5",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_6",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_7",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_8",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_final_chamber_1",
+        "location": "final_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_final_chamber_2",
+        "location": "final_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_final_chamber_3",
+        "location": "final_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_final_chamber_4",
+        "location": "final_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_final_chamber_5",
+        "location": "final_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_final_chamber_6",
+        "location": "final_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_final_chamber_7",
+        "location": "final_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_final_chamber_8",
+        "location": "final_chamber",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. [entry_hall] go library — moved to library",
+      "2. [library] take library_key — took library_key",
+      "3. [library] use_tool library_door — used library_key on library_door → unlocked",
+      "4. [library] go dining_room — moved to dining_room",
+      "5. [dining_room] take dining_room_key — took dining_room_key",
+      "6. [dining_room] use_tool dining_room_door — used dining_room_key on dining_room_door → unlocked"
+    ],
+    "win_condition": {
+      "object_id": "dining_room_door",
+      "state": "unlocked"
+    }
+  }
+}

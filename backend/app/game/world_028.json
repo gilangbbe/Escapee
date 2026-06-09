@@ -1,0 +1,500 @@
+{
+  "world": {
+    "scenario": "You wake up in the abandoned manor of a reclusive billionaire who vanished under mysterious circumstances. The house is sealed from the outside, and the only way out is through the locked doors that lead deeper into the mansion. Each room holds a piece of the mystery: a hidden message, a forbidden secret, or a clue to the billionaire’s fate. But time is against you — the house is coming alive, and something in the walls is watching.",
+    "objective": "Discover the truth behind the billionaire's disappearance and escape the house before it collapses around you.",
+    "rooms": [
+      {
+        "id": "entry_hall",
+        "description": "The entry hall is thick with the scent of mildew and old wax, clinging to the air like a ghost. Flickering sconces cast jagged shadows across the cracked marble floor, revealing faint, smudged fingerprints that seem to lead nowhere.",
+        "adjacency": {
+          "north": "study"
+        },
+        "goal": "Get rusted_gate into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "rusted_gate",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "rusted_gate",
+          "smudged_wall",
+          "wax_sconce"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "The study is heavy with the scent of aged paper and something acrid — like burnt hair. A single desk sits in the center, its surface littered with scattered papers and a broken glass inkwell that still oozes black liquid.",
+        "adjacency": {
+          "south": "entry_hall",
+          "east": "library"
+        },
+        "goal": "Get locked_drawer into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "locked_drawer",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "broken_inkwell",
+          "locked_drawer",
+          "aged_desk"
+        ]
+      },
+      {
+        "id": "library",
+        "description": "The library is a maze of towering bookshelves, their wooden frames warped by age and moisture. A faint, metallic tang lingers in the air, and the floor creaks beneath your steps as though the house itself is shifting with each footfall.",
+        "adjacency": {
+          "west": "study",
+          "north": "dining_hall"
+        },
+        "goal": "Get warped_bookshelf into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "warped_bookshelf",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "warped_bookshelf",
+          "symbol_book",
+          "creaking_floor"
+        ]
+      },
+      {
+        "id": "dining_hall",
+        "description": "The dining hall reeks of decayed meat and old wine, the air thick with the weight of unspeakable secrets. A grand table lies abandoned, its surface stained with dark, congealed liquid that glistens under the flickering chandelier light.",
+        "adjacency": {
+          "south": "library",
+          "east": "solarium"
+        },
+        "goal": "Get stained_table into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "stained_table",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "stained_table",
+          "flickering_chandelier",
+          "hidden_engraving"
+        ]
+      },
+      {
+        "id": "solarium",
+        "description": "The solarium is bathed in the pale, sickly light of a cracked stained-glass window. A faint, almost imperceptible hum vibrates through the floor, and the air is thick with the scent of something metallic and sweet — like blood and copper.",
+        "adjacency": {
+          "west": "dining_hall"
+        },
+        "goal": "Get hidden_mechanism into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "hidden_mechanism",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "cracked_stained_glass",
+          "hidden_mechanism",
+          "humming_floor"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "rusted_gate",
+        "location": "entry_hall",
+        "description": "A heavy iron gate, rusted and bolted shut. The lock is broken, but it seems to require a key or code to open.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "code_458",
+        "code_digits": 3,
+        "scenic": false
+      },
+      {
+        "id": "smudged_wall",
+        "location": "entry_hall",
+        "description": "A wall covered in smudges and fingerprints, some of which appear to form patterns or numbers.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "code_458",
+        "scenic": false
+      },
+      {
+        "id": "wax_sconce",
+        "location": "entry_hall",
+        "description": "A flickering sconce made of wax, casting long, distorted shadows across the entry hall.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_floor_rug",
+        "location": "entry_hall",
+        "description": "A dusty, faded rug on the floor, partially hidden under the rusted gate.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "broken_inkwell",
+        "location": "study",
+        "description": "A shattered inkwell, still oozing black liquid onto the desk.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "code_213",
+        "scenic": false
+      },
+      {
+        "id": "locked_drawer",
+        "location": "study",
+        "description": "A locked drawer on the desk, its handle slightly ajar as though someone tried to open it recently.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "code_213",
+        "code_digits": 3,
+        "scenic": false
+      },
+      {
+        "id": "aged_desk",
+        "location": "study",
+        "description": "An old, wooden desk with a cracked surface, strewn with scattered papers and ink stains.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_drawer",
+        "location": "study",
+        "description": "A dusty drawer on the side of the desk, slightly ajar and empty.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "warped_bookshelf",
+        "location": "library",
+        "description": "A bookshelf warped by moisture, its books slightly tilted and leaning toward the center.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "symbol_book",
+        "scenic": false
+      },
+      {
+        "id": "symbol_book",
+        "location": "library",
+        "description": "An old book filled with strange symbols and diagrams. Its pages are brittle and yellowed with age.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "contains_info": "code_672",
+        "scenic": false
+      },
+      {
+        "id": "creaking_floor",
+        "location": "library",
+        "description": "A part of the wooden floor that creaks loudly when stepped on.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_shelf",
+        "location": "library",
+        "description": "A dusty shelf filled with old books and faded manuscripts.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "stained_table",
+        "location": "dining_hall",
+        "description": "A large, grand table with a dark, glistening stain in the center. It seems to be made of dark wood.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "key_from_drawer",
+        "scenic": false
+      },
+      {
+        "id": "flickering_chandelier",
+        "location": "dining_hall",
+        "description": "A large, flickering chandelier hanging above the table. Its crystals are dim and coated in dust.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "hidden_engraving",
+        "location": "dining_hall",
+        "description": "A faint engraving on the leg of the table, barely visible beneath the dark stain.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "code_987",
+        "scenic": false
+      },
+      {
+        "id": "dusty_chair",
+        "location": "dining_hall",
+        "description": "A dusty, old chair pushed against the wall, its fabric worn and frayed.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "hidden_mechanism",
+        "location": "solarium",
+        "description": "A hidden mechanical device partially embedded in the wall, its gears rusted but still intact.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "key_from_table",
+        "scenic": false
+      },
+      {
+        "id": "cracked_stained_glass",
+        "location": "solarium",
+        "description": "A cracked stained-glass window casting colorful, distorted light across the floor.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "dusty_floor",
+        "location": "solarium",
+        "description": "A dusty floor covered in small stones and pebbles, some of which are cracked and broken.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "key_from_drawer",
+        "location": "study",
+        "description": "An old, tarnished key found inside the locked drawer after entering the correct code.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "key_from_table",
+        "location": "dining_hall",
+        "description": "An old key found beneath the stained table after using the correct tool to open it.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true,
+        "scenic": false
+      },
+      {
+        "id": "scenic_filler_entry_hall_1",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_2",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_3",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_entry_hall_4",
+        "location": "entry_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_1",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_2",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_study_3",
+        "location": "study",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_1",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_2",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_3",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_library_4",
+        "location": "library",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_1",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_2",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_dining_hall_3",
+        "location": "dining_hall",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_solarium_1",
+        "location": "solarium",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_solarium_2",
+        "location": "solarium",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_solarium_3",
+        "location": "solarium",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_solarium_4",
+        "location": "solarium",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      },
+      {
+        "id": "scenic_filler_solarium_5",
+        "location": "solarium",
+        "description": "Nondescript clutter that fills the space — of no use to anyone.",
+        "state": "visible",
+        "interactable": false,
+        "takeable": false,
+        "scenic": true
+      }
+    ],
+    "rules": [
+      "Agent only reveals information already discovered in the game state.",
+      "Codes and numbers must come from the game state, never invented.",
+      "If information is not yet found, agent must say 'not yet known' instead of guessing.",
+      "Actions are only valid if the object is visible and within reach."
+    ],
+    "solution_path": [
+      "1. [entry_hall] examine smudged_wall — examined smudged_wall; learned code_458",
+      "2. [entry_hall] enter_code rusted_gate — entered code code_458 → rusted_gate unlocked",
+      "3. [entry_hall] go study — moved to study",
+      "4. [study] examine broken_inkwell — examined broken_inkwell; learned code_213",
+      "5. [study] enter_code locked_drawer — entered code code_213 → locked_drawer unlocked",
+      "6. [study] take key_from_drawer — took key_from_drawer",
+      "7. [study] go library — moved to library",
+      "8. [library] take symbol_book — took symbol_book",
+      "9. [library] use_tool warped_bookshelf — used symbol_book on warped_bookshelf → unlocked",
+      "10. [library] go dining_hall — moved to dining_hall",
+      "11. [dining_hall] use_tool stained_table — used key_from_drawer on stained_table → unlocked",
+      "12. [dining_hall] take key_from_table — took key_from_table",
+      "13. [dining_hall] go solarium — moved to solarium",
+      "14. [solarium] use_tool hidden_mechanism — used key_from_table on hidden_mechanism → unlocked"
+    ],
+    "win_condition": {
+      "object_id": "hidden_mechanism",
+      "state": "unlocked"
+    }
+  }
+}

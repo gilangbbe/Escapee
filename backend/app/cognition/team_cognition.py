@@ -650,18 +650,21 @@ class TeamCognition:
             return []
         # Exact-match wins: if the lock's literal code is already a known phrase
         # (e.g. a discovered info token equal to requires_code), use it directly.
-        # The engine compares requires_code literally, so this holds even when
-        # code_digits is set — AI-authored worlds often pair a symbolic code like
-        # "fingerprint_code" with a cosmetic code_digits, and a digits-only filter
-        # would wrongly discard the one code that actually opens the lock.
         if obj.requires_code in phrase_codes:
             return [obj.requires_code]
-        # Numeric code lock: only suggest digit codes, length-matched when known.
-        if obj.code_digits:
-            filtered = [c for c in numeric_codes if len(c) == obj.code_digits]
-            return filtered[:2]
-        # Textual/unknown-format lock: phrase first, then numeric fallback.
-        return (phrase_codes + numeric_codes)[:2]
+        # Purely numeric code: match by declared keypad length when known.
+        # This only applies when requires_code itself is all-digits — token-style
+        # codes like "compass_code_9" must NOT fall through to digit-length
+        # matching, which would return unrelated codes from other rooms ("5", "8").
+        if obj.requires_code.isdigit():
+            if obj.code_digits:
+                filtered = [c for c in numeric_codes if len(c) == obj.code_digits]
+                return filtered[:2]
+            return numeric_codes[:2]
+        # Token-style code not yet discovered: return nothing.
+        # Agents must inspect the info source first; guessing random codes only
+        # burns redundancy slots and misleads the stall recovery.
+        return []
 
     def _compile_candidates(
         self,
@@ -932,22 +935,26 @@ class TeamCognition:
         if not (say_loop or inspect_loop):
             return None
 
-        # Build a specific directive using known code + matching lock when possible.
+        # Build a specific directive using the correct code for a visible locked object.
         numeric_codes, phrase_codes = self._extract_known_codes(player_id, state)
-        known_codes = numeric_codes + phrase_codes
         for obj in state.setting.objects:
             cur = state.object_state.get(obj.id)
-            # Only nudge toward a lock the player can actually reach/see right now,
-            # otherwise the agent gets pushed into an unreachable "can't reach" move.
-            if (
+            # Only nudge toward a lock the player can actually reach/see right now.
+            if not (
                 obj.requires_code
                 and cur in _LOCKED_STATES
-                and known_codes
                 and state.is_visible_to(obj.id, player_id)
             ):
+                continue
+            # Only emit a code directive when we can match the right code for THIS
+            # specific lock — using known_codes[0] (any known code) often recommends
+            # a code from a completely different room's puzzle (e.g. "123" for a lock
+            # that needs "compass_code_9"), which wastes attempts and confuses agents.
+            matching = self._codes_for_object(obj, numeric_codes, phrase_codes)
+            if matching:
                 self._last_critical_turn[player_id] = state.turn
                 return (
-                    f"The team is looping. You know code '{known_codes[0]}'. "
+                    f"The team is looping. You know code '{matching[0]}'. "
                     f"Use enter_code on '{obj.id}' now to progress."
                 )
 
