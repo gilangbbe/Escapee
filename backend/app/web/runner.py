@@ -48,6 +48,9 @@ def build_agents(
     ``model``/``temperature`` arguments here are the team-wide fallback. One
     `OllamaClient` is shared per distinct ``(model, base_url)`` pair so multiple
     personas on the same model do not spin up redundant clients.
+
+    Human personas (``is_human=True``) receive no LLM client — the orchestrator
+    pauses and waits for real user input instead of calling the model.
     """
     if not setting.players:
         raise ValueError("This setting defines no players to drive.")
@@ -65,6 +68,9 @@ def build_agents(
 
     agents: list[GamePlayerAgent] = []
     for persona in setting.players:
+        if persona.is_human:
+            agents.append(GamePlayerAgent(persona=persona, client=None))
+            continue
         persona_model = persona.model or model
         persona_temp = persona.temperature if persona.temperature is not None else temperature
         agents.append(
@@ -109,6 +115,20 @@ class GameRunner:
         self.max_rounds = max_rounds
         self.narrator = narrator
         self.enforce_candidate_policy = enforce_candidate_policy
+        self._orchestrator: GameOrchestrator | None = None
+
+    # ------------------------------------------------------------------ #
+    # Human-interaction API — delegate to the live orchestrator
+    # ------------------------------------------------------------------ #
+    def inject_nudge(self, text: str) -> None:
+        """Forward a human observer's hint to the running orchestrator."""
+        if self._orchestrator is not None:
+            self._orchestrator.inject_nudge(text)
+
+    def submit_human_action(self, action_dict: dict) -> None:
+        """Forward a human player's chosen action to the running orchestrator."""
+        if self._orchestrator is not None:
+            self._orchestrator.submit_human_action(action_dict)
 
     async def run(self, send: SendFn) -> GameResult:
         """Stream the full game over `send` and return the final result."""
@@ -131,6 +151,7 @@ class GameRunner:
             narrator=self.narrator,
             enforce_candidate_policy=self.enforce_candidate_policy,
         )
+        self._orchestrator = orchestrator
 
         # Initial snapshot before any turn.
         await send(state_snapshot(orchestrator.sim.state))

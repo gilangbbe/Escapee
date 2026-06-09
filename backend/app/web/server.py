@@ -18,6 +18,7 @@ produces. CORS is open to the Vite dev server origins for local development.
 
 from __future__ import annotations
 
+import asyncio
 import json
 from typing import Optional
 
@@ -199,15 +200,52 @@ async def game_socket(websocket: WebSocket) -> None:
     async def send(message: dict) -> None:
         await websocket.send_text(json.dumps(message))
 
+    agents = build_agents(setting, model=model)
+    narrator = build_narrator(model=model) if narrate else None
+    runner = GameRunner(setting, agents, max_rounds=rounds, narrator=narrator)
+
+    async def receive_loop() -> None:
+        """Route incoming client messages to the runner while the game runs.
+
+        Accepted message types:
+          {"type": "nudge", "text": "..."}
+              Human observer injects a hint; broadcast to agents next turn.
+          {"type": "human_action", "action": {"action": "inspect", ...}}
+              Human player submits their chosen game action.
+        """
+        try:
+            while True:
+                raw = await websocket.receive_text()
+                try:
+                    msg = json.loads(raw)
+                except (ValueError, TypeError):
+                    continue
+                kind = msg.get("type")
+                if kind == "nudge":
+                    runner.inject_nudge(str(msg.get("text", "")))
+                elif kind == "human_action":
+                    runner.submit_human_action(msg.get("action") or {})
+        except (WebSocketDisconnect, Exception):
+            pass
+
+    game_task = asyncio.create_task(runner.run(send))
+    recv_task = asyncio.create_task(receive_loop())
+
     try:
-        # Re-announce setup so the UI reflects the roster actually in play.
-        agents = build_agents(setting, model=model)
-        narrator = build_narrator(model=model) if narrate else None
-        runner = GameRunner(setting, agents, max_rounds=rounds, narrator=narrator)
-        await runner.run(send)
+        done, pending = await asyncio.wait(
+            [game_task, recv_task],
+            return_when=asyncio.FIRST_COMPLETED,
+        )
+        for task in pending:
+            task.cancel()
+        # Re-raise any exception from the game task so the error handler fires.
+        for task in done:
+            if not task.cancelled():
+                task.result()
     except WebSocketDisconnect:
-        return
-    except Exception as exc:  # surface runtime errors (e.g. Ollama unreachable)
+        game_task.cancel()
+        recv_task.cancel()
+    except Exception as exc:
         await send({"type": "error", "message": str(exc)})
     finally:
         try:

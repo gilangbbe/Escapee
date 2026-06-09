@@ -19,9 +19,10 @@ export interface PersonaInfo {
   personality?: string;
   gender?: string;
   model?: string | null;
+  is_human?: boolean;
 }
 
-export type EventKind = "speech" | "observation" | "system" | "planner" | "prompt" | "decision" | "narration";
+export type EventKind = "speech" | "observation" | "system" | "planner" | "prompt" | "decision" | "narration" | "human_turn";
 
 export interface PlannerCandidate {
   rank: number;
@@ -36,6 +37,20 @@ export interface PlannerEventData {
   candidates: PlannerCandidate[];
 }
 
+export interface HumanTurnCandidate {
+  index: number;
+  description: string;
+  action: Record<string, unknown>;
+}
+
+export interface HumanTurnData {
+  player_id: string;
+  player_name: string;
+  current_goal: string;
+  team_memory: string[];
+  candidates: HumanTurnCandidate[];
+}
+
 export interface EventMessage {
   type: "event";
   kind: EventKind;
@@ -44,7 +59,7 @@ export interface EventMessage {
   turn: number;
   public: boolean;
   audience_id: string | null;
-  data?: PlannerEventData | null;
+  data?: PlannerEventData | HumanTurnData | null;
 }
 
 export interface ObjectSnapshot {
@@ -107,6 +122,7 @@ export interface PersonaDraft {
   gender: string;
   model: string;
   temperature: number | null;
+  is_human: boolean;
 }
 
 // Bootstrap payload from GET /api/personas.

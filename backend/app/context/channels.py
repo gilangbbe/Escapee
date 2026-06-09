@@ -20,6 +20,7 @@ class EventKind(str, Enum):
     PROMPT = "prompt"            # model prompt shown for debugging / UI visibility
     DECISION = "decision"        # validated player-turn JSON (debug visibility)
     NARRATION = "narration"      # GM prose story (observer-only; not seen by agents)
+    HUMAN_TURN = "human_turn"    # waiting for human player input (carries candidate actions)
 
 
 @dataclass

@@ -40,7 +40,7 @@ class GamePlayerAgent:
     """A single player's persona, model binding, and rolling-summary memory."""
 
     persona: PlayerPersona
-    client: OllamaClient
+    client: OllamaClient | None = None
     recent_window: int = 8
     max_attempts: int = 3
     temperature: float = 0.7

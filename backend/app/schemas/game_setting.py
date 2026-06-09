@@ -148,6 +148,9 @@ class PlayerPersona(BaseModel):
     temperature: Optional[float] = Field(
         None, description="Per-persona sampling temperature; falls back to the default."
     )
+    is_human: bool = Field(
+        False, description="When True, this player is controlled by the human; the LLM is not called."
+    )
 
 
 class PlayerClue(BaseModel):

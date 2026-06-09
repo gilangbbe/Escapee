@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   EventMessage,
+  HumanTurnData,
   PersonaDraft,
   ResultMessage,
   ServerMessage,
@@ -18,6 +19,7 @@ interface GameState {
   snapshot: StateMessage | null;
   result: ResultMessage | null;
   error: string | null;
+  humanTurn: HumanTurnData | null;
 }
 
 const INITIAL: GameState = {
@@ -27,6 +29,7 @@ const INITIAL: GameState = {
   snapshot: null,
   result: null,
   error: null,
+  humanTurn: null,
 };
 
 function httpBaseFromWs(wsBaseUrl: string): string {
@@ -39,8 +42,7 @@ function httpBaseFromWs(wsBaseUrl: string): string {
   return wsBaseUrl;
 }
 
-/** Serialize the UI roster into the backend PlayerPersona shape, dropping
- * blank per-player overrides so the team-wide model/temperature win. */
+/** Serialize the UI roster into the backend PlayerPersona shape. */
 function rosterParam(personas: PersonaDraft[]): string | null {
   const named = personas.filter((p) => p.name.trim());
   if (named.length === 0) return null;
@@ -52,9 +54,12 @@ function rosterParam(personas: PersonaDraft[]): string | null {
       backstory: p.backstory,
       personality: p.personality,
       gender: p.gender.trim(),
+      is_human: p.is_human,
     };
-    if (p.model.trim()) entry.model = p.model.trim();
-    if (p.temperature != null) entry.temperature = p.temperature;
+    if (!p.is_human) {
+      if (p.model.trim()) entry.model = p.model.trim();
+      if (p.temperature != null) entry.temperature = p.temperature;
+    }
     return entry;
   });
   return JSON.stringify(payload);
@@ -64,6 +69,10 @@ function rosterParam(personas: PersonaDraft[]): string | null {
 /**
  * useGameSocket — opens a WebSocket to the backend, runs one game, and
  * accumulates the streamed setup / event / state / result messages.
+ *
+ * Exposes sendNudge() and submitHumanAction() for bidirectional interaction:
+ *   sendNudge(text)         — broadcast a hint to AI agents on their next turn
+ *   submitHumanAction(act)  — deliver the human player's chosen game action
  */
 export function useGameSocket(wsBaseUrl: string) {
   const [state, setState] = useState<GameState>(INITIAL);
@@ -127,13 +136,18 @@ export function useGameSocket(wsBaseUrl: string) {
             case "setup":
               return { ...s, setup: msg };
             case "event":
+              // human_turn events are UI directives — extract to humanTurn state,
+              // don't add to the story feed.
+              if (msg.kind === "human_turn") {
+                return { ...s, humanTurn: msg.data as HumanTurnData };
+              }
               return { ...s, events: [...s.events, msg] };
             case "state":
               return { ...s, snapshot: msg };
             case "result":
-              return { ...s, result: msg, status: "finished" };
+              return { ...s, result: msg, status: "finished", humanTurn: null };
             case "error":
-              return { ...s, error: msg.message, status: "error" };
+              return { ...s, error: msg.message, status: "error", humanTurn: null };
             default:
               return s;
           }
@@ -160,5 +174,21 @@ export function useGameSocket(wsBaseUrl: string) {
     socketRef.current = null;
   }, []);
 
-  return { state, start, stop, httpBase: httpBaseFromWs(wsBaseUrl) };
+  const sendNudge = useCallback((text: string) => {
+    const ws = socketRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "nudge", text }));
+    }
+  }, []);
+
+  const submitHumanAction = useCallback((action: Record<string, unknown>) => {
+    const ws = socketRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "human_action", action }));
+      // Optimistically clear the human turn panel so the UI unblocks immediately.
+      setState((s) => ({ ...s, humanTurn: null }));
+    }
+  }, []);
+
+  return { state, start, stop, sendNudge, submitHumanAction, httpBase: httpBaseFromWs(wsBaseUrl) };
 }

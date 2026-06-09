@@ -30,6 +30,7 @@ function blankPersona(model: string): PersonaDraft {
     gender: "",
     model,
     temperature: null,
+    is_human: false,
   };
 }
 
@@ -44,6 +45,7 @@ function fromCatalog(entry: PersonaCatalogEntry, model: string): PersonaDraft {
     gender: entry.gender ?? "",
     model: entry.model ?? model,
     temperature: entry.temperature,
+    is_human: false,
   };
 }
 
@@ -86,6 +88,7 @@ export function PersonaConfigPanel({
               gender: p.gender ?? "",
               model: p.model ?? data.default_model ?? defaultModel,
               temperature: null,
+              is_human: p.is_human ?? false,
             }))
           );
         }
@@ -167,7 +170,9 @@ export function PersonaConfigPanel({
             {personas.map((p, i) => (
               <li key={p.id} className="persona-editor">
                 <div className="persona-editor-row">
-                  <span className="persona-editor-tag">P{i + 1}</span>
+                  <span className={`persona-editor-tag${p.is_human ? " persona-human-badge" : ""}`}>
+                    {p.is_human ? "YOU" : `P${i + 1}`}
+                  </span>
                   <input
                     className="grow"
                     value={p.name}
@@ -175,6 +180,15 @@ export function PersonaConfigPanel({
                     disabled={disabled}
                     onChange={(e) => update(p.id, { name: e.target.value })}
                   />
+                  <label className="persona-human-toggle" title="Human-controlled player">
+                    <input
+                      type="checkbox"
+                      checked={p.is_human}
+                      disabled={disabled}
+                      onChange={(e) => update(p.id, { is_human: e.target.checked })}
+                    />
+                    human
+                  </label>
                   <button
                     type="button"
                     className="persona-remove"
@@ -221,38 +235,40 @@ export function PersonaConfigPanel({
                   />
                 </div>
 
-                <div className="persona-editor-row">
-                  <label className="persona-field">
-                    model
-                    <input
-                      list="persona-model-options"
-                      value={p.model}
-                      placeholder={defaultModel}
-                      disabled={disabled}
-                      onChange={(e) => update(p.id, { model: e.target.value })}
-                    />
-                  </label>
-                  <label className="persona-field temp">
-                    temp
-                    <input
-                      type="number"
-                      step={0.1}
-                      min={0}
-                      max={2}
-                      value={p.temperature ?? ""}
-                      placeholder="def"
-                      disabled={disabled}
-                      onChange={(e) =>
-                        update(p.id, {
-                          temperature:
-                            e.target.value === ""
-                              ? null
-                              : Number(e.target.value),
-                        })
-                      }
-                    />
-                  </label>
-                </div>
+                {!p.is_human && (
+                  <div className="persona-editor-row">
+                    <label className="persona-field">
+                      model
+                      <input
+                        list="persona-model-options"
+                        value={p.model}
+                        placeholder={defaultModel}
+                        disabled={disabled}
+                        onChange={(e) => update(p.id, { model: e.target.value })}
+                      />
+                    </label>
+                    <label className="persona-field temp">
+                      temp
+                      <input
+                        type="number"
+                        step={0.1}
+                        min={0}
+                        max={2}
+                        value={p.temperature ?? ""}
+                        placeholder="def"
+                        disabled={disabled}
+                        onChange={(e) =>
+                          update(p.id, {
+                            temperature:
+                              e.target.value === ""
+                                ? null
+                                : Number(e.target.value),
+                          })
+                        }
+                      />
+                    </label>
+                  </div>
+                )}
 
                 <textarea
                   className="persona-editor-text"

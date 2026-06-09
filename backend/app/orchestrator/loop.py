@@ -25,6 +25,7 @@ actions.
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass, field
 from typing import Awaitable, Callable, Optional
 
@@ -137,6 +138,29 @@ class GameOrchestrator:
         # Seed each player's asymmetric private clues from the setting.
         seed_private_clues(self.log, self.sim.state)
 
+        # Human-interaction state.
+        # _pending_nudge: a hint typed by the human observer, broadcast as
+        #   SYSTEM message and used as critical_note for the very next AI turn.
+        # _human_action_queue: delivers GameAction dicts from the human player
+        #   to _take_human_turn(), which awaits one item per turn.
+        self._pending_nudge: str | None = None
+        self._human_action_queue: asyncio.Queue[dict] = asyncio.Queue()
+
+    # ------------------------------------------------------------------ #
+    # Human-interaction public API (called by the web layer)
+    # ------------------------------------------------------------------ #
+    def inject_nudge(self, text: str) -> None:
+        """Store a hint from the human observer.
+
+        Emitted immediately as a SYSTEM event (visible in the UI and recorded
+        in MessageLog so AI agents see it next turn) and also stored as the
+        critical_note override for the very next AI agent turn.
+        """
+        self._pending_nudge = text.strip() or None
+
+    def submit_human_action(self, action_dict: dict) -> None:
+        """Deliver a human-player action into the turn queue."""
+        self._human_action_queue.put_nowait(action_dict)
 
     # ------------------------------------------------------------------ #
     # Setup checks
@@ -219,8 +243,26 @@ class GameOrchestrator:
     async def _take_turn(self, agent: GamePlayerAgent) -> bool:
         """Run one agent's ReAct turn. Returns True if the game was just won."""
         pid = agent.persona.id
+
+        # Human players skip the LLM entirely and wait for UI input.
+        if agent.persona.is_human:
+            return await self._take_human_turn(agent)
+
+        # Consume any pending nudge from the human observer: broadcast it as a
+        # SYSTEM event (so it lands in MessageLog and agents see it) then use it
+        # as this turn's critical_note override in place of stall detection.
+        nudge = self._pending_nudge
+        self._pending_nudge = None
+        if nudge:
+            await self._emit(
+                EventKind.SYSTEM,
+                None,
+                f"[Human hint] {nudge}",
+                turn=self.sim.state.turn,
+            )
+
         reflect = self.cognition.should_reflect(self.sim.state.turn)
-        critical_note = self.cognition.critical_guidance_for(pid, self.sim.state)
+        critical_note = nudge or self.cognition.critical_guidance_for(pid, self.sim.state)
         if critical_note:
             await self._emit(
                 EventKind.SYSTEM,
@@ -645,6 +687,63 @@ class GameOrchestrator:
                 data={"action_execution_status": execution_status.value, "source": "narrator"},
             )
 
+        return obs.game_won
+
+    # ------------------------------------------------------------------ #
+    # Human player turn
+    # ------------------------------------------------------------------ #
+    async def _take_human_turn(self, agent: GamePlayerAgent) -> bool:
+        """Pause the game, emit candidate actions to the UI, await human input."""
+        pid = agent.persona.id
+        brief = self.cognition.brief_for(pid, self.sim.state)
+        candidates = self.cognition.policy_candidates(
+            pid, self.sim.state, brief.current_goal, brief.next_plan_step
+        )
+        candidate_list = [
+            {
+                "index": i,
+                "description": describe_action_brief(c),
+                "action": c.model_dump(exclude_none=True),
+            }
+            for i, c in enumerate(candidates)
+        ]
+        await self._emit(
+            EventKind.HUMAN_TURN,
+            pid,
+            f"Your turn, {agent.persona.name}. Choose an action.",
+            turn=self.sim.state.turn,
+            record=False,
+            data={
+                "player_id": pid,
+                "player_name": agent.persona.name,
+                "current_goal": brief.current_goal,
+                "team_memory": brief.team_memory,
+                "candidates": candidate_list,
+            },
+        )
+
+        # Wait for the human to send an action (5-minute timeout → fallback LOOK).
+        try:
+            action_dict = await asyncio.wait_for(
+                self._human_action_queue.get(), timeout=300.0
+            )
+            action = GameAction.model_validate(action_dict)
+        except (asyncio.TimeoutError, Exception):
+            action = GameAction(action=GameActionType.LOOK)
+
+        world_key = world_fingerprint(self.sim.state)
+        obs = self.sim.step(pid, action)
+        obs_text = obs.message + (f" Hint: {obs.hint}" if obs.hint else "")
+        await self._emit(
+            EventKind.OBSERVATION,
+            pid,
+            obs_text,
+            turn=self.sim.state.turn,
+            public=obs.public,
+            audience_id=None if obs.public else pid,
+        )
+        update = self.cognition.observe(pid, action, world_key, obs, self.sim.state)
+        await self._announce_cognition(update)
         return obs.game_won
 
     # ------------------------------------------------------------------ #
