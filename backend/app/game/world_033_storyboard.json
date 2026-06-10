@@ -1,79 +1,77 @@
 {
   "world_id": "world_033",
-  "generated_at": "2026-06-10T04:27:40.193878+00:00",
+  "generated_at": "2026-06-10T06:21:55.902851+00:00",
   "schema_version": "1",
   "plot": {
-    "victim": "The art collector was found dead in the entry hall with injuries suggesting a staged accident, but foul play is suspected.",
-    "threat": "Evelyn Hartley, the collector's ambitious secretary, returns to cover up her crime and eliminate any witnesses.",
-    "stakes": "If you do not expose Evelyn, she will kill again and take over the estate permanently.",
-    "timeline": "The collector was last seen alive a few hours ago in the dining hall. His death was staged to look like an accident.",
-    "tension_hint": "Secret recordings hint at a heated argument between the collector and his secretary moments before he died.",
-    "atmosphere": "The entry hall is dimly lit with flickering candles, creating shadows that shift ominously across the walls. The air is thick with the scent of old books and decaying flowers.",
-    "protagonist_context": "You are a field analyst and systems operator investigating the collector's death for the art crime unit."
+    "victim": "The renowned art collector was found dead in their secluded estate, with signs pointing towards a staged accident.",
+    "threat": "Blackwood, a rival collector who has been secretly plotting against the victim for years.",
+    "stakes": "Failure means you might become the next target of Blackwood's wrath.",
+    "timeline": "The night before your arrival, a significant art collection was auctioned off, leaving only the estate as the last known location of the victim.",
+    "tension_hint": "Someone has been watching the collector closely and saw an opportunity to strike when the coast was clear.",
+    "atmosphere": "The air is thick with the smell of old books and a lingering chill from the recent storm, making it hard to shake the feeling that you are being watched.",
+    "protagonist_context": "You were invited as experts to solve a mystery surrounding the collection's disappearance but now find yourself investigating a murder."
   },
   "adapted_personas": {
     "Alex Quinn": {
-      "world_role": "As a methodical investigator, Alex meticulously documents each clue to piece together the sequence of events leading to the collector's death.",
-      "voice": "Direct and analytical",
+      "world_role": "A meticulous investigator who specializes in tracking down clues under pressure.",
+      "voice": "Observant and methodical, always thinking ahead to the next logical step.",
       "vocabulary": [
-        "crucial evidence",
-        "methodical investigation",
-        "logical deduction"
+        "follow the trail",
+        "next move",
+        "clue by clue"
       ]
     },
     "Riley Sato": {
-      "world_role": "Riley maintains critical systems within the estate, quickly restoring power and unlocking doors to advance your investigation.",
-      "voice": "Calming and practical",
+      "world_role": "A pragmatic engineer who can restore failing systems quickly and find unique solutions in tight spots.",
+      "voice": "Direct and to-the-point, with a focus on solving problems efficiently.",
       "vocabulary": [
-        "technical fix",
-        "system integrity",
-        "critical infrastructure"
+        "route the power",
+        "fix it now",
+        "next step"
       ]
     }
   },
   "room_stories": {
-    "entry_hall": "The scene of the staged accident, clues hint at foul play and a hidden motive.",
-    "parlor": "A gathering place filled with personal artifacts that reveal deeper secrets about the collector's life.",
-    "study": "The room where the collector kept his most valuable documents and ledgers, now holding critical evidence.",
-    "library": "A repository of knowledge and secrets, containing vital clues hidden behind ancient texts.",
-    "dining_hall": "The last known location of the collector before his death, harboring final moments that need to be uncovered."
+    "entry_hall": "The starting point where the murder appears to be staged as an accident.",
+    "parlor": "A room filled with potential clues and signs of recent disturbance.",
+    "study": "Where you find critical evidence that connects Blackwood's involvement in the crime.",
+    "library": "Holds a hidden compartment with a diary revealing the killer’s identity.",
+    "dining_hall": "The final area where you must solve the last puzzle to escape."
   },
   "discovery_beats": {
-    "burnt_incense_bowl": "The burnt incense bowl in the parlor holds a piece of paper with code written on it, hinting at deeper secrets.",
-    "shattered_glass": "A sharp shard of glass lies within a puddle of water and broken objects, revealing fresh fingerprints that need examination.",
-    "aged_books": "Behind ancient tomes in the library hides a sequence of numbers that could unlock further mysteries.",
-    "locked_diary_compartment": "The small compartment contains an encrypted diary that hints at the collector's final moments."
+    "shattered_glass": "The sharp shard of glass in the study is covered in dried blood and could be the murder weapon.",
+    "hidden_diary": "In the hidden diary, there are entries detailing Blackwood's obsession with eliminating his competitor and plans for the murder."
   },
   "phase_guidance": {},
   "conversation_seeds": {
     "Alex Quinn": [
-      "I've noticed a pattern in how objects are arranged – it's almost as if someone is trying to distract us from certain items.",
-      "Evelyn Hartley's behavior has been suspicious, she's always on edge whenever we're around."
+      "I noticed that the stains on both the piano keys and the rug match the dried blood found in the study.",
+      "Blackwood's name kept coming up in the victim's records, especially around the time of the auction."
     ],
     "Riley Sato": [
-      "The power fluctuations in the library suggest something wasn't working properly when the collector was last here.",
-      "I found some unusual electrical signatures near the dining hall that don't match any known system malfunction."
+      "The burnt incense bowl might have been used to cover any suspicious smells after the murder was committed.",
+      "If we find the code for the locked compartment in the library, it could contain a crucial piece of evidence."
     ]
   },
   "ending_guidance": {
-    "won": "You piece together the evidence to expose Evelyn Hartley, securing justice for the art collector and his estate.",
-    "lost": "Evelyn Hartley escapes with her secret intact as you fail to gather enough evidence against her.",
-    "lost_by_wrong_deduction": "Calling out the wrong name allows Evelyn Hartley to slip away undetected."
+    "won": "You successfully identified Blackwood as the murderer and uncovered his hidden diary that proves his guilt. The killer will never silence you now.",
+    "lost": "Despite your best efforts, you were unable to uncover all the clues in time. Blackwood remains free and ready for another chance to strike.",
+    "lost_by_wrong_deduction": "By naming the wrong person as the murderer, Blackwood was able to escape before being caught."
   },
   "solution": {
     "question": "Who murdered the art collector?",
-    "answer": "Evelyn Hartley",
+    "answer": "Blackwood",
     "answer_aliases": [
-      "Hartley",
-      "Collector's Secretary"
+      "Theodore Blackwood",
+      "Mr. Blackwood"
     ],
     "answer_type": "person",
-    "motive": "Evelyn, obsessed with the collector's wealth and status, orchestrated his death to inherit his fortune.",
-    "proof_object": "burnt_incense_bowl",
-    "proof_sentence": "The burnt incense bowl in the parlor contains code that reveals Evelyn Hartley's fingerprints.",
-    "hint_1": "Look for clues in common areas where the collector and secretary both frequently visited.",
-    "hint_2": "Consider who might have had a personal motive and access to the estate.",
-    "victory_narration_hook": "The burnt incense bowl proves Evelyn Hartley's involvement, leading to her arrest before she could silence you.",
-    "defeat_narration_hook": "Evelyn Hartley escapes with her secret intact as you fail to gather enough evidence."
+    "motive": "Blackwood, a rival collector and former friend of the victim, saw an opportunity to eliminate his competition.",
+    "proof_object": "hidden_diary",
+    "proof_sentence": "In the hidden diary, there are entries detailing Blackwood's obsession with eliminating his competitor and plans for the murder.",
+    "hint_1": "Look for clues in places where the collector kept personal items or records of transactions.",
+    "hint_2": "The murderer left behind a significant clue in a place where they believed no one would think to look.",
+    "victory_narration_hook": "You find Blackwood's hidden diary in the library, revealing his obsession and plans for the murder.",
+    "defeat_narration_hook": "By failing to uncover all the evidence, you missed your chance to identify the real murderer before they could strike again."
   }
 }
