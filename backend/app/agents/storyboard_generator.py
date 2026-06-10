@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from datetime import datetime, timezone
 
 from app.agents.storyboard import Storyboard
@@ -81,13 +82,14 @@ Generate sections IN ORDER — the most critical sections come first.
   },
 
   "discovery_beats": {
-    "<object_id marked is_key=true in WORLD_DATA.plot_objects>": "1 sentence. Narration for the FIRST TIME this object is touched. Physical, specific, plot-connected. No spoilers."
+    "<object_id with clue_type='key'>": "1 sentence. What finding this physical item reveals — specific and physical.",
+    "<object_id with clue_type='story_clue'>": "1 sentence. MUST name the killer/answer explicitly. This is the moment the human reader learns who is responsible. Example: 'The name scratched into the lining reads Blackwood — the same name on the guest register the night of the murder.'"
   },
 
   "conversation_seeds": {
     "<character name from WORLD_DATA.players>": [
-      "2 specific plot-rooted observations this character surfaces in conversation.",
-      "Should feel like planted clues — specific, meaningful in retrospect."
+      "Seed 1: a specific observation about the evidence — MAY name the killer if this character has seen a clue pointing to them.",
+      "Seed 2: a different angle — motive, alibi gap, or physical evidence. At least one seed per character should mention a concrete name or fact."
     ]
   },
 
@@ -106,11 +108,13 @@ Generate sections IN ORDER — the most critical sections come first.
 STRICT ANTI-HALLUCINATION RULES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. room_stories keys MUST be room ids from WORLD_DATA.rooms — no others.
-2. discovery_beats keys MUST be object ids from WORLD_DATA.plot_objects marked is_key=true.
+2. discovery_beats keys MUST be object ids from WORLD_DATA.plot_objects — no others.
 3. adapted_personas keys MUST be character names from WORLD_DATA.players — no others.
 4. conversation_seeds keys MUST be character names from WORLD_DATA.players — no others.
 5. The solution.answer MUST NOT be the name of any character in WORLD_DATA.players.
-6. Do NOT reveal puzzle codes or solutions in any narrative field.
+6. Do NOT reveal mechanical lock codes (numbers, sequences) in any narrative field.
+   DO name the killer/answer in discovery_beats for clue_type='story_clue' objects
+   and in conversation_seeds — this is how the human player learns the answer.
 7. Do NOT invent new rooms, objects, or characters not in WORLD_DATA.
 8. Each vocabulary list must contain exactly 3 short phrases — no full sentences.
 9. Generate sections in the order given — solution FIRST, room_stories LAST.
@@ -151,14 +155,30 @@ def _build_user_prompt(setting: GameSetting, world_id: str) -> str:
             or o.id in referenced_as_code_source
         )
 
+    def _clue_type(o) -> str:
+        if o.id in referenced_as_tool:
+            return "key"          # physical item that unlocks something
+        if o.id in referenced_as_code_source:
+            return "code"         # contains a mechanical code required by a lock
+        if o.contains_info:
+            # If the info token contains digits it's a numeric combination code
+            # (e.g. "mirror_code_124", "0102") — don't reveal the value.
+            # If it's a descriptive token (e.g. "murderer_surname") it's a
+            # narrative clue that SHOULD name the answer.
+            if re.search(r"\d", o.contains_info):
+                return "code"
+            return "story_clue"
+        if o.requires_tool or o.requires_code or o.connects_to:
+            return "lock"
+        return "other"
+
     plot_objects = [
         {
             "id": o.id,
             "location": o.location,
             "description": o.description,
-            "is_key": o.id in referenced_as_tool or o.id in referenced_as_code_source,
-            "is_lock": bool(o.requires_tool or o.requires_code or o.connects_to),
-            "contains_info": o.contains_info,
+            "clue_type": _clue_type(o),
+            "contains_info_token": o.contains_info,
         }
         for o in setting.objects
         if is_plot_critical(o)
@@ -199,11 +219,17 @@ def _build_user_prompt(setting: GameSetting, world_id: str) -> str:
     return (
         f"Generate the complete narrative storyboard for this escape room world.\n\n"
         f"WORLD_DATA:\n{json.dumps(world_data, indent=2)}\n\n"
-        "IMPORTANT:\n"
-        "- Generate sections IN ORDER: solution first, room_stories last.\n"
-        "- discovery_beats: ONLY use object ids where is_key=true in WORLD_DATA.plot_objects.\n"
-        "- conversation_seeds: exactly 2 items per character.\n"
-        "- Output raw JSON only. Follow ALL STRICT ANTI-HALLUCINATION RULES."
+        "IMPORTANT — discovery_beats rules:\n"
+        "- clue_type='key': write a beat describing finding the physical item.\n"
+        "- clue_type='story_clue': write a beat that NAMES the story answer "
+        "(killer, saboteur, etc.) from your solution section. This is the moment "
+        "the human player learns WHO is responsible. Be explicit — say the name.\n"
+        "- clue_type='code': write flavor only — do NOT reveal the code value.\n"
+        "- clue_type='lock': skip — only write beats for key/story_clue objects.\n"
+        "Generate sections IN ORDER: solution first, room_stories last.\n"
+        "conversation_seeds: exactly 2 items per character — at least one seed "
+        "per character must mention the killer's name or a direct clue to their identity.\n"
+        "Output raw JSON only. Follow ALL STRICT ANTI-HALLUCINATION RULES."
     )
 
 

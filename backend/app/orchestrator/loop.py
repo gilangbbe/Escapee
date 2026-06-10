@@ -834,16 +834,26 @@ class GameOrchestrator:
             )
 
     def _item_unlocks_desc(self, item_id: str, item_obj) -> str:
-        """Return the description of what this item directly enables, or '' if not critical."""
-        # Case 1: another object has requires_tool == this item
+        """Return a non-empty string if this item is plot-critical.
+
+        Returns the description of what it enables (for key/code objects)
+        or the item's own description (for story-clue objects like the book
+        that reveals the murderer's surname). An empty string means the item
+        is not plot-critical and no discovery beat should fire.
+        """
+        # Case 1: physical key — another object requires this as a tool
         for obj in self.setting.objects:
             if obj.requires_tool == item_id:
                 return obj.description or obj.id.replace("_", " ")
-        # Case 2: this item carries info (contains_info) that a code lock requires
         if item_obj.contains_info:
+            # Case 2: mechanical code source — a lock explicitly requires this code
             for obj in self.setting.objects:
                 if obj.requires_code == item_obj.contains_info:
                     return obj.description or obj.id.replace("_", " ")
+            # Case 3: story clue (e.g. murderer surname, victim note) — no lock
+            # requires this mechanically, but it IS a narrative clue the human
+            # reader needs to make the final deduction. Always fire a beat.
+            return item_obj.description or item_id.replace("_", " ")
         return ""
 
     def _get_candidate_flavor(self, action) -> str:
