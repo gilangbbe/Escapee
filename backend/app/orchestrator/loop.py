@@ -146,6 +146,10 @@ class GameOrchestrator:
         self._pending_nudge: str | None = None
         self._human_action_queue: asyncio.Queue[dict] = asyncio.Queue()
 
+        # Tracks which plot-critical object ids have already triggered a discovery
+        # narration beat so each item only gets one connective story moment.
+        self._narrated_discoveries: set[str] = set()
+
     # ------------------------------------------------------------------ #
     # Human-interaction public API (called by the web layer)
     # ------------------------------------------------------------------ #
@@ -184,11 +188,7 @@ class GameOrchestrator:
 
         # Opening scene narration (observer-only, stream-only).
         if self.narrator is not None:
-            # Generate lore once from the world JSON before the game starts.
-            await self.narrator.generate_lore(self.setting)
-            # First beat: emit the scenario text directly as context for the reader.
-            await self._emit(EventKind.NARRATION, None, self.setting.scenario, turn=0, record=False)
-            # Second beat: the crew wakes up.
+            # Storyboard is pre-loaded into the narrator at construction — no generation here.
             opening = await self.narrator.narrate_opening(self.setting)
             await self._emit(EventKind.NARRATION, None, opening, turn=0, record=False)
 
@@ -232,13 +232,8 @@ class GameOrchestrator:
 
         if draft:
             self.cognition.set_plan(draft)
-            steps = "; ".join(f"{i + 1}) {s}" for i, s in enumerate(draft))
-            await self._emit(
-                EventKind.SYSTEM,
-                None,
-                f"📋 Shared plan agreed by the team: {steps}",
-                turn=0,
-            )
+            # Plan is stored for agent cognition only — never streamed to readers.
+            # Revealing the solution path at turn 0 spoils the mystery entirely.
 
     async def _take_turn(self, agent: GamePlayerAgent) -> bool:
         """Run one agent's ReAct turn. Returns True if the game was just won."""
@@ -264,11 +259,13 @@ class GameOrchestrator:
         reflect = self.cognition.should_reflect(self.sim.state.turn)
         critical_note = nudge or self.cognition.critical_guidance_for(pid, self.sim.state)
         if critical_note:
+            # Record for agents to read; never stream to the UI — it's agent guidance.
             await self._emit(
                 EventKind.SYSTEM,
                 pid,
                 f"CRITICAL: {critical_note}",
                 turn=self.sim.state.turn,
+                stream=False,
             )
             await self._narrate_event(
                 SystemEventKind.CRITICAL_STUCK,
@@ -345,6 +342,7 @@ class GameOrchestrator:
                     pid,
                     f"{pid} hesitated (could not form a valid action). reason: {reason}",
                     turn=self.sim.state.turn,
+                    stream=False,
                 )
                 # Recovery: keep the game flowing with a deterministic no-risk
                 # fallback so one malformed model turn does not dead-end play.
@@ -384,6 +382,7 @@ class GameOrchestrator:
                         pid,
                         f"(stall gate) {blocked_note}",
                         turn=self.sim.state.turn,
+                        stream=False,
                     )
                     continue
                 turn = candidate.model_copy(deep=True)
@@ -403,6 +402,7 @@ class GameOrchestrator:
                         f"executing {action_signature(turn.action)}"
                     ),
                     turn=self.sim.state.turn,
+                    stream=False,
                 )
                 break
 
@@ -441,6 +441,7 @@ class GameOrchestrator:
                                 f"executing {action_signature(turn.action)}"
                             ),
                             turn=self.sim.state.turn,
+                            stream=False,
                         )
                     else:
                         turn = candidate
@@ -450,6 +451,7 @@ class GameOrchestrator:
                     pid,
                     f"(policy gate) {blocked_note}",
                     turn=self.sim.state.turn,
+                    stream=False,
                 )
                 continue
             if (
@@ -478,6 +480,7 @@ class GameOrchestrator:
                                 f"executing {action_signature(turn.action)}"
                             ),
                             turn=self.sim.state.turn,
+                            stream=False,
                         )
                         await self._narrate_event(
                             SystemEventKind.PLANNER_OVERRIDE,
@@ -492,6 +495,7 @@ class GameOrchestrator:
                     pid,
                     f"(loop avoided) {blocked_note}",
                     turn=self.sim.state.turn,
+                    stream=False,
                 )
                 await self._narrate_event(
                     SystemEventKind.LOOP_AVOIDED,
@@ -545,6 +549,7 @@ class GameOrchestrator:
                             pid,
                             f"(progress gate) {blocked_note}",
                             turn=self.sim.state.turn,
+                            stream=False,
                         )
                         continue
                     turn = candidate.model_copy(deep=True)
@@ -564,6 +569,7 @@ class GameOrchestrator:
                             f"executing {action_signature(turn.action)}"
                         ),
                         turn=self.sim.state.turn,
+                        stream=False,
                     )
                     await self._narrate_event(
                         SystemEventKind.PLANNER_OVERRIDE,
@@ -594,25 +600,13 @@ class GameOrchestrator:
             record=False,
         )
 
-        # 1. Reflection checkpoint output becomes the team's summarized memory.
+        # 1. Reflection checkpoint: update cognition silently — never shown as dialogue.
         if turn.reflection:
             self.cognition.set_reflection(turn.reflection.strip())
-            await self._emit(
-                EventKind.SPEECH,
-                pid,
-                f"(reflection) {turn.reflection.strip()}",
-                turn=self.sim.state.turn,
-            )
 
-        # 2. Share the proposed plan with the team (blackboard + public speech).
+        # 2. Hypothesis: update blackboard silently — never shown as dialogue.
         if turn.hypothesis:
             self.cognition.record_hypothesis(pid, turn.hypothesis.strip())
-            await self._emit(
-                EventKind.SPEECH,
-                pid,
-                f"(idea) {turn.hypothesis.strip()}",
-                turn=self.sim.state.turn,
-            )
 
         # 3. Player speak is disabled — speech is generated by the GM Narrator.
         # Intent (turn.intent) is passed to narrate_turn() below for richer dialogue.
@@ -626,6 +620,8 @@ class GameOrchestrator:
         obs = self.sim.step(pid, turn.action)
 
         # 5. Record the grounded observation (+ any non-spoiler hint).
+        # stream=False: agents read this through MessageLog; readers never see raw
+        # engine text. The narrator translates it into story prose below.
         obs_text = obs.message + (f" Hint: {obs.hint}" if obs.hint else "")
         await self._emit(
             EventKind.OBSERVATION,
@@ -634,11 +630,21 @@ class GameOrchestrator:
             turn=self.sim.state.turn,
             public=obs.public,
             audience_id=None if obs.public else pid,
+            stream=False,
         )
 
         # 6. External cognition: episodic memory + progress / stall update.
         update = self.cognition.observe(pid, turn.action, world_key, obs, self.sim.state)
         await self._announce_cognition(update)
+
+        # 6b. First-touch discovery beat for plot-critical items (inspect / take).
+        if obs.success and turn.action.action in {GameActionType.INSPECT, GameActionType.TAKE}:
+            await self._maybe_narrate_discovery(turn.action.target_id, agent.persona.name)
+
+        # 6c. First visit to a new room: emit an atmospheric description card.
+        if obs.success and turn.action.action == GameActionType.MOVE and self.narrator is not None:
+            dest = turn.action.to_room or turn.action.target_id or ""
+            await self._maybe_narrate_room_entry(dest, agent.persona.name)
 
         # 7. GM narration of this beat (observer-only; never fed back to agents).
         if self.narrator is not None:
@@ -675,6 +681,7 @@ class GameOrchestrator:
                 success=obs.success,
                 status=execution_status,
                 room_id=actor_room,
+                object_id=turn.action.target_id or "",
                 world_snapshot=snapshot,
             )
             # Emit as SPEECH so iOS renders it as a chat bubble for this character.
@@ -704,6 +711,7 @@ class GameOrchestrator:
                 "index": i,
                 "description": describe_action_brief(c),
                 "action": c.model_dump(exclude_none=True),
+                "flavor": self._get_candidate_flavor(c),
             }
             for i, c in enumerate(candidates)
         ]
@@ -734,6 +742,7 @@ class GameOrchestrator:
         world_key = world_fingerprint(self.sim.state)
         obs = self.sim.step(pid, action)
         obs_text = obs.message + (f" Hint: {obs.hint}" if obs.hint else "")
+        # Human players see their own action result — they have no narrator.
         await self._emit(
             EventKind.OBSERVATION,
             pid,
@@ -744,7 +753,102 @@ class GameOrchestrator:
         )
         update = self.cognition.observe(pid, action, world_key, obs, self.sim.state)
         await self._announce_cognition(update)
+        # Discovery beat for plot-critical items the human touches.
+        if obs.success and action.action in {GameActionType.INSPECT, GameActionType.TAKE}:
+            await self._maybe_narrate_discovery(action.target_id, agent.persona.name)
         return obs.game_won
+
+    # ------------------------------------------------------------------ #
+    # Story-layer helpers (discovery beats + human-turn flavor)
+    # ------------------------------------------------------------------ #
+    async def _maybe_narrate_discovery(
+        self, obj_id: str | None, actor_name: str
+    ) -> None:
+        """Emit a one-time narrator beat the first time a plot-critical item is touched.
+
+        Fires on the first TAKE or successful INSPECT of any object that is either
+        a required key for another object, or contains info that another object's
+        code lock needs. Each object only fires once per game session.
+        """
+        if not obj_id or obj_id in self._narrated_discoveries or self.narrator is None:
+            return
+        obj = next((o for o in self.setting.objects if o.id == obj_id), None)
+        if obj is None:
+            return
+        unlocks_desc = self._item_unlocks_desc(obj_id, obj)
+        if not unlocks_desc:
+            return  # not plot-critical; no story beat needed
+        self._narrated_discoveries.add(obj_id)
+        prose = await self.narrator.narrate_discovery(
+            actor_name=actor_name,
+            item_id=obj_id,
+            item_description=obj.description or "",
+            unlocks_description=unlocks_desc,
+            connection_lore=self.narrator.connection_lore_for(obj_id),
+            scenario=self.setting.scenario,
+        )
+        if prose:
+            await self._emit(
+                EventKind.NARRATION,
+                None,
+                prose,
+                turn=self.sim.state.turn,
+                record=False,
+            )
+
+    async def _maybe_narrate_room_entry(self, room_id: str, actor_name: str) -> None:
+        """Emit a one-time atmospheric NARRATION card the first time a room is entered."""
+        if not room_id or not self.narrator:
+            return
+        attr = f"_room_entered_{room_id}"
+        if getattr(self, attr, False):
+            return
+        setattr(self, attr, True)
+        prose = await self.narrator.narrate_room_entry(
+            actor_name=actor_name,
+            room_id=room_id,
+            scenario=self.setting.scenario,
+        )
+        if prose:
+            await self._emit(
+                EventKind.NARRATION,
+                None,
+                prose,
+                turn=self.sim.state.turn,
+                record=False,
+            )
+
+    def _item_unlocks_desc(self, item_id: str, item_obj) -> str:
+        """Return the description of what this item directly enables, or '' if not critical."""
+        # Case 1: another object has requires_tool == this item
+        for obj in self.setting.objects:
+            if obj.requires_tool == item_id:
+                return obj.description or obj.id.replace("_", " ")
+        # Case 2: this item carries info (contains_info) that a code lock requires
+        if item_obj.contains_info:
+            for obj in self.setting.objects:
+                if obj.requires_code == item_obj.contains_info:
+                    return obj.description or obj.id.replace("_", " ")
+        return ""
+
+    def _get_candidate_flavor(self, action) -> str:
+        """Return the narrative description (or connection lore) for an action's target.
+
+        Used to populate flavor text in the human player's action chip panel so
+        they understand WHY a candidate action might matter before choosing it.
+        """
+        target_id = getattr(action, "target_id", None) or getattr(action, "item_id", None)
+        if not target_id:
+            return ""
+        obj = next((o for o in self.setting.objects if o.id == target_id), None)
+        if obj is None:
+            return ""
+        # Prefer connection_lore (story-why) over bare description when available.
+        if self.narrator:
+            lore = self.narrator.connection_lore_for(target_id)
+            if lore:
+                return lore
+        return obj.description or ""
 
     # ------------------------------------------------------------------ #
     # External cognition announcements (progress markers / stall signals)
@@ -752,28 +856,26 @@ class GameOrchestrator:
     async def _announce_cognition(self, update) -> None:
         """Surface intermediate rewards and stall signals to the team + story."""
         if update.new_milestones:
-            markers = ", ".join(m.replace(":", " ").replace("_", " ") for m in update.new_milestones)
-            await self._emit(
-                EventKind.SYSTEM,
-                None,
-                f"✓ Progress! The team just achieved: {markers}.",
-                turn=self.sim.state.turn,
-            )
-            # Narrator narrates the milestone as atmospheric prose.
-            if self.narrator is not None:
-                milestone_text = f"The team just achieved: {markers}."
-                narration = await self.narrator.narrate_milestone(
-                    milestone=milestone_text,
-                    setting=self.setting,
+            # Show system pills only for meaningful game events, not room arrivals.
+            # Room-arrival milestones start with "reached " — those are covered by
+            # the room-entry narration beat and don't need a separate pill.
+            story_milestones = [
+                m for m in update.new_milestones
+                if not m.startswith("reached ")
+            ]
+            if story_milestones:
+                markers = ", ".join(
+                    m.replace(":", " ").replace("_", " ") for m in story_milestones
                 )
-                if narration:
-                    await self._emit(
-                        EventKind.NARRATION,
-                        None,
-                        narration,
-                        turn=self.sim.state.turn,
-                        record=False,
-                    )
+                await self._emit(
+                    EventKind.SYSTEM,
+                    None,
+                    f"✓ {markers}.",
+                    turn=self.sim.state.turn,
+                )
+            # Milestone narrator beats are intentionally removed: the turn narrator
+            # and discovery beats already cover every action. A third beat per turn
+            # produces redundant generic prose and dilutes the story rhythm.
         if update.became_stuck:
             await self._emit(
                 EventKind.SYSTEM,
@@ -868,6 +970,7 @@ class GameOrchestrator:
         public: bool = True,
         audience_id: Optional[str] = None,
         record: bool = True,
+        stream: bool = True,
         data: dict | None = None,
     ) -> None:
         event = Event(
@@ -883,7 +986,9 @@ class GameOrchestrator:
         # OUT of the shared log so it can never feed back into player agents.
         if record:
             self.log.add(event)
-        if self.on_event is not None:
+        # stream=False: write to agent MessageLog for context, but never send to
+        # the WebSocket — internal planner/override messages are not user-facing.
+        if stream and self.on_event is not None:
             await self.on_event(event)
 
     async def _finalize(self, won: bool, reason: str) -> GameResult:

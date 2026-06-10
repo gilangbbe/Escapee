@@ -138,10 +138,14 @@ class GameSimulator:
         self.state.object_location[tid] = player_id
         self.state.object_state[tid] = ObjectState.TAKEN
         self.state.player_inventories[player_id].append(tid)
-        msg = f"You pick up {self._name(tid)}"
+        # Weave the object's narrative description into the pick-up message so
+        # agents and human players immediately understand what they've found.
+        desc = (obj.description or "").rstrip(".")
+        msg = f"You pick up {self._name(tid)} — {desc}" if desc else f"You pick up {self._name(tid)}"
         if obj.contains_info and obj.contains_info not in self.state.discovered_info:
             self.state.discovered_info.add(obj.contains_info)
-            msg += f"; you notice {obj.contains_info.replace('_', ' ')}"
+            info_words = obj.contains_info.replace("_", " ")
+            msg += f". You notice: {info_words}"
         return self._ok(player_id, msg + ".")
 
     def _enter_code(self, player_id: str, a: GameAction) -> Observation:

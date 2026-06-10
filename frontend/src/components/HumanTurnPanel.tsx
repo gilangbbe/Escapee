@@ -46,11 +46,16 @@ export function HumanTurnPanel({ turn, onSubmit }: Props) {
           <button
             key={c.index}
             type="button"
-            className="action-chip"
+            className={`action-chip${c.flavor ? " action-chip-has-flavor" : ""}`}
             onClick={() => pick(c)}
           >
             <span className="action-chip-num">{c.index + 1}</span>
-            {c.description}
+            <span className="action-chip-body">
+              <span className="action-chip-desc">{c.description}</span>
+              {c.flavor && (
+                <span className="action-chip-flavor">{c.flavor}</span>
+              )}
+            </span>
           </button>
         ))}
       </div>

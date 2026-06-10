@@ -41,6 +41,7 @@ export interface HumanTurnCandidate {
   index: number;
   description: string;
   action: Record<string, unknown>;
+  flavor?: string;
 }
 
 export interface HumanTurnData {

@@ -1,0 +1,79 @@
+{
+  "world_id": "world_033",
+  "generated_at": "2026-06-10T04:27:40.193878+00:00",
+  "schema_version": "1",
+  "plot": {
+    "victim": "The art collector was found dead in the entry hall with injuries suggesting a staged accident, but foul play is suspected.",
+    "threat": "Evelyn Hartley, the collector's ambitious secretary, returns to cover up her crime and eliminate any witnesses.",
+    "stakes": "If you do not expose Evelyn, she will kill again and take over the estate permanently.",
+    "timeline": "The collector was last seen alive a few hours ago in the dining hall. His death was staged to look like an accident.",
+    "tension_hint": "Secret recordings hint at a heated argument between the collector and his secretary moments before he died.",
+    "atmosphere": "The entry hall is dimly lit with flickering candles, creating shadows that shift ominously across the walls. The air is thick with the scent of old books and decaying flowers.",
+    "protagonist_context": "You are a field analyst and systems operator investigating the collector's death for the art crime unit."
+  },
+  "adapted_personas": {
+    "Alex Quinn": {
+      "world_role": "As a methodical investigator, Alex meticulously documents each clue to piece together the sequence of events leading to the collector's death.",
+      "voice": "Direct and analytical",
+      "vocabulary": [
+        "crucial evidence",
+        "methodical investigation",
+        "logical deduction"
+      ]
+    },
+    "Riley Sato": {
+      "world_role": "Riley maintains critical systems within the estate, quickly restoring power and unlocking doors to advance your investigation.",
+      "voice": "Calming and practical",
+      "vocabulary": [
+        "technical fix",
+        "system integrity",
+        "critical infrastructure"
+      ]
+    }
+  },
+  "room_stories": {
+    "entry_hall": "The scene of the staged accident, clues hint at foul play and a hidden motive.",
+    "parlor": "A gathering place filled with personal artifacts that reveal deeper secrets about the collector's life.",
+    "study": "The room where the collector kept his most valuable documents and ledgers, now holding critical evidence.",
+    "library": "A repository of knowledge and secrets, containing vital clues hidden behind ancient texts.",
+    "dining_hall": "The last known location of the collector before his death, harboring final moments that need to be uncovered."
+  },
+  "discovery_beats": {
+    "burnt_incense_bowl": "The burnt incense bowl in the parlor holds a piece of paper with code written on it, hinting at deeper secrets.",
+    "shattered_glass": "A sharp shard of glass lies within a puddle of water and broken objects, revealing fresh fingerprints that need examination.",
+    "aged_books": "Behind ancient tomes in the library hides a sequence of numbers that could unlock further mysteries.",
+    "locked_diary_compartment": "The small compartment contains an encrypted diary that hints at the collector's final moments."
+  },
+  "phase_guidance": {},
+  "conversation_seeds": {
+    "Alex Quinn": [
+      "I've noticed a pattern in how objects are arranged – it's almost as if someone is trying to distract us from certain items.",
+      "Evelyn Hartley's behavior has been suspicious, she's always on edge whenever we're around."
+    ],
+    "Riley Sato": [
+      "The power fluctuations in the library suggest something wasn't working properly when the collector was last here.",
+      "I found some unusual electrical signatures near the dining hall that don't match any known system malfunction."
+    ]
+  },
+  "ending_guidance": {
+    "won": "You piece together the evidence to expose Evelyn Hartley, securing justice for the art collector and his estate.",
+    "lost": "Evelyn Hartley escapes with her secret intact as you fail to gather enough evidence against her.",
+    "lost_by_wrong_deduction": "Calling out the wrong name allows Evelyn Hartley to slip away undetected."
+  },
+  "solution": {
+    "question": "Who murdered the art collector?",
+    "answer": "Evelyn Hartley",
+    "answer_aliases": [
+      "Hartley",
+      "Collector's Secretary"
+    ],
+    "answer_type": "person",
+    "motive": "Evelyn, obsessed with the collector's wealth and status, orchestrated his death to inherit his fortune.",
+    "proof_object": "burnt_incense_bowl",
+    "proof_sentence": "The burnt incense bowl in the parlor contains code that reveals Evelyn Hartley's fingerprints.",
+    "hint_1": "Look for clues in common areas where the collector and secretary both frequently visited.",
+    "hint_2": "Consider who might have had a personal motive and access to the estate.",
+    "victory_narration_hook": "The burnt incense bowl proves Evelyn Hartley's involvement, leading to her arrest before she could silence you.",
+    "defeat_narration_hook": "Evelyn Hartley escapes with her secret intact as you fail to gather enough evidence."
+  }
+}

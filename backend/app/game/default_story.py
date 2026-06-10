@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 
 
-_DEFAULT_STORY_PATH = Path(__file__).with_name("world_034.json")
+DEFAULT_STORY_PATH: Path = Path(__file__).with_name("world_034.json")
 
-with _DEFAULT_STORY_PATH.open(encoding="utf-8") as fh:
+with DEFAULT_STORY_PATH.open(encoding="utf-8") as fh:
     DEFAULT_STORY_PAYLOAD: dict = json.load(fh)

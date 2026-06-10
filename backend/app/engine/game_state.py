@@ -71,8 +71,10 @@ class GameState:
             state.player_inventories["player_1"] = []
 
         state.accessible_rooms.add(start)
-        # Recompute power flags from any fuses that start ON.
+        # Recompute power flags from any fuses that start ON, then immediately
+        # apply them so gates whose conditions are satisfied at game start open.
         state.recompute_power_flags()
+        state.apply_power_to_consumers()
         return state
 
     # ------------------------------------------------------------------ #

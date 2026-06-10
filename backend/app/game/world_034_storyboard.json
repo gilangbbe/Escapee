@@ -1,0 +1,76 @@
+{
+  "world_id": "world_034",
+  "generated_at": "2026-06-10T04:25:58.890186+00:00",
+  "schema_version": "1",
+  "plot": {
+    "victim": "A previous guest was found dead in the library last night, suffocated with a pillow.",
+    "threat": "Edward Blackwood, a former resident who killed under the cover of darkness years ago, now seeks to silence anyone who threatens his secret.",
+    "stakes": "If you do not stop him soon, he will kill another guest tonight and escape before dawn.",
+    "timeline": "A century-old murder resurfaced recently when old documents were discovered, hinting at Edward's involvement.",
+    "tension_hint": "Whispers of a masked killer from the past have haunted the manor for decades.",
+    "atmosphere": "The air is thick with dust and decay; the musty smell of aging books mixes with the chill of the old house. The faint sound of creaking floorboards echoes through the halls, and shadows shift in the flickering candlelight.",
+    "protagonist_context": "Alex Quinn and Riley Sato are trapped in the manor during a storm and decide to investigate the murder to uncover the truth."
+  },
+  "adapted_personas": {
+    "Alex Quinn": {
+      "world_role": "A methodical investigator who relies on observation and reasoning to solve puzzles.",
+      "voice": "Tactful and thorough, Alex speaks in measured tones with a focus on detail.",
+      "vocabulary": [
+        "meticulously observed",
+        "logical deduction",
+        "clues intertwine"
+      ]
+    },
+    "Riley Sato": {
+      "world_role": "A pragmatic engineer who uses their skills to fix issues and restore power to the manor's systems.",
+      "voice": "Practical and straightforward, Riley speaks with a calm but determined tone.",
+      "vocabulary": [
+        "efficient repair",
+        "system integrity",
+        "overriding malfunction"
+      ]
+    }
+  },
+  "room_stories": {
+    "foyer_entry": "The entrance hall where guests enter and leave, now filled with shadows and secrets from the past.",
+    "parlor_room": "A room of conversation and gathering, now silent except for the echoes of whispered truths.",
+    "study_corridor": "An area once dedicated to knowledge and discovery, now holding locked doors and hidden keys.",
+    "library_chamber": "The heart of wisdom and learning in this manor, now a chamber of deadly silence and hidden dangers."
+  },
+  "discovery_beats": {
+    "hidden_key": "Underneath the bloodstained floorboard in the study corridor lies a small key. It's cold and metallic, hinting at past crimes.",
+    "murderer_mask": "Hanging on the wall of the attic stairwell is a dark mask made from the same material as an old portrait — it seems to watch you closely."
+  },
+  "phase_guidance": {},
+  "conversation_seeds": {
+    "Alex Quinn": [
+      "There's something about this room that feels too quiet, like someone or something doesn't want us here.",
+      "The whispers in the books could be real... if we listen carefully enough."
+    ],
+    "Riley Sato": [
+      "This storm is worse than any power grid malfunction I've ever seen. We need to find a way out before it gets even worse.",
+      "I found an old system schematic in the study, showing how parts of this house were once powered differently."
+    ]
+  },
+  "ending_guidance": {
+    "won": "With Edward Blackwood's identity revealed and his escape thwarted, you've prevented another tragic death at this haunted manor.",
+    "lost": "Unable to uncover the truth in time, you are left as witnesses to another murder — your fear now is becoming the next victim.",
+    "lost_by_wrong_deduction": "Edward Blackwood escaped while you were distracted by a false lead."
+  },
+  "solution": {
+    "question": "Who murdered the previous guest who was found dead?",
+    "answer": "Edward Blackwood",
+    "answer_aliases": [
+      "Blackwood",
+      "Mr. Edward"
+    ],
+    "answer_type": "person",
+    "motive": "Driven by a long-buried family secret, he killed to protect his reputation.",
+    "proof_object": "murderer_mask",
+    "proof_sentence": "The mask hanging in the attic bears the same material as an old portrait of Edward Blackwood.",
+    "hint_1": "Look for clues that point towards the house's past and its dark history.",
+    "hint_2": "One of the rooms holds a hidden chamber with evidence about someone's true identity.",
+    "victory_narration_hook": "The murderer mask proves it — Edward Blackwood is the killer you've been looking for.",
+    "defeat_narration_hook": "You failed to identify the right suspect, leaving the killer free to strike again."
+  }
+}

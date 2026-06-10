@@ -14,23 +14,22 @@ degrades gracefully to a deterministic fallback so the game keeps flowing.
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 
 from app.agents.gm_narrator_prompt import (
     ActionExecutionStatus,
-    LORE_SYSTEM_PROMPT,
     NARRATOR_EVENT_SYSTEM_PROMPT,
     NARRATOR_SYSTEM_PROMPT,
     SystemEventKind,
     WorldSnapshot,
+    build_discovery_prompt,
     build_ending_user_prompt,
-    build_lore_prompt,
     build_opening_user_prompt,
+    build_room_entry_prompt,
     build_system_event_prompt,
     build_turn_user_prompt,
-    extract_lore_excerpt,
 )
+from app.agents.storyboard import Storyboard
 from app.llm.ollama_client import OllamaClient
 from app.schemas.game_setting import GameSetting
 
@@ -42,9 +41,10 @@ class GameMasterNarrator:
     client: OllamaClient
     temperature: float = 0.8
     recent_window: int = 6
+    storyboard: Storyboard = field(default_factory=Storyboard)
 
     _recent: list[str] = field(default_factory=list, init=False)
-    _lore: dict = field(default_factory=dict, init=False)
+    _used_seeds: set[str] = field(default_factory=set, init=False)
 
     def _normalize_dialogue_line(self, text: str) -> str:
         """Extract just the message text from model output.
@@ -115,42 +115,18 @@ class GameMasterNarrator:
         if len(self._recent) > self.recent_window:
             self._recent = self._recent[-self.recent_window:]
 
-    def _lore_excerpt(self, *, actor_name: str, room_id: str) -> str:
-        if not self._lore:
-            return ""
-        return extract_lore_excerpt(self._lore, actor_name=actor_name, room_id=room_id)
-
-    async def generate_lore(self, setting: GameSetting) -> None:
-        """Generate and store a one-time backstory/lore doc from the world JSON.
-
-        Called once before the game starts. Output is stored in self._lore and
-        used as tone/voice context for narrate_turn(). Fails silently — if the
-        model errors or returns invalid JSON, lore stays empty and the game
-        continues without it.
-        """
-        raw = await self._say(
-            build_lore_prompt(setting),
-            system=LORE_SYSTEM_PROMPT,
-            fallback="",
+    def _lore_excerpt(self, *, actor_name: str, room_id: str, object_id: str = "") -> str:
+        return self.storyboard.lore_excerpt(
+            actor_name=actor_name, room_id=room_id, object_id=object_id
         )
-        if not raw:
-            return
-        # Strip markdown code fences if model wraps output despite instructions.
-        cleaned = raw.strip()
-        if cleaned.startswith("```"):
-            cleaned = "\n".join(cleaned.splitlines()[1:])
-        if cleaned.endswith("```"):
-            cleaned = "\n".join(cleaned.splitlines()[:-1])
-        try:
-            parsed = json.loads(cleaned)
-            if isinstance(parsed, dict):
-                self._lore = parsed
-        except Exception:
-            pass  # Lore is best-effort; game continues without it.
+
+    def connection_lore_for(self, object_id: str) -> str:
+        """Return the pre-written story sentence for a specific object, or empty string."""
+        return self.storyboard.discovery_beat(object_id)
 
     async def narrate_opening(self, setting: GameSetting) -> str:
         text = await self._say(
-            build_opening_user_prompt(setting),
+            build_opening_user_prompt(setting, self.storyboard),
             system=NARRATOR_EVENT_SYSTEM_PROMPT,
             fallback=setting.scenario,
         )
@@ -174,9 +150,17 @@ class GameMasterNarrator:
         success: bool,
         status: ActionExecutionStatus,
         room_id: str = "",
+        object_id: str = "",
         world_snapshot: WorldSnapshot | None = None,
     ) -> str:
-        lore_excerpt = self._lore_excerpt(actor_name=actor_name, room_id=room_id)
+        lore_excerpt = self._lore_excerpt(
+            actor_name=actor_name, room_id=room_id, object_id=object_id
+        )
+        persona = self.storyboard.persona_for(actor_name)
+        seed = self.storyboard.pop_seed(actor_name, self._used_seeds)
+        if seed:
+            self._used_seeds.add(seed)
+
         line = await self._say(
             build_turn_user_prompt(
                 scenario=scenario,
@@ -195,6 +179,9 @@ class GameMasterNarrator:
                 recent_story=list(self._recent),
                 lore_excerpt=lore_excerpt,
                 world_snapshot=world_snapshot,
+                adapted_world_role=persona.world_role if persona else "",
+                adapted_vocabulary=persona.vocabulary if persona else None,
+                conversation_seed=seed or "",
             ),
             system=NARRATOR_SYSTEM_PROMPT,
             fallback=f'{actor_name}: "{outcome}"',
@@ -232,6 +219,67 @@ class GameMasterNarrator:
             self._remember(text)
         return text
 
+    async def narrate_room_entry(
+        self,
+        *,
+        actor_name: str,
+        room_id: str,
+        scenario: str,
+    ) -> str:
+        """One-time atmospheric beat the first time a character enters a room."""
+        text = await self._say(
+            build_room_entry_prompt(
+                actor_name=actor_name,
+                room_id=room_id,
+                room_story=self.storyboard.room_story(room_id),
+                scenario=scenario,
+            ),
+            system=NARRATOR_EVENT_SYSTEM_PROMPT,
+            fallback="",
+        )
+        if text:
+            self._remember(text)
+        return text
+
+    async def narrate_discovery(
+        self,
+        *,
+        actor_name: str,
+        item_id: str,
+        item_description: str,
+        unlocks_description: str,
+        connection_lore: str,
+        scenario: str,
+    ) -> str:
+        """One-time discovery beat: connects a found item to what it unlocks.
+
+        Fires the first time a plot-critical object is touched (taken or inspected).
+        If the storyboard has a pre-written beat for this object, that sentence is
+        emitted directly — no LLM call. Falls back to LLM generation only when the
+        storyboard has no entry for this object.
+        """
+        pre_written = self.storyboard.discovery_beat(item_id)
+        if pre_written:
+            self._remember(pre_written)
+            return pre_written
+
+        # Fallback: generate at runtime using LLM.
+        text = await self._say(
+            build_discovery_prompt(
+                actor_name=actor_name,
+                item_id=item_id,
+                item_description=item_description,
+                unlocks_description=unlocks_description,
+                connection_lore=connection_lore,
+                scenario=scenario,
+            ),
+            system=NARRATOR_EVENT_SYSTEM_PROMPT,
+            fallback="",
+        )
+        if text:
+            self._remember(text)
+        return text
+
     async def narrate_milestone(self, *, milestone: str, setting: GameSetting) -> str:
         """Generate a short atmospheric narrator beat for a progress milestone."""
         prompt = (
@@ -248,11 +296,12 @@ class GameMasterNarrator:
 
     async def narrate_ending(self, setting: GameSetting, won: bool) -> str:
         fallback = (
-            "The crew breaks free into the dark." if won
-            else "Time runs out, and the station keeps its prisoners."
+            "The crew breaks free into the light." if won
+            else "Time runs out. The truth stays buried."
         )
+        ending_guidance = self.storyboard.ending_text(won)
         text = await self._say(
-            build_ending_user_prompt(setting, won),
+            build_ending_user_prompt(setting, won, ending_guidance=ending_guidance),
             system=NARRATOR_EVENT_SYSTEM_PROMPT,
             fallback=fallback,
         )

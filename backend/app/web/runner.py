@@ -13,10 +13,13 @@ streams what the orchestrator produces.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Awaitable, Callable, Optional
 
 from app.agents.game_player_agent import GamePlayerAgent
 from app.agents.gm_narrator import GameMasterNarrator
+from app.agents.storyboard import Storyboard, is_storyboard_stale, storyboard_path_for
+from app.agents.storyboard_generator import StoryboardGenerator, make_storyboard_client
 from app.context.channels import Event, EventKind
 from app.llm.ollama_client import OllamaClient
 from app.orchestrator.loop import GameOrchestrator, GameResult
@@ -83,11 +86,52 @@ def build_agents(
     return agents
 
 
+async def load_or_generate_storyboard(
+    setting: GameSetting,
+    world_path: Optional[Path],
+    base_url: Optional[str] = None,
+) -> Storyboard:
+    """Return a Storyboard for this world, auto-generating if needed.
+
+    If world_path is None or generation fails, returns an empty Storyboard
+    so the game can always proceed without narrative context.
+    """
+    if world_path is None:
+        return Storyboard()
+
+    sb_path = storyboard_path_for(world_path)
+    world_id = world_path.stem
+
+    if not is_storyboard_stale(world_path, sb_path):
+        try:
+            return Storyboard.from_file(sb_path)
+        except Exception as exc:
+            print(f"[runner] Failed to load storyboard from {sb_path}: {exc}")
+
+    # Missing or stale — generate now.
+    print(f"[runner] Generating storyboard for {world_id} (this may take ~60s)...")
+    client = make_storyboard_client(base_url)
+    generator = StoryboardGenerator(client)
+    storyboard = await generator.generate(setting, world_id=world_id)
+
+    if not storyboard.is_empty():
+        try:
+            storyboard.save(sb_path)
+            print(f"[runner] Storyboard saved to {sb_path.name}")
+        except Exception as exc:
+            print(f"[runner] Could not save storyboard: {exc}")
+    else:
+        print(f"[runner] Storyboard generation returned empty — continuing without it.")
+
+    return storyboard
+
+
 def build_narrator(
     *,
     model: str = DEFAULT_MODEL,
     base_url: Optional[str] = None,
     temperature: float = 0.8,
+    storyboard: Optional[Storyboard] = None,
 ) -> GameMasterNarrator:
     """Construct the GM storyteller bound to a local Ollama model."""
     client = (
@@ -95,7 +139,11 @@ def build_narrator(
         if base_url
         else OllamaClient(model=model)
     )
-    return GameMasterNarrator(client=client, temperature=temperature)
+    return GameMasterNarrator(
+        client=client,
+        temperature=temperature,
+        storyboard=storyboard or Storyboard(),
+    )
 
 
 class GameRunner:

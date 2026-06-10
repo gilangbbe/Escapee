@@ -27,11 +27,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from app.game import persona_store
-from app.game.default_story import DEFAULT_STORY_PAYLOAD
+from app.game.default_story import DEFAULT_STORY_PATH, DEFAULT_STORY_PAYLOAD
 from app.llm.ollama_client import DEFAULT_OLLAMA_URL, list_installed_models
 from app.schemas.fixed_world import load_setting_compat
 from app.schemas.game_setting import GameSetting, PlayerPersona
-from app.web.runner import DEFAULT_MODEL, GameRunner, build_agents, build_narrator
+from app.web.game_logger import GameLogger
+from app.web.runner import DEFAULT_MODEL, GameRunner, build_agents, build_narrator, load_or_generate_storyboard
 from app.web.serializers import setup_message
 
 app = FastAPI(title="Multi-LLM Escape Room", version="0.1.0")
@@ -197,11 +198,20 @@ async def game_socket(websocket: WebSocket) -> None:
     if custom_personas:
         setting.players = custom_personas
 
+    # Derive a short world id from the scenario title for readable log filenames.
+    world_id = (setting.scenario or "")[:20].replace(" ", "_").replace("/", "-")
+    logger = GameLogger(world_id)
+
     async def send(message: dict) -> None:
+        logger.record(message)
         await websocket.send_text(json.dumps(message))
 
     agents = build_agents(setting, model=model)
-    narrator = build_narrator(model=model) if narrate else None
+    if narrate:
+        storyboard = await load_or_generate_storyboard(setting, DEFAULT_STORY_PATH)
+        narrator = build_narrator(model=model, storyboard=storyboard)
+    else:
+        narrator = None
     runner = GameRunner(setting, agents, max_rounds=rounds, narrator=narrator)
 
     async def receive_loop() -> None:
@@ -248,6 +258,7 @@ async def game_socket(websocket: WebSocket) -> None:
     except Exception as exc:
         await send({"type": "error", "message": str(exc)})
     finally:
+        logger.close()
         try:
             await websocket.close()
         except RuntimeError:
