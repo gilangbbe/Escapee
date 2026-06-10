@@ -294,12 +294,14 @@ class GameMasterNarrator:
             self._remember(text)
         return text
 
-    async def narrate_ending(self, setting: GameSetting, won: bool) -> str:
+    async def narrate_ending(
+        self, setting: GameSetting, won: bool, *, wrong_deduction: bool = False
+    ) -> str:
         fallback = (
             "The crew breaks free into the light." if won
             else "Time runs out. The truth stays buried."
         )
-        ending_guidance = self.storyboard.ending_text(won)
+        ending_guidance = self.storyboard.ending_text(won, wrong_deduction=wrong_deduction)
         text = await self._say(
             build_ending_user_prompt(setting, won, ending_guidance=ending_guidance),
             system=NARRATOR_EVENT_SYSTEM_PROMPT,

@@ -143,8 +143,11 @@ class GameOrchestrator:
         #   SYSTEM message and used as critical_note for the very next AI turn.
         # _human_action_queue: delivers GameAction dicts from the human player
         #   to _take_human_turn(), which awaits one item per turn.
+        # _deduction_queue: delivers the human's final answer string during the
+        #   deduction phase; one item per attempt.
         self._pending_nudge: str | None = None
         self._human_action_queue: asyncio.Queue[dict] = asyncio.Queue()
+        self._deduction_queue: asyncio.Queue[str] = asyncio.Queue()
 
         # Tracks which plot-critical object ids have already triggered a discovery
         # narration beat so each item only gets one connective story moment.
@@ -165,6 +168,10 @@ class GameOrchestrator:
     def submit_human_action(self, action_dict: dict) -> None:
         """Deliver a human-player action into the turn queue."""
         self._human_action_queue.put_nowait(action_dict)
+
+    def submit_deduction(self, answer: str) -> None:
+        """Deliver the human player's final deduction answer."""
+        self._deduction_queue.put_nowait(answer.strip())
 
     # ------------------------------------------------------------------ #
     # Setup checks
@@ -201,6 +208,14 @@ class GameOrchestrator:
             for agent in self.agents:
                 won = await self._take_turn(agent)
                 if won:
+                    # If the storyboard has a sealed solution, pause for the
+                    # human deduction phase before declaring victory.
+                    has_solution = (
+                        self.narrator is not None
+                        and not self.narrator.storyboard.solution.is_empty()
+                    )
+                    if has_solution:
+                        return await self._run_deduction_phase()
                     return await self._finalize(True, "escaped")
                 if self.sim.state.finished:
                     return await self._finalize(
@@ -991,10 +1006,66 @@ class GameOrchestrator:
         if stream and self.on_event is not None:
             await self.on_event(event)
 
+    async def _run_deduction_phase(self) -> GameResult:
+        """Pause the game and ask the human to name the answer. Up to 3 attempts.
+
+        The AI agents have mechanically solved the puzzle. Now the human must
+        make the final call — identify the killer, the sabotaged system, the
+        stolen object, etc. — based on the evidence gathered during the game.
+        """
+        solution = self.narrator.storyboard.solution  # type: ignore[union-attr]
+        max_attempts = 3
+
+        for attempt in range(max_attempts):
+            hint = ""
+            if attempt == 1:
+                hint = solution.hint_1
+            elif attempt >= 2:
+                hint = solution.hint_2
+
+            await self._emit(
+                EventKind.HUMAN_DEDUCTION,
+                None,
+                solution.question,
+                turn=self.sim.state.turn,
+                record=False,
+                data={
+                    "question": solution.question,
+                    "attempt": attempt + 1,
+                    "max_attempts": max_attempts,
+                    "hint": hint,
+                },
+            )
+
+            try:
+                answer = await asyncio.wait_for(
+                    self._deduction_queue.get(), timeout=300.0
+                )
+            except asyncio.TimeoutError:
+                answer = ""
+
+            if solution.matches(answer):
+                return await self._finalize(True, "escaped")
+
+            if attempt < max_attempts - 1:
+                next_hint = solution.hint_1 if attempt == 0 else solution.hint_2
+                msg = "Not quite." + (f" {next_hint}" if next_hint else "")
+                await self._emit(
+                    EventKind.SYSTEM,
+                    None,
+                    msg,
+                    turn=self.sim.state.turn,
+                )
+
+        return await self._finalize(False, "wrong_deduction")
+
     async def _finalize(self, won: bool, reason: str) -> GameResult:
         """Emit closing narration (if any) and build the final result."""
         if self.narrator is not None:
-            ending = await self.narrator.narrate_ending(self.setting, won)
+            wrong_deduction = reason == "wrong_deduction"
+            ending = await self.narrator.narrate_ending(
+                self.setting, won, wrong_deduction=wrong_deduction
+            )
             await self._emit(
                 EventKind.NARRATION, None, ending, turn=self.sim.state.turn, record=False
             )

@@ -22,7 +22,7 @@ export interface PersonaInfo {
   is_human?: boolean;
 }
 
-export type EventKind = "speech" | "observation" | "system" | "planner" | "prompt" | "decision" | "narration" | "human_turn";
+export type EventKind = "speech" | "observation" | "system" | "planner" | "prompt" | "decision" | "narration" | "human_turn" | "human_deduction";
 
 export interface PlannerCandidate {
   rank: number;
@@ -52,6 +52,13 @@ export interface HumanTurnData {
   candidates: HumanTurnCandidate[];
 }
 
+export interface DeductionData {
+  question: string;
+  attempt: number;
+  max_attempts: number;
+  hint: string;
+}
+
 export interface EventMessage {
   type: "event";
   kind: EventKind;
@@ -60,7 +67,7 @@ export interface EventMessage {
   turn: number;
   public: boolean;
   audience_id: string | null;
-  data?: PlannerEventData | HumanTurnData | null;
+  data?: PlannerEventData | HumanTurnData | DeductionData | null;
 }
 
 export interface ObjectSnapshot {

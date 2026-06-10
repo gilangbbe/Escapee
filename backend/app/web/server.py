@@ -235,6 +235,8 @@ async def game_socket(websocket: WebSocket) -> None:
                     runner.inject_nudge(str(msg.get("text", "")))
                 elif kind == "human_action":
                     runner.submit_human_action(msg.get("action") or {})
+                elif kind == "deduction":
+                    runner.submit_deduction(str(msg.get("answer", "")))
         except (WebSocketDisconnect, Exception):
             pass
 

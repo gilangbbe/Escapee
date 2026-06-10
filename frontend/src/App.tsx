@@ -6,6 +6,7 @@ import { StatePanel } from "./components/StatePanel";
 import { SetupPanel } from "./components/SetupPanel";
 import { PersonaConfigPanel } from "./components/PersonaConfigPanel";
 import { HumanTurnPanel } from "./components/HumanTurnPanel";
+import { DeductionPanel } from "./components/DeductionPanel";
 import type { PersonaDraft } from "./types";
 
 const DEFAULT_WS = "ws://localhost:8000";
@@ -32,7 +33,7 @@ export default function App() {
   const nudgeInputRef = useRef<HTMLInputElement>(null);
   const feedEndRef = useRef<HTMLDivElement>(null);
 
-  const { state, start, stop, sendNudge, submitHumanAction, httpBase } =
+  const { state, start, stop, sendNudge, submitHumanAction, submitDeduction, httpBase } =
     useGameSocket(DEFAULT_WS);
 
   const running = state.status === "running" || state.status === "connecting";
@@ -128,7 +129,12 @@ export default function App() {
           </div>
 
           <div className="chat-input-area">
-            {state.humanTurn ? (
+            {state.deductionPhase ? (
+              <DeductionPanel
+                deduction={state.deductionPhase}
+                onSubmit={submitDeduction}
+              />
+            ) : state.humanTurn ? (
               <HumanTurnPanel
                 turn={state.humanTurn}
                 onSubmit={submitHumanAction}

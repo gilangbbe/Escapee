@@ -178,6 +178,11 @@ class GameRunner:
         if self._orchestrator is not None:
             self._orchestrator.submit_human_action(action_dict)
 
+    def submit_deduction(self, answer: str) -> None:
+        """Forward the human's final deduction answer to the running orchestrator."""
+        if self._orchestrator is not None:
+            self._orchestrator.submit_deduction(answer)
+
     async def run(self, send: SendFn) -> GameResult:
         """Stream the full game over `send` and return the final result."""
         await send(setup_message(self.setting))

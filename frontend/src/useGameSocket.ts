@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
+  DeductionData,
   EventMessage,
   HumanTurnData,
   PersonaDraft,
@@ -20,6 +21,7 @@ interface GameState {
   result: ResultMessage | null;
   error: string | null;
   humanTurn: HumanTurnData | null;
+  deductionPhase: DeductionData | null;
 }
 
 const INITIAL: GameState = {
@@ -30,6 +32,7 @@ const INITIAL: GameState = {
   result: null,
   error: null,
   humanTurn: null,
+  deductionPhase: null,
 };
 
 function httpBaseFromWs(wsBaseUrl: string): string {
@@ -136,18 +139,21 @@ export function useGameSocket(wsBaseUrl: string) {
             case "setup":
               return { ...s, setup: msg };
             case "event":
-              // human_turn events are UI directives — extract to humanTurn state,
-              // don't add to the story feed.
+              // human_turn and human_deduction are UI directives — extract to
+              // dedicated state fields, don't add to the story feed.
               if (msg.kind === "human_turn") {
                 return { ...s, humanTurn: msg.data as HumanTurnData };
+              }
+              if (msg.kind === "human_deduction") {
+                return { ...s, deductionPhase: msg.data as unknown as DeductionData };
               }
               return { ...s, events: [...s.events, msg] };
             case "state":
               return { ...s, snapshot: msg };
             case "result":
-              return { ...s, result: msg, status: "finished", humanTurn: null };
+              return { ...s, result: msg, status: "finished", humanTurn: null, deductionPhase: null };
             case "error":
-              return { ...s, error: msg.message, status: "error", humanTurn: null };
+              return { ...s, error: msg.message, status: "error", humanTurn: null, deductionPhase: null };
             default:
               return s;
           }
@@ -190,5 +196,15 @@ export function useGameSocket(wsBaseUrl: string) {
     }
   }, []);
 
-  return { state, start, stop, sendNudge, submitHumanAction, httpBase: httpBaseFromWs(wsBaseUrl) };
+  const submitDeduction = useCallback((answer: string) => {
+    const ws = socketRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "deduction", answer }));
+      // Optimistically clear the panel; the next attempt event will re-show it
+      // if the answer was wrong, or the result event will close it if correct.
+      setState((s) => ({ ...s, deductionPhase: null }));
+    }
+  }, []);
+
+  return { state, start, stop, sendNudge, submitHumanAction, submitDeduction, httpBase: httpBaseFromWs(wsBaseUrl) };
 }
