@@ -18,7 +18,20 @@ from typing import Awaitable, Callable, Optional
 from app.agents.game_player_agent import GamePlayerAgent
 from app.agents.gm_narrator import GameMasterNarrator
 from app.context.channels import Event, EventKind
+from app.llm.llama_cpp_client import LlamaCppClient, get_model_path
 from app.llm.ollama_client import OllamaClient
+
+# If MODEL_PATH env var is set, use llama-cpp-python. Otherwise use Ollama.
+_MODEL_PATH = get_model_path()
+
+
+def _make_client(model: str, base_url: str | None = None) -> OllamaClient | LlamaCppClient:
+    """Return the appropriate LLM client based on environment config."""
+    if _MODEL_PATH:
+        return LlamaCppClient(model_path=_MODEL_PATH)
+    if base_url:
+        return OllamaClient(model=model, base_url=base_url)
+    return OllamaClient(model=model)
 from app.orchestrator.loop import GameOrchestrator, GameResult
 from app.schemas.game_setting import GameSetting
 from app.web.serializers import (
@@ -52,15 +65,11 @@ def build_agents(
     if not setting.players:
         raise ValueError("This setting defines no players to drive.")
 
-    clients: dict[str, OllamaClient] = {}
+    clients: dict[str, OllamaClient | LlamaCppClient] = {}
 
-    def client_for(persona_model: str) -> OllamaClient:
+    def client_for(persona_model: str) -> OllamaClient | LlamaCppClient:
         if persona_model not in clients:
-            clients[persona_model] = (
-                OllamaClient(model=persona_model, base_url=base_url)
-                if base_url
-                else OllamaClient(model=persona_model)
-            )
+            clients[persona_model] = _make_client(persona_model, base_url)
         return clients[persona_model]
 
     agents: list[GamePlayerAgent] = []
@@ -84,11 +93,7 @@ def build_narrator(
     temperature: float = 0.8,
 ) -> GameMasterNarrator:
     """Construct the GM storyteller bound to a local Ollama model."""
-    client = (
-        OllamaClient(model=model, base_url=base_url)
-        if base_url
-        else OllamaClient(model=model)
-    )
+    client = _make_client(model, base_url)
     return GameMasterNarrator(client=client, temperature=temperature)
 
 

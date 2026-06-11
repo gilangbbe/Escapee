@@ -181,7 +181,7 @@ def _personas_from_param(raw: str | None) -> list[PlayerPersona] | None:
 async def game_socket(websocket: WebSocket) -> None:
     await websocket.accept()
 
-    model = websocket.query_params.get("model", DEFAULT_MODEL)
+    model = websocket.query_params.get("model", DEFAULT_MODEL) or DEFAULT_MODEL
     try:
         rounds = int(websocket.query_params.get("rounds", "30"))
     except ValueError:
@@ -208,6 +208,8 @@ async def game_socket(websocket: WebSocket) -> None:
     except WebSocketDisconnect:
         return
     except Exception as exc:  # surface runtime errors (e.g. Ollama unreachable)
+        import traceback
+        traceback.print_exc()
         await send({"type": "error", "message": str(exc)})
     finally:
         try:
