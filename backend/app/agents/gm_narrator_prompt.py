@@ -24,40 +24,45 @@ if TYPE_CHECKING:
     from app.agents.storyboard import Storyboard
 
 NARRATOR_SYSTEM_PROMPT = """\
-You are DIALOGUE GENERATOR writing in-character chat messages for people trapped in a mystery.
-They are talking directly to each other. You write ONE message per turn, in that character's voice.
+You are a DIALOGUE WRITER for a mystery chat game. Write one short in-character message per turn.
+The characters are investigators trapped in a mystery, talking in a group chat.
 
-FORBIDDEN (never use):
-- Em-dash: — or en-dash: – or double hyphen: --
-- Semicolons: ; or Ellipsis: ...
-- Third-person narration ("she goes", "he checks")
-- Generic filler: "check it out", "hurry!", "let's see what X knows", "might reveal clues"
-- Teammate names when talking TO them. Use "you" or "we". Use names only for absent teammates.
+OUTPUT: Exactly one line — Character Name: "message"
+LENGTH: 10 to 20 words. Short, punchy, specific.
 
-OUTPUT CONTRACT (strict):
-1. Exactly ONE chat line: <Character Name>: "<message>"
-2. Lowercase. Present tense. 15 to 30 words.
-3. Must sound like THIS specific character — use BACKSTORY_HINT and ROLE to shape every word.
+MYSTERY MODE vs REVELATION MODE:
+  You will be told explicitly in INVESTIGATION_STATUS which mode is active.
+  MYSTERY MODE (default): you MUST NOT name any specific person as the killer.
+    Describe evidence with "whoever did this", "someone with access", "the person responsible".
+    Even if STORY_SO_FAR contains a suspect name, do NOT echo it as a conclusion.
+  REVELATION MODE: the proof has been found. You MAY now name the killer — do so naturally.
 
-CHARACTER VOICE IS MANDATORY. Two characters in the same situation must sound different:
-- A Field Analyst speaks in observations and hypotheses: "the scarf still smells like perfume, not fear"
-- A Systems Operator speaks in patterns and logic: "this matches the cipher pattern, second lock must be nearby"
-- A Scout speaks in physical instinct: "don't touch it yet, the dust shows someone came back here"
-If you ignore the character sheet and write generic urgency ("hurry! let's go!"), you have failed.
+CONVERSATION RULE (non-negotiable — two steps, in this order):
+  STEP 1 — REACT: if the last STORY_SO_FAR entry is a teammate's line, address it directly.
+    Answer their question. Confirm or push back on their observation. Add what you just found that connects to what they said.
+  STEP 2 — REVEAL: add one new observation from what ACTION_EVENT just showed.
+  If no teammate spoke recently, skip STEP 1 and go straight to STEP 2.
+  NEVER skip STEP 1 to report your own strategy when a teammate spoke last.
 
-CONVERSATION RULES:
-1. If the CONVERSATION_THREAD shows another character spoke last, REACT to what they said first.
-   Bad: "found the key, let's use it on the desk"
-   Good: "you're right about the cipher, and i think this key fits what it described"
-2. Show the WHY behind the action, in character voice. Not just WHAT was done.
-3. Emotional register by ACTION_EXECUTION_STATUS:
-   - FRESH_ACTION_SUCCESS: specific relief or excitement tied to this exact find
-   - FRESH_ACTION_FAILURE: frustration with a pivot idea ("that didn't work, but...")
-   - REPEATED_ACTION_LOOP_CATCH: impatience, demand a different direction entirely
+VOICE: Every word comes from this specific character's way of seeing the world (CHARACTER_SHEET).
+FORBIDDEN vocab: "system", "power", "restore", "circuit", "override", "malfunction", "scan"
 
-GROUND-TRUTH RULES:
-1. SIMULATOR_OUTCOME is absolute truth. Never invent objects or results.
-2. Never copy PLAYER_INTENT word-for-word. Rephrase in the character's own voice.
+FORBIDDEN (hard rules):
+- Em-dash: — or en-dash: –  or double hyphen: --
+- Rhetorical questions: "Why would...?", "What does...?", "Could this be...?"
+- Generic filler: "something amiss", "let's go", "check it out", "hurry"
+- Invented facts not in SIMULATOR_OUTCOME
+- Writing more than one line — output STOPS after the closing quote
+- If SUCCESS: no — do NOT say "no clues here", "nothing found", "can't find anything".
+  Instead react to STORY_SO_FAR teammate or describe the character's physical state.
+
+GOOD (reacts then reveals):
+  Last entry: Riley: "who entered this room last?"
+  Alex: "the scarf angle answers that — someone came back after the fight, not during it"
+
+BAD (ignores teammate, reports strategy):
+  Last entry: Riley: "who entered this room last?"
+  Alex: "the story of this room points to deliberate placement, check if anyone visited recently"
 """
 
 NARRATOR_EVENT_SYSTEM_PROMPT = """\
@@ -394,17 +399,21 @@ def build_dialogue_context_package(
     adapted_world_role: str = "",
     adapted_vocabulary: list[str] | None = None,
     conversation_seed: str = "",
+    proof_revealed: bool = False,
+    killer_name: str = "",
+    suspects_context: str = "",
 ) -> str:
     """Build a rigid, low-drift context package for local 7B dialogue models."""
-    story = "\n".join(f"- {beat}" for beat in recent_story) or "(session just started, no prior messages)"
-    speech_text = speech.strip() if speech and speech.strip() else "(not stated)"
+    from app.agents.storyboard import humanize_text
+    story = "\n".join(f"- {beat}" for beat in recent_story) or "(session just started)"
+    speech_text = humanize_text(speech.strip()) if speech and speech.strip() else "(not stated)"
 
     lore_section = (
-        f"WORLD_LORE (tone/voice reference only — do not state as fact):\n{lore_excerpt}\n\n"
+        f"WORLD_LORE (tone/voice reference — do not quote directly):\n{lore_excerpt}\n\n"
         if lore_excerpt else ""
     )
     snapshot_section = (
-        f"WORLD_STATE (authoritative — only reference these, nothing else):\n"
+        f"WORLD_STATE (authoritative — only reference these):\n"
         f"{world_snapshot.render()}\n\n"
         if world_snapshot is not None else ""
     )
@@ -416,21 +425,36 @@ def build_dialogue_context_package(
         skills = ", ".join(actor_skills) if actor_skills else "general"
         role_line = f"- ROLE: {actor_role}\n- SKILLS: {skills}"
 
-    # Vocabulary constraints from storyboard — hard override for genre contamination.
-    vocab_section = ""
-    if adapted_vocabulary:
-        vocab_items = "\n".join(f'  "{v}"' for v in adapted_vocabulary[:6])
-        vocab_section = (
-            f"- VOCABULARY (use these phrasings — they define your voice in this world):\n"
-            f"{vocab_items}\n"
-        )
+    # Vocabulary removed from narrator context — it's already in the player agent's system
+    # prompt via apply_storyboard_persona. Exposing it here caused the model to fixate on
+    # specific phrases ("the story of this room") and repeat them across every turn.
 
     # Unused conversation seed — a plot-rooted observation to surface if relevant.
     seed_section = (
-        f"PENDING_OBSERVATION (if contextually natural, weave this into your line):\n"
+        f"PLOT_OBSERVATION (surface this naturally if the moment fits):\n"
         f"  {conversation_seed}\n\n"
         if conversation_seed else ""
     )
+
+    # Build investigation status block — mystery mode vs revelation mode.
+    if proof_revealed and killer_name:
+        investigation_status = (
+            "INVESTIGATION_STATUS: REVELATION MODE\n"
+            f"The proof has been found. The killer is {killer_name}. "
+            f"Characters now know who is responsible. You MAY name {killer_name} explicitly.\n"
+        )
+    else:
+        suspects_block = (
+            f"KNOWN SUSPECTS (any could be responsible — do not name which is guilty):\n{suspects_context}\n"
+            if suspects_context else
+            "KNOWN SUSPECTS: identity unknown.\n"
+        )
+        investigation_status = (
+            "INVESTIGATION_STATUS: MYSTERY MODE\n"
+            + suspects_block
+            + "FORBIDDEN: naming any specific suspect as the killer. "
+            "Use 'whoever did this', 'someone with access', 'the person responsible'.\n"
+        )
 
     tension = _tension_level(turn, world_snapshot)
     return (
@@ -439,31 +463,32 @@ def build_dialogue_context_package(
         f"- SCENARIO: {scenario}\n"
         f"- OBJECTIVE: {objective}\n"
         f"- TURN: {turn} | TENSION_LEVEL: {tension}\n"
-        f"CONVERSATION_THREAD (most recent last — react to the last entry if from a teammate):\n{story}\n\n"
+        f"STORY_SO_FAR (most recent last — react to the last entry if it's from a teammate):\n{story}\n\n"
         f"{lore_section}"
         f"{seed_section}"
         f"{snapshot_section}"
-        "CHARACTER_SHEET (this defines your entire voice — every word must reflect it):\n"
+        f"{investigation_status}\n"
+        "CHARACTER_SHEET (shapes this character's specific lens on everything they see):\n"
         f"- NAME: {actor_name}\n"
-        f"{role_line}\n"
-        f"- GENDER: {actor_gender or 'unspecified'}\n"
+        + (f"- PRONOUNS: {actor_gender} — use correct pronouns throughout\n" if actor_gender else "")
+        + f"{role_line}\n"
         f"- BACKSTORY_HINT: {actor_backstory or 'ordinary survivor under pressure'}\n"
-        f"{vocab_section}"
-        f"- MOOD_GUIDANCE: {_mood_for(status, success=success)}\n\n"
+        f"- MOOD: {_mood_for(status, success=success)}\n\n"
         "ACTION_EVENT:\n"
         f"- ATTEMPT: {action_text}\n"
-        f"- PLAYER_INTENT: {speech_text}\n"
+        f"- PLAYER_MOTIVATION (background only — DO NOT echo this as your line; it is what the character is thinking, not what they say):\n"
+        f"  {speech_text}\n"
         f"- SIMULATOR_OUTCOME: {outcome}\n"
-        f"- ACTION_SUCCESS: {'true' if success else 'false'}\n"
-        f"- ACTION_EXECUTION_STATUS: {status.value}\n\n"
+        f"- SUCCESS: {'yes' if success else 'no'}\n\n"
         "WRITING_TARGET:\n"
         "- FORMAT: Character Name: \"message\"\n"
-        "- LENGTH: 15 to 30 words\n"
-        "- VOICE: match CHARACTER_SHEET exactly — ROLE IN THIS WORLD and VOCABULARY override generic instincts\n"
-        "- REACTION: if last CONVERSATION_THREAD entry is a teammate, address what they said\n"
-        "- FORBIDDEN: — or – or -- or ... or generic filler like 'check it out', 'hurry!'\n"
+        "- LENGTH: 10 to 20 words — short, punchy, specific\n"
+        "- STEP 1: react to the last STORY_SO_FAR entry if it's a teammate\n"
+        "- STEP 2: add what SIMULATOR_OUTCOME just revealed, through CHARACTER_SHEET lens\n"
+        "- FORBIDDEN: — or – or -- or rhetorical questions (Why...? What...? Could this...?)\n"
+        "- FORBIDDEN: echoing PLAYER_MOTIVATION word-for-word\n"
         "- FORBIDDEN: invented facts not in SIMULATOR_OUTCOME\n"
-        "Generate the final chat line now."
+        "Write the single dialogue line now. Stop after the closing quote."
     )
 
 
@@ -508,7 +533,8 @@ def build_opening_user_prompt(setting: GameSetting, storyboard: "Storyboard | No
         + story_context
         + "\nWrite 2-3 sentences. Open with a single sharp sensory detail (smell, sound, or sight). "
         "If STORY CONTEXT includes a victim name, use it — make them real. "
-        "End with what's concretely at stake. "
+        "End with what's concretely at stake — say 'the killer', 'whoever is responsible', or 'the murderer'. "
+        "NEVER name the killer or any suspect in the opening — the mystery must remain unsolved. "
         "Present tense. Third person. No em-dashes. No generic words like 'eerie' or 'dark secrets'."
     )
 
@@ -534,6 +560,9 @@ def build_turn_user_prompt(
     adapted_world_role: str = "",
     adapted_vocabulary: list[str] | None = None,
     conversation_seed: str = "",
+    proof_revealed: bool = False,
+    killer_name: str = "",
+    suspects_context: str = "",
 ) -> str:
     return build_dialogue_context_package(
         scenario=scenario,
@@ -555,6 +584,9 @@ def build_turn_user_prompt(
         adapted_world_role=adapted_world_role,
         adapted_vocabulary=adapted_vocabulary,
         conversation_seed=conversation_seed,
+        proof_revealed=proof_revealed,
+        killer_name=killer_name,
+        suspects_context=suspects_context,
     )
 
 

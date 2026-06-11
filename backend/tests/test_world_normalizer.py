@@ -330,8 +330,8 @@ class TestCombinedRepairs:
         # R4: promoted to visible
         assert key["state"] == "visible"
 
-    def test_world_034_scenario(self):
-        """Simulates the exact structural issues found in world_034.json."""
+    def test_world_033_scenario(self):
+        """Simulates the exact structural issues found in world_033.json."""
         objs = [
             # room_1
             _obj("wall_mounted_comms", contains_info="pulse_code_492"),
@@ -461,11 +461,11 @@ class TestR6FunctionalFirst:
         result = normalize_world(objs, WIN, ROOMS)
         assert not any("R6" in r for r in result.repairs)
 
-    def test_world_034_scenic_rotting_fabric_in_beam_position(self):
-        """Simulates the world_034 beam-miss: scenic_rotting_fabric must be sorted
+    def test_world_033_scenic_rotting_fabric_in_beam_position(self):
+        """Simulates the world_033 beam-miss: scenic_rotting_fabric must be sorted
         before scenic fillers so it lands within the 5-candidate planner beam."""
         objs = [
-            # closet objects in their original world_034 order
+            # closet objects in their original world_033 order
             _obj("closet_locket",    location="closet", state="locked",
                  requires_code="passage_key_code_2"),
             _obj("closet_light_bulb", location="closet", contains_info="light_bulb_clue_4"),
@@ -557,8 +557,8 @@ class TestR7NumericCodeRelink:
         assert lock["requires_code"] == "compass_code_9"
         assert not any("R7" in r for r in result.repairs)
 
-    def test_world_034_all_code_locks_relinked(self):
-        """Simulates the exact world_034 pattern: all pure-digit codes relinked to tokens."""
+    def test_world_033_all_code_locks_relinked(self):
+        """Simulates the exact world_033 pattern: all pure-digit codes relinked to tokens."""
         objs = [
             _obj("torn_map",                contains_info="map_code_128"),
             _obj("bloodstained_music_sheet",contains_info="music_code_972"),
@@ -584,7 +584,7 @@ class TestR7NumericCodeRelink:
         r7_repairs = [r for r in result.repairs if r.startswith("R7")]
         assert len(r7_repairs) == 4
 
-    def test_world_034_solution_path_traces_info_chain(self):
+    def test_world_033_solution_path_traces_info_chain(self):
         """After R7 relinking, _derive_solution_path correctly traces crypt_exit → final_symbol."""
         objs = [
             _obj("final_symbol", contains_info="symbol_code_321"),
@@ -609,7 +609,7 @@ GAME_DIR = os.path.join(os.path.dirname(__file__), "..", "app", "game")
 @pytest.mark.parametrize("world_file", [
     "world_015.json", "world_016.json", "world_017.json",
     "world_018.json", "world_019.json", "world_020.json",
-    "world_021.json", "world_034.json",
+    "world_021.json", "world_033.json",
 ])
 def test_world_loads_and_normalizes_without_crash(world_file):
     """Each world should load through load_setting_compat without exception."""

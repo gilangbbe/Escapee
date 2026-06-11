@@ -65,7 +65,7 @@ File: `backend/app/game/world_XXX_storyboard.json`
 
 ```json
 {
-  "world_id": "world_034",
+  "world_id": "world_033",
   "generated_at": "2026-06-10T09:00:00",
   "schema_version": "1",
 
@@ -512,8 +512,8 @@ backend/app/game/
   world_005.json
   world_005_storyboard.json
   ...
-  world_034.json
-  world_034_storyboard.json
+  world_033.json
+  world_033_storyboard.json
 
 backend/app/agents/
   storyboard_generator.py        ← StoryboardGenerator class + prompts
@@ -530,7 +530,7 @@ backend/app/schemas/
   events.py                      ← new EventKind.HUMAN_DEDUCTION
 
 backend/app/tools/
-  generate_storyboard.py         ← CLI: python -m app.tools.generate_storyboard world_034
+  generate_storyboard.py         ← CLI: python -m app.tools.generate_storyboard world_033
 
 frontend/src/components/
   DeductionPanel.tsx             ← new component: question, evidence list, answer + reasoning inputs
@@ -545,13 +545,13 @@ frontend/src/types.ts            ← new event type: HumanDeductionEvent
 
 ```bash
 # Generate storyboard for a single world
-python -m app.tools.generate_storyboard world_034
+python -m app.tools.generate_storyboard world_033
 
 # Generate and print to stdout without saving (for inspection)
-python -m app.tools.generate_storyboard world_034 --dry-run
+python -m app.tools.generate_storyboard world_033 --dry-run
 
 # Regenerate even if storyboard already exists
-python -m app.tools.generate_storyboard world_034 --force
+python -m app.tools.generate_storyboard world_033 --force
 
 # Generate for all worlds
 python -m app.tools.generate_storyboard --all

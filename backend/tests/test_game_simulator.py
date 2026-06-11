@@ -181,7 +181,7 @@ def test_opening_object_reveals_its_contained_info():
     """Regression: solving an object via USE/ENTER_CODE must reveal its own
     `contains_info`, just like inspecting it. Otherwise a downstream lock or
     known_info gate that depends on that info can never be satisfied (the
-    world_034 failure: a console unlocked with a tool kept its code hidden).
+    world_033 failure: a console unlocked with a tool kept its code hidden).
     """
     setting = GameSetting.model_validate(
         {
@@ -242,7 +242,7 @@ def test_taking_item_reveals_its_contained_info():
     """Regression: TAKE must auto-reveal contains_info so agents never need a
     separate INSPECT step for a taken item (which becomes invisible post-TAKE).
 
-    Mirrors the world_034 pattern: ancient_bone is both a takeable tool and the
+    Mirrors the world_033 pattern: ancient_bone is both a takeable tool and the
     only source of chamber_password, which gates the door to final_chamber via a
     known_info progression condition. Agents took the bone but could never inspect
     it (TAKEN items are invisible), so the gate never opened.

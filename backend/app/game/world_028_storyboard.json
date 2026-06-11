@@ -1,0 +1,86 @@
+{
+  "world_id": "world_028",
+  "generated_at": "2026-06-11T02:31:20.476706+00:00",
+  "schema_version": "1",
+  "plot": {
+    "victim": "",
+    "threat": "",
+    "stakes": "",
+    "timeline": "",
+    "tension_hint": "",
+    "atmosphere": "",
+    "protagonist_context": ""
+  },
+  "adapted_personas": {
+    "Alex Quinn": {
+      "world_role": "A methodical investigator who tracks clues under pressure.",
+      "voice": "",
+      "vocabulary": [
+        "pattern breaks",
+        "clues connect",
+        "motive behind"
+      ]
+    },
+    "Riley Sato": {
+      "world_role": "A pragmatic engineer who can restore failing systems quickly.",
+      "voice": "",
+      "vocabulary": [
+        "timing key",
+        "sequence break",
+        "pattern reveal"
+      ]
+    }
+  },
+  "suspects": [
+    {
+      "name": "Evelyn Blackwood",
+      "connection_to_victim": "She was the victim's ex-wife, bitterly divorced three years ago.",
+      "apparent_motive": "Evelyn still harbors deep resentment over the divorce settlement and seeks revenge for perceived injustices."
+    },
+    {
+      "name": "Henry Voss",
+      "connection_to_victim": "He was the victim's long-time accountant, trusted with financial secrets.",
+      "apparent_motive": "Henry had recently uncovered evidence of embezzlement by the victim but was fired in retaliation."
+    }
+  ],
+  "room_stories": {
+    "entry_hall": "The entry hall is eerie with shadows that seem to move when you're not looking.",
+    "study": "The study reeks of old books and secrets, each item telling a story of the victim's life.",
+    "library": "In the library, rows upon rows of ancient texts whisper of dark magic and lost knowledge.",
+    "dining_hall": "The dining hall is shrouded in mystery; the stained table hints at more than just food.",
+    "solarium": "The solarium seems to be the heart of the manor's secret workings, with hidden mechanisms lurking."
+  },
+  "discovery_beats": {
+    "smudged_wall": "You notice patterns in the smudges, forming shapes and numbers. Someone left clues here.",
+    "broken_inkwell": "The ink from the broken inkwell is still fresh, hinting at a recent disturbance.",
+    "symbol_book": "Finding the symbol book reveals ancient diagrams suggesting dark rituals tied to local legends.",
+    "hidden_engraving": "Cleaning off the stain on the dining hall table uncovers an engraving with strange symbols.",
+    "key_from_drawer": "Inside the drawer lies an old, tarnished key, possibly leading somewhere important.",
+    "key_from_table": "Underneath the stained table is a hidden key, hinting at secrets beneath the surface."
+  },
+  "phase_guidance": {},
+  "conversation_seeds": {
+    "Alex Quinn": [
+      "The smudges on the wall look like they form a hidden message, suggesting someone left clues behind.",
+      "I noticed that Henry Voss was recently fired; his sudden departure could be linked to something more sinister."
+    ],
+    "Riley Sato": [
+      "That inkwell in the study is still leaking. Someone must have broken it recently to send us a signal.",
+      "The stained table looks like it has been there for ages but might hide a secret that was just placed there."
+    ]
+  },
+  "ending_guidance": {},
+  "solution": {
+    "question": "",
+    "answer": "Evelyn Blackwood",
+    "answer_aliases": [],
+    "answer_type": "person",
+    "motive": "",
+    "proof_object": "",
+    "proof_sentence": "",
+    "hint_1": "",
+    "hint_2": "",
+    "victory_narration_hook": "",
+    "defeat_narration_hook": ""
+  }
+}

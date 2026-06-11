@@ -34,7 +34,8 @@ from app.web.serializers import (
 # Async sink the runner pushes JSON-able dicts into (e.g. a WebSocket sender).
 SendFn = Callable[[dict], Awaitable[None]]
 
-DEFAULT_MODEL = "qwen2.5:7b"
+DEFAULT_MODEL = "qwen2.5:7b"      # player agents — action selection + intent
+NARRATOR_MODEL = "qwen2.5:14b"   # narrator — creative dialogue, higher quality needed
 
 
 def build_agents(
@@ -112,7 +113,17 @@ async def load_or_generate_storyboard(
     print(f"[runner] Generating storyboard for {world_id} (this may take ~60s)...")
     client = make_storyboard_client(base_url)
     generator = StoryboardGenerator(client)
-    storyboard = await generator.generate(setting, world_id=world_id)
+
+    # Read the mystery anchor from the world JSON if present.
+    mystery: dict = {}
+    try:
+        import json as _json
+        raw = _json.loads(world_path.read_text(encoding="utf-8"))
+        mystery = raw.get("mystery", {}) if isinstance(raw, dict) else {}
+    except Exception:
+        pass
+
+    storyboard = await generator.generate(setting, world_id=world_id, mystery=mystery or None)
 
     if not storyboard.is_empty():
         try:
@@ -128,7 +139,7 @@ async def load_or_generate_storyboard(
 
 def build_narrator(
     *,
-    model: str = DEFAULT_MODEL,
+    model: str = NARRATOR_MODEL,
     base_url: Optional[str] = None,
     temperature: float = 0.8,
     storyboard: Optional[Storyboard] = None,
@@ -165,6 +176,19 @@ class GameRunner:
         self.enforce_candidate_policy = enforce_candidate_policy
         self._orchestrator: GameOrchestrator | None = None
 
+        # Overwrite each AI agent's role/skills with the storyboard's genre-adapted
+        # persona so intent generation matches the story's genre, not the mechanical role.
+        if narrator is not None and not narrator.storyboard.is_empty():
+            for agent in agents:
+                if agent.client is None:
+                    continue  # skip human-controlled agents
+                persona_data = narrator.storyboard.persona_for(agent.persona.name)
+                if persona_data is not None:
+                    agent.apply_storyboard_persona(
+                        world_role=persona_data.world_role,
+                        vocabulary=persona_data.vocabulary,
+                    )
+
     # ------------------------------------------------------------------ #
     # Human-interaction API — delegate to the live orchestrator
     # ------------------------------------------------------------------ #
@@ -185,7 +209,8 @@ class GameRunner:
 
     async def run(self, send: SendFn) -> GameResult:
         """Stream the full game over `send` and return the final result."""
-        await send(setup_message(self.setting))
+        sb = self.narrator.storyboard if self.narrator else None
+        await send(setup_message(self.setting, storyboard=sb))
 
         async def on_event(event: Event) -> None:
             # PLANNER events are internal telemetry — hide from UI.

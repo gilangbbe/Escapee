@@ -12,14 +12,14 @@ from app.schemas.fixed_world import load_setting_compat
 
 
 FIXED_WORLD_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "app", "game", "world_034.json"
+    os.path.dirname(__file__), "..", "app", "game", "world_033.json"
 )
 
 # A structurally-specific world used by the wiring/progression tests below,
 # which assert exact object ids and codes. Pinned independently of the generic
 # FIXED_WORLD_PATH so repointing that constant cannot break these tests.
 STRUCT_WORLD_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "app", "game", "world_034.json"
+    os.path.dirname(__file__), "..", "app", "game", "world_033.json"
 )
 
 

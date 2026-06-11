@@ -1,6 +1,12 @@
 // Message shapes streamed by the backend over the WebSocket. These mirror the
 // dicts produced by backend/app/web/serializers.py.
 
+export interface Suspect {
+  name: string;
+  connection_to_victim: string;
+  apparent_motive: string;
+}
+
 export interface SetupMessage {
   type: "setup";
   scenario: string;
@@ -8,6 +14,9 @@ export interface SetupMessage {
   rooms: string[];
   rules: string[];
   players: PersonaInfo[];
+  suspects: Suspect[];
+  deduction_question: string;
+  proof_object_id: string;
 }
 
 export interface PersonaInfo {

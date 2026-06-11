@@ -77,9 +77,9 @@ def state_snapshot(state: GameState) -> dict:
     }
 
 
-def setup_message(setting: GameSetting) -> dict:
+def setup_message(setting: GameSetting, storyboard=None) -> dict:
     """One-time message describing the scenario + personas before play starts."""
-    return {
+    msg: dict = {
         "type": "setup",
         "scenario": setting.scenario,
         "objective": setting.objective,
@@ -95,10 +95,19 @@ def setup_message(setting: GameSetting) -> dict:
                 "personality": p.personality,
                 "gender": p.gender,
                 "model": p.model,
+                "is_human": p.is_human,
             }
             for p in setting.players
         ],
+        "suspects": [],
+        "deduction_question": "",
+        "proof_object_id": "",
     }
+    if storyboard is not None and not storyboard.is_empty():
+        msg["suspects"] = storyboard.suspects  # is_killer already stripped at load time
+        msg["deduction_question"] = storyboard.solution.question
+        msg["proof_object_id"] = storyboard.mystery.proof_object_id or storyboard.solution.proof_object
+    return msg
 
 
 def result_to_dict(result: GameResult) -> dict:

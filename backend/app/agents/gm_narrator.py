@@ -45,15 +45,25 @@ class GameMasterNarrator:
 
     _recent: list[str] = field(default_factory=list, init=False)
     _used_seeds: set[str] = field(default_factory=set, init=False)
+    _proof_revealed: bool = field(default=False, init=False)
+
+    def reveal_proof(self) -> None:
+        """Flip narrator into revelation mode.
+
+        Called the moment the proof object is discovered. From this point on,
+        the narrator is allowed to name the killer. Before this call, mystery
+        mode is active and the killer's name is suppressed from all dialogue.
+        """
+        self._proof_revealed = True
 
     def _normalize_dialogue_line(self, text: str) -> str:
-        """Extract just the message text from model output.
-
-        Model outputs `Name: "message"` — we strip the name prefix and quotes
-        so the caller gets bare message text. actor_id on the event carries
-        the speaker identity; we don't need it duplicated in the text.
-        """
+        """Extract message text from model output in `Name: "message"` format."""
+        import re
         line = " ".join((text or "").strip().splitlines()).strip()
+        if not line:
+            return "..."
+        # Strip CJK and other non-Latin script characters (model switching to Chinese).
+        line = re.sub(r"[⺀-鿿豈-﫿︰-﹏＀-￯]+", "", line).strip()
         if not line:
             return "..."
 
@@ -74,9 +84,31 @@ class GameMasterNarrator:
         if line.startswith('"') and line.endswith('"') and len(line) > 1:
             line = line[1:-1].strip()
 
+        # Truncate at embedded character-name continuation the model appended.
+        # Pattern: quote/spaces then CapWord CapWord: (a second speaker prefix).
+        # e.g. 'message."   Alex Quinn: "second message' → keep only first part.
+        line = re.split(r'["\s]{2,}[A-Z][a-z]+ [A-Z][a-z]+\s*:', line)[0]
+        line = line.rstrip('"').strip()
+
         # Hard strip forbidden dash characters regardless of model compliance.
         line = line.replace("—", ",").replace("–", ",").replace("--", ",")
 
+        return line or "..."
+
+    def _clean_prose(self, text: str) -> str:
+        """Clean raw prose output (narrator beats) — strip role prefixes and dashes."""
+        import re as _re
+        line = " ".join((text or "").strip().splitlines()).strip()
+        if not line:
+            return "..."
+        line = _re.sub(r"[⺀-鿿豈-﫿︰-﹏＀-￯]+", "", line).strip()
+        if not line:
+            return "..."
+        for prefix in ("assistant:", "narrator:", "prose:"):
+            if line.lower().startswith(prefix):
+                line = line[len(prefix):].strip()
+                break
+        line = line.replace("—", ",").replace("–", ",").replace("--", ",")
         return line or "..."
 
     async def _say(self, user_prompt: str, *, system: str, fallback: str) -> str:
@@ -108,9 +140,8 @@ class GameMasterNarrator:
         speech: str,
         turn_no: int,
     ) -> None:
-        """Store a structured turn record so narrator can see attribution + outcome + speech."""
-        status = "OK" if success else "FAIL"
-        record = f"[Turn {turn_no}] {actor_name} → {action_text} → {status}: \"{speech}\""
+        """Store the character's speech as a chat line so STORY_SO_FAR reads as a conversation."""
+        record = f'{actor_name}: "{speech}"'
         self._recent.append(record)
         if len(self._recent) > self.recent_window:
             self._recent = self._recent[-self.recent_window:]
@@ -161,6 +192,11 @@ class GameMasterNarrator:
         if seed:
             self._used_seeds.add(seed)
 
+        # Prefer storyboard.mystery (authoritative generated source); fall back to solution.answer.
+        killer_name = (
+            (self.storyboard.mystery.killer_name or self.storyboard.solution.answer)
+            if self._proof_revealed else ""
+        )
         line = await self._say(
             build_turn_user_prompt(
                 scenario=scenario,
@@ -182,6 +218,9 @@ class GameMasterNarrator:
                 adapted_world_role=persona.world_role if persona else "",
                 adapted_vocabulary=persona.vocabulary if persona else None,
                 conversation_seed=seed or "",
+                proof_revealed=self._proof_revealed,
+                killer_name=killer_name,
+                suspects_context=self.storyboard.suspects_context(),
             ),
             system=NARRATOR_SYSTEM_PROMPT,
             fallback=f'{actor_name}: "{outcome}"',

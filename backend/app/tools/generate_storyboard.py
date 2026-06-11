@@ -2,9 +2,9 @@
 CLI tool for generating storyboards from world JSON files.
 
 Usage:
-  python -m app.tools.generate_storyboard world_034
-  python -m app.tools.generate_storyboard world_034 --dry-run
-  python -m app.tools.generate_storyboard world_034 --force
+  python -m app.tools.generate_storyboard world_033
+  python -m app.tools.generate_storyboard world_033 --dry-run
+  python -m app.tools.generate_storyboard world_033 --force
   python -m app.tools.generate_storyboard --all
   python -m app.tools.generate_storyboard --all --force
 """
@@ -113,7 +113,7 @@ def main() -> None:
     parser.add_argument(
         "world_id",
         nargs="?",
-        help="World ID to generate (e.g. world_034). Omit when using --all.",
+        help="World ID to generate (e.g. world_033). Omit when using --all.",
     )
     parser.add_argument(
         "--all",

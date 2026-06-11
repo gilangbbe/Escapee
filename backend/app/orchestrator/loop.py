@@ -794,6 +794,13 @@ class GameOrchestrator:
         if not unlocks_desc:
             return  # not plot-critical; no story beat needed
         self._narrated_discoveries.add(obj_id)
+
+        # If this is the proof object, flip narrator to revelation mode BEFORE the
+        # discovery beat fires — the beat itself is the killer-reveal moment.
+        sb = self.narrator.storyboard
+        proof_obj = sb.mystery.proof_object_id or sb.solution.proof_object
+        if proof_obj and obj_id == proof_obj:
+            self.narrator.reveal_proof()
         prose = await self.narrator.narrate_discovery(
             actor_name=actor_name,
             item_id=obj_id,
@@ -909,11 +916,9 @@ class GameOrchestrator:
                 "assumptions, and try a DIFFERENT plan.",
                 turn=self.sim.state.turn,
             )
-            await self._narrate_event(
-                SystemEventKind.CRITICAL_STUCK,
-                actor_name="the team",
-                detail="the team is looping with no progress",
-            )
+            # No narrator beat here — the MOVE action that follows will fire a
+            # room-entry beat, and two consecutive NARRATOR blocks without player
+            # dialogue between them reads as a visual stutter.
 
     async def _narrate_event(
         self,

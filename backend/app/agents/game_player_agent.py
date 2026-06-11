@@ -52,6 +52,23 @@ class GamePlayerAgent:
     def __post_init__(self) -> None:
         self._system_prompt = build_player_system_prompt(self.persona)
 
+    def apply_storyboard_persona(
+        self,
+        world_role: str,
+        vocabulary: list[str],
+    ) -> None:
+        """Overwrite role/skills with storyboard's genre-adapted persona, then rebuild system prompt.
+
+        This must be called before the game loop starts. It ensures the agent's
+        intent generation is grounded in the story's genre (manor mystery, sci-fi, etc.)
+        rather than the raw mechanical role (Systems Operator, Field Analyst, etc.).
+        """
+        if world_role:
+            self.persona.role = world_role
+        if vocabulary:
+            self.persona.skills = list(vocabulary)
+        self._system_prompt = build_player_system_prompt(self.persona)
+
     async def propose_plan(
         self, state: GameState, log: MessageLog, draft_plan: list[str] | None = None
     ) -> list[str]:

@@ -7,6 +7,7 @@ import { SetupPanel } from "./components/SetupPanel";
 import { PersonaConfigPanel } from "./components/PersonaConfigPanel";
 import { HumanTurnPanel } from "./components/HumanTurnPanel";
 import { DeductionPanel } from "./components/DeductionPanel";
+import { CaseFilePanel } from "./components/CaseFilePanel";
 import type { PersonaDraft } from "./types";
 
 const DEFAULT_WS = "ws://localhost:8000";
@@ -54,7 +55,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <h1>🛰 Multi-LLM Escape Room</h1>
+        <h1>🕵 Murder Mystery</h1>
         <div className="controls">
           <label>
             model
@@ -132,6 +133,7 @@ export default function App() {
             {state.deductionPhase ? (
               <DeductionPanel
                 deduction={state.deductionPhase}
+                suspects={state.setup?.suspects ?? []}
                 onSubmit={submitDeduction}
               />
             ) : state.humanTurn ? (
@@ -169,8 +171,9 @@ export default function App() {
 
         {/* ── RIGHT SIDEBAR ── */}
         <aside className="sidebar-right">
+          {/* Investigators strip */}
           <div className="crew-strip">
-            <h3>Crew</h3>
+            <h3>Investigators</h3>
             {state.setup?.players.map((p, i) => {
               const snap = state.snapshot?.players.find((sp) => sp.id === p.id);
               const color = p.is_human
@@ -208,6 +211,13 @@ export default function App() {
               <p className="muted">Configure crew and start a game.</p>
             )}
           </div>
+
+          {/* Case file: suspects + evidence */}
+          <CaseFilePanel
+            suspects={state.setup?.suspects ?? []}
+            proofObjectId={state.setup?.proof_object_id ?? ""}
+            events={state.events}
+          />
 
           <button
             className="debug-toggle"

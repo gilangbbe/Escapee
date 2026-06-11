@@ -1,77 +1,96 @@
 {
   "world_id": "world_033",
-  "generated_at": "2026-06-10T06:21:55.902851+00:00",
+  "generated_at": "2026-06-11T06:28:02.333696+00:00",
   "schema_version": "1",
+  "mystery": {
+    "victim": "",
+    "killer_name": "Isabella Finch",
+    "proof_object_id": "hidden_diary",
+    "motive_hint": ""
+  },
   "plot": {
-    "victim": "The renowned art collector was found dead in their secluded estate, with signs pointing towards a staged accident.",
-    "threat": "Blackwood, a rival collector who has been secretly plotting against the victim for years.",
-    "stakes": "Failure means you might become the next target of Blackwood's wrath.",
-    "timeline": "The night before your arrival, a significant art collection was auctioned off, leaving only the estate as the last known location of the victim.",
-    "tension_hint": "Someone has been watching the collector closely and saw an opportunity to strike when the coast was clear.",
-    "atmosphere": "The air is thick with the smell of old books and a lingering chill from the recent storm, making it hard to shake the feeling that you are being watched.",
-    "protagonist_context": "You were invited as experts to solve a mystery surrounding the collection's disappearance but now find yourself investigating a murder."
+    "victim": "",
+    "threat": "Isabella Finch, whose guilt is concealed beneath a carefully arranged crime scene.",
+    "stakes": "The killer is still close — if the team fails to uncover the truth, they escape forever.",
+    "timeline": "",
+    "tension_hint": "",
+    "atmosphere": "",
+    "protagonist_context": ""
   },
   "adapted_personas": {
     "Alex Quinn": {
-      "world_role": "A meticulous investigator who specializes in tracking down clues under pressure.",
-      "voice": "Observant and methodical, always thinking ahead to the next logical step.",
-      "vocabulary": [
-        "follow the trail",
-        "next move",
-        "clue by clue"
-      ]
+      "world_role": "Field Analyst",
+      "voice": "",
+      "vocabulary": []
     },
     "Riley Sato": {
-      "world_role": "A pragmatic engineer who can restore failing systems quickly and find unique solutions in tight spots.",
-      "voice": "Direct and to-the-point, with a focus on solving problems efficiently.",
-      "vocabulary": [
-        "route the power",
-        "fix it now",
-        "next step"
-      ]
+      "world_role": "Systems Operator",
+      "voice": "",
+      "vocabulary": []
     }
   },
+  "suspects": [
+    {
+      "name": "Jonathan Hale",
+      "connection_to_victim": "Financial Beneficiary",
+      "apparent_motive": "Eleanor Marsh was planning to cut Jonathan's financial support, putting him at risk of bankruptcy."
+    },
+    {
+      "name": "Isabella Finch",
+      "connection_to_victim": "Confidant and Heir Apparent",
+      "apparent_motive": "Eleanor Marsh was planning to reveal that Isabella had been embezzling funds."
+    },
+    {
+      "name": "Richard Langley",
+      "connection_to_victim": "Business Partner",
+      "apparent_motive": "Eleanor Marsh threatened to expose his illegal art dealings."
+    }
+  ],
   "room_stories": {
-    "entry_hall": "The starting point where the murder appears to be staged as an accident.",
-    "parlor": "A room filled with potential clues and signs of recent disturbance.",
-    "study": "Where you find critical evidence that connects Blackwood's involvement in the crime.",
-    "library": "Holds a hidden compartment with a diary revealing the killer’s identity.",
-    "dining_hall": "The final area where you must solve the last puzzle to escape."
+    "entry_hall": "The entry hall is eerily quiet, with a large rug that seems out of place and suspiciously stained.",
+    "parlor": "The parlor holds remnants of burnt incense and darkened piano keys hinting at efforts to obscure the truth.",
+    "study": "In the study lies shattered glass, suggesting an orchestrated attempt to create confusion over Eleanor's death.",
+    "library": "The library houses aged books and a hidden compartment with strange symbols, indicating Eleanor had secrets she wanted protected."
   },
   "discovery_beats": {
-    "shattered_glass": "The sharp shard of glass in the study is covered in dried blood and could be the murder weapon.",
-    "hidden_diary": "In the hidden diary, there are entries detailing Blackwood's obsession with eliminating his competitor and plans for the murder."
+    "bloodstained_rug": "The rug's fibers are matted and sticky, suggesting the presence of blood. It looks as if someone dragged something across it.",
+    "stained_piano_keys": "Dark stains on the piano keys indicate they were used in a violent altercation.",
+    "burnt_incense_bowl": "Ashes and remnants of burnt incense suggest an effort to hide evidence or delay arrival at certain scenes.",
+    "shattered_glass": "The shard lies near where Eleanor Marsh was found. Whoever broke it likely did so to create the illusion of an accident.",
+    "cryptic_ledger": "Symbols within the ledger appear to have a sequence, possibly hinting towards important dates or codes.",
+    "aged_books": "The books are dusty and aged but hold some unusual markings that could lead to further clues elsewhere in the estate.",
+    "hidden_diary": "Inside the diary lies a letter from Eleanor Marsh revealing she intended to expose Isabella Finch's embezzlement, implicating her strongly as the killer.",
+    "locked_diary_compartment": "A strange symbol engraved on this compartment appears familiar to someone who might have knowledge of Eleanor's secret vaults."
   },
   "phase_guidance": {},
   "conversation_seeds": {
     "Alex Quinn": [
-      "I noticed that the stains on both the piano keys and the rug match the dried blood found in the study.",
-      "Blackwood's name kept coming up in the victim's records, especially around the time of the auction."
+      "Jonathan Hale's account of his evening has two gaps that need explaining; he claims to have been painting, but there’s no evidence.",
+      "Richard Langley is an art dealer with a history of shady dealings. He was seen at Eleanor's estate earlier in the week."
     ],
     "Riley Sato": [
-      "The burnt incense bowl might have been used to cover any suspicious smells after the murder was committed.",
-      "If we find the code for the locked compartment in the library, it could contain a crucial piece of evidence."
+      "Isabella Finch worked late in the study and claimed she was organizing documents; however, she had access to Eleanor’s personal items.",
+      "Jonathan Hale owed Eleanor Marsh a significant debt. This could explain his motive for wanting her out of the picture."
     ]
   },
   "ending_guidance": {
-    "won": "You successfully identified Blackwood as the murderer and uncovered his hidden diary that proves his guilt. The killer will never silence you now.",
-    "lost": "Despite your best efforts, you were unable to uncover all the clues in time. Blackwood remains free and ready for another chance to strike.",
-    "lost_by_wrong_deduction": "By naming the wrong person as the murderer, Blackwood was able to escape before being caught."
+    "successful_ending_message": "By piecing together the clues, you've uncovered that Isabella Finch was driven by fear and greed to murder Eleanor Marsh before she could expose her crimes.",
+    "failure_message": "You failed to identify Isabella Finch as the killer. She returns to silence your suspicions forever.",
+    "won": "By piecing together the clues, you've uncovered that Isabella Finch was driven by fear and greed to murder Eleanor Marsh before she could expose her crimes.",
+    "lost": "The truth stays buried. Isabella Finch walks free while the manor keeps its secrets.",
+    "lost_by_wrong_deduction": "The wrong name was called. Isabella Finch slips away."
   },
   "solution": {
-    "question": "Who murdered the art collector?",
-    "answer": "Blackwood",
-    "answer_aliases": [
-      "Theodore Blackwood",
-      "Mr. Blackwood"
-    ],
+    "question": "Who murdered the victim?",
+    "answer": "Isabella Finch",
+    "answer_aliases": [],
     "answer_type": "person",
-    "motive": "Blackwood, a rival collector and former friend of the victim, saw an opportunity to eliminate his competition.",
+    "motive": "",
     "proof_object": "hidden_diary",
-    "proof_sentence": "In the hidden diary, there are entries detailing Blackwood's obsession with eliminating his competitor and plans for the murder.",
-    "hint_1": "Look for clues in places where the collector kept personal items or records of transactions.",
-    "hint_2": "The murderer left behind a significant clue in a place where they believed no one would think to look.",
-    "victory_narration_hook": "You find Blackwood's hidden diary in the library, revealing his obsession and plans for the murder.",
-    "defeat_narration_hook": "By failing to uncover all the evidence, you missed your chance to identify the real murderer before they could strike again."
+    "proof_sentence": "",
+    "hint_1": "Focus on who had both a reason and the opportunity — look at the relationships.",
+    "hint_2": "The proof object holds the answer — check what it reveals about its owner.",
+    "victory_narration_hook": "The evidence points unmistakably to Isabella Finch — every clue was a thread leading here.",
+    "defeat_narration_hook": "The truth stays buried. Isabella Finch walks free while the manor keeps its secrets."
   }
 }

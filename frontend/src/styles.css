@@ -1011,3 +1011,196 @@ code    { color: var(--accent); }
 }
 .deduction-submit:hover:not(:disabled) { background: #e3a83a; }
 .deduction-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─────────────────────────────────────────
+   Suspect picker (inside DeductionPanel)
+   ───────────────────────────────────────── */
+.suspect-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.suspect-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s, background 0.12s;
+  width: 100%;
+}
+.suspect-card:hover {
+  border-color: var(--amber);
+  background: rgba(210, 153, 34, 0.07);
+}
+.suspect-card-selected {
+  border-color: var(--amber) !important;
+  background: rgba(210, 153, 34, 0.14) !important;
+  box-shadow: 0 0 0 2px rgba(210, 153, 34, 0.25);
+}
+
+.suspect-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.suspect-card-motive {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* ─────────────────────────────────────────
+   Case File Panel (right sidebar)
+   ───────────────────────────────────────── */
+.case-file {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.mystery-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 7px;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+.mystery-status-open {
+  background: rgba(139, 148, 158, 0.1);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.mystery-status-revealed {
+  background: rgba(210, 153, 34, 0.12);
+  color: var(--amber);
+  border: 1px solid rgba(210, 153, 34, 0.3);
+}
+.mystery-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: currentColor;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+.mystery-status-revealed .mystery-status-dot { animation: none; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+.case-section {
+  margin-bottom: 14px;
+}
+
+.case-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 0 0 7px;
+}
+
+.evidence-count {
+  background: var(--accent);
+  color: #04121f;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 1px 6px;
+  line-height: 1.5;
+}
+
+.suspects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.suspect-entry {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.suspect-entry-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.suspect-entry-connection {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.suspect-entry-motive {
+  font-size: 11px;
+  color: #c09050;
+  font-style: italic;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.suspect-motive-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--amber);
+  background: rgba(210, 153, 34, 0.12);
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-right: 5px;
+  font-style: normal;
+}
+
+.case-empty {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.evidence-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.evidence-item {
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.45;
+  padding: 5px 8px;
+  background: rgba(63, 185, 80, 0.05);
+  border: 1px solid rgba(63, 185, 80, 0.15);
+  border-left: 2px solid var(--green);
+  border-radius: 0 5px 5px 0;
+}
