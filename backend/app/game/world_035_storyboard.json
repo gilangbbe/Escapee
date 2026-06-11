@@ -1,0 +1,92 @@
+{
+  "world_id": "world_035",
+  "generated_at": "2026-06-11T07:45:46.881188+00:00",
+  "schema_version": "1",
+  "mystery": {
+    "victim": "",
+    "killer_name": "Isabella Finch",
+    "proof_object_id": "faded_letter_inside_trunk",
+    "motive_hint": "The letter inside the trunk contains a coded message that hints at a hidden motive."
+  },
+  "plot": {
+    "victim": "",
+    "threat": "Isabella Finch, whose guilt is concealed beneath a carefully arranged crime scene.",
+    "stakes": "The killer is still close — if the team fails to uncover the truth, they escape forever.",
+    "timeline": "",
+    "tension_hint": "The letter inside the trunk contains a coded message that hints at a hidden motive.",
+    "atmosphere": "",
+    "protagonist_context": ""
+  },
+  "adapted_personas": {
+    "Alex Quinn": {
+      "world_role": "",
+      "voice": "",
+      "vocabulary": []
+    },
+    "Riley Sato": {
+      "world_role": "",
+      "voice": "",
+      "vocabulary": []
+    }
+  },
+  "suspects": [
+    {
+      "name": "Jonathan Hale",
+      "connection_to_victim": "",
+      "apparent_motive": "Victor Marlowe had threatened to expose a scandal involving Jonathan Hale's company. The letter inside the trunk reveals this."
+    },
+    {
+      "name": "Isabella Finch",
+      "connection_to_victim": "",
+      "apparent_motive": "Victor Marlowe had promised to bequeath a significant portion of his estate to Isabella, but recent documents suggest he was reconsidering. The faded letter proves she visited him on the night of the murder."
+    }
+  ],
+  "room_stories": {
+    "entry_hall": "Victor Marlowe's entry hall is filled with antique furniture and art, all frozen in time since his death. A heavy antique trunk stands in the corner, hinting at secrets within.",
+    "study": "Marlowe's study is cluttered but organized, reflecting the meticulous nature of its owner. Hidden behind a cabinet lies a cabinet that opens to reveal even more hidden items."
+  },
+  "discovery_beats": {
+    "faded_letter_inside_trunk": "The evidence here bears Isabella Finch's mark — this is the moment the investigation breaks open.",
+    "copper_key_with_carved_ornament": {
+      "id": "copper_key_with_carved_ornament",
+      "description": "The copper key is still warm to the touch, indicating it was placed here recently. The intricate floral patterns suggest a connection to the collector's extensive artwork collection.",
+      "clue_type": "key"
+    },
+    "silver_key_with_engraved_initials": {
+      "id": "silver_key_with_engraved_initials",
+      "description": "The slender silver key is engraved with an initial 'E'. It matches Isabella Finch's signature style, and it's warm to the touch, suggesting recent use.",
+      "clue_type": "key"
+    }
+  },
+  "phase_guidance": {},
+  "conversation_seeds": {
+    "Alex Quinn": [
+      "Jonathan Hale was in Victor Marlowe’s study a day before the murder — he might have left something behind.",
+      "Isabella Finch had access to the estate at unusual hours. She could be hiding more than just grief."
+    ],
+    "Riley Sato": [
+      "The portrait frame being sealed suggests someone wanted it hidden or tampered with. Jonathan Hale visited often and could know its significance.",
+      "The cabinet in the study was recently broken into, but only Isabella Finch had access to a key that matches the initials on the lock."
+    ]
+  },
+  "ending_guidance": {
+    "uncover_the_truth": "Before it's too late, uncover the hidden motives and identify Victor Marlowe's killer.",
+    "time_sensitive": "The estate will be sealed soon; act quickly to gather evidence before it’s lost forever.",
+    "won": "The evidence points unmistakably to Isabella Finch — every clue was a thread leading here.",
+    "lost": "The truth stays buried. Isabella Finch walks free while the manor keeps its secrets.",
+    "lost_by_wrong_deduction": "The wrong name was called. Isabella Finch slips away."
+  },
+  "solution": {
+    "question": "Who murdered the victim?",
+    "answer": "Isabella Finch",
+    "answer_aliases": [],
+    "answer_type": "person",
+    "motive": "The letter inside the trunk contains a coded message that hints at a hidden motive.",
+    "proof_object": "faded_letter_inside_trunk",
+    "proof_sentence": "",
+    "hint_1": "Focus on who had both a reason and the opportunity — look at the relationships.",
+    "hint_2": "The proof object holds the answer — check what it reveals about its owner.",
+    "victory_narration_hook": "The evidence points unmistakably to Isabella Finch — every clue was a thread leading here.",
+    "defeat_narration_hook": "The truth stays buried. Isabella Finch walks free while the manor keeps its secrets."
+  }
+}

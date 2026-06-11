@@ -1,0 +1,249 @@
+{
+  "world": {
+    "scenario": "A renowned art curator has been found dead in their secluded mansion, the scene of the crime a tableau of chaos and silent accusation. The house, once a sanctuary of culture and refinement, now breathes only with the whisper of secrets and the scent of decay. As the only person with access to the curator’s private journals and a key to the final locked room, you must uncover the truth before the killer strikes again.",
+    "objective": "Uncover the identity of the murderer and prevent them from escaping the mansion with the curator’s final secret.",
+    "rooms": [
+      {
+        "id": "entry_hall",
+        "description": "The entry hall is thick with the musty scent of old wood and the metallic tang of rusted chains. A single flickering chandelier casts jagged shadows across the floor, where a pool of dark liquid glistens under the light.",
+        "adjacency": {
+          "north": "study"
+        },
+        "goal": "Get grand_entrance_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "grand_entrance_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "grand_entrance_door"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "The study reeks of old paper and burning incense, as if someone tried to mask the stench of something far worse. A shattered stained-glass window casts fractured light over a heavy oak desk, its drawers mysteriously jammed.",
+        "adjacency": {
+          "south": "entry_hall",
+          "east": "library"
+        },
+        "goal": "Get goal_study_2 into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "goal_study_2",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "goal_study_2"
+        ]
+      },
+      {
+        "id": "library",
+        "description": "The library is heavy with the scent of old leather and the faint, acrid smell of spilled wine. Dust motes swirl in the air, illuminated by a single, dim overhead bulb, while a locked iron gate blocks the way to the final room.",
+        "adjacency": {
+          "west": "study",
+          "north": "final_chamber"
+        },
+        "goal": "Get mahogany_door into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "mahogany_door",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "mahogany_door"
+        ]
+      },
+      {
+        "id": "final_chamber",
+        "description": "The final chamber is cold and dry, filled with the sharp scent of ozone and the faint metallic taste of blood on the air. A single mirror reflects a shadow that does not move, while a sealed lead box sits on a pedestal, untouched by time or decay.",
+        "adjacency": {
+          "south": "library"
+        },
+        "goal": "Get curator_s_final_lockbox into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "curator_s_final_lockbox",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "curator_s_final_lockbox"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "curator_silver_case",
+        "location": "entry_hall",
+        "description": "A small, ornate silver case rests on a pedestal, its surface engraved with the curator's initials and a faded emblem of an art gallery. It appears to be locked with a delicate latch that requires a specific key to open.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "brass_key_fob"
+      },
+      {
+        "id": "brass_key_fob",
+        "location": "entry_hall",
+        "description": "A polished brass key fob hangs from a thin chain, its surface engraved with an elegant monogram that matches the silver case. It feels warm to the touch, as if it has been handled often.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "grand_entrance_door",
+        "location": "entry_hall",
+        "description": "A massive, gilded double door stands at the far end of the entry hall, its surface covered in intricate carvings of art and history. A thick curtain of dust covers its surface, and a faint light flickers from behind it, as if something is watching.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_power": "sekring_A_ON"
+      },
+      {
+        "id": "ancient_electric_box",
+        "location": "curator_silver_case",
+        "description": "An old electric box, its wooden casing warped with age and covered in peeling paint. Inside, a single switch is visible, labeled in faded lettering that reads 'Main Power.' It looks as though it hasn't been touched in years.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "fuses": {
+          "A": "OFF"
+        }
+      },
+      {
+        "id": "goal_study_1",
+        "location": "study",
+        "description": "A locked compartment — forcing it open reveals something useful.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_power": "sekring_G_ON"
+      },
+      {
+        "id": "fuse_box_old_mansions_electrical",
+        "location": "study",
+        "description": "A small, dusty fuse box is mounted on the wall, its cover slightly ajar. Inside, a tangle of old wires and faded labels hint at a long-forgotten electrical system. A single switch, marked 'G', is visible, though its purpose is unclear.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "fuses": {
+          "G": "OFF"
+        }
+      },
+      {
+        "id": "goal_study_2",
+        "location": "study",
+        "description": "A stubbornly locked fixture — the heart of this room's puzzle.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_power": "sekring_A_ON"
+      },
+      {
+        "id": "hidden_power_box_under_floor",
+        "location": "goal_study_1",
+        "description": "Hidden beneath a loose floorboard, this small power box is covered in dust and cobwebs. A single switch, labeled 'A', is mounted on its front, and the faint hum of distant machinery suggests it may still be operational.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "fuses": {
+          "A": "OFF"
+        }
+      },
+      {
+        "id": "obsidian_lockbox",
+        "location": "library",
+        "description": "A heavy obsidian lockbox rests on a pedestal, its surface etched with the curator's initials and a strange, unbroken seal. It radiates an air of secrecy, as though it guards something that must remain hidden.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "9529",
+        "code_digits": 4
+      },
+      {
+        "id": "clue_library_1",
+        "location": "library",
+        "description": "A scrap of writing — study it and a hidden code reveals itself.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "9529"
+      },
+      {
+        "id": "mahogany_door",
+        "location": "library",
+        "description": "A massive mahogany door blocks the way forward, its ornate carvings depicting scenes of art and betrayal. It is reinforced with iron bolts and hinges that have not been touched in years.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "tool_library_1"
+      },
+      {
+        "id": "tool_library_1",
+        "location": "obsidian_lockbox",
+        "description": "A handy implement, just the thing for prying something open.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "locked_ancient_trunk",
+        "location": "final_chamber",
+        "description": "A massive, timeworn trunk forged from dark mahogany and iron bands, its surface scarred by age and neglect. The lid is sealed with rusted bolts and a tarnished brass lock, whispering of secrets long buried.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_power": "sekring_H_ON"
+      },
+      {
+        "id": "panel_final_chamber_1",
+        "location": "final_chamber",
+        "description": "A fuse panel with a switch that controls power to the room.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "fuses": {
+          "H": "OFF"
+        }
+      },
+      {
+        "id": "curator_s_final_lockbox",
+        "location": "final_chamber",
+        "description": "A solid oak lockbox, its surface carved with intricate symbols and the curator's initials. It rests on a pedestal of black marble, as if waiting for the final key to release its deadly secret.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "curator_s_hidden_key"
+      },
+      {
+        "id": "curator_s_hidden_key",
+        "location": "locked_ancient_trunk",
+        "description": "A small, tarnished key hidden within the ancient trunk, its surface engraved with the curator's monogram. Though worn, it bears the unmistakable shape of a key meant to open the final lockbox.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      }
+    ],
+    "rules": [],
+    "solution_path": [
+      "1. [entry_hall] take brass_key_fob — took brass_key_fob",
+      "2. [entry_hall] use_tool curator_silver_case — used brass_key_fob on curator_silver_case → unlocked",
+      "3. [entry_hall] flip_fuse ancient_electric_box A — flipped fuse A on ancient_electric_box → ON",
+      "4. [entry_hall] open grand_entrance_door — power sekring_A_ON satisfied → grand_entrance_door unlocked",
+      "5. [entry_hall] go study — moved to study",
+      "6. [study] open goal_study_2 — power sekring_A_ON satisfied → goal_study_2 unlocked",
+      "7. [study] go library — moved to library",
+      "8. [library] examine clue_library_1 — examined clue_library_1; learned 9529",
+      "9. [library] enter_code obsidian_lockbox — entered code 9529 → obsidian_lockbox unlocked",
+      "10. [library] take tool_library_1 — took tool_library_1",
+      "11. [library] use_tool mahogany_door — used tool_library_1 on mahogany_door → unlocked",
+      "12. [library] go final_chamber — moved to final_chamber",
+      "13. [final_chamber] flip_fuse panel_final_chamber_1 H — flipped fuse H on panel_final_chamber_1 → ON",
+      "14. [final_chamber] open locked_ancient_trunk — power sekring_H_ON satisfied → locked_ancient_trunk unlocked",
+      "15. [final_chamber] take curator_s_hidden_key — took curator_s_hidden_key",
+      "16. [final_chamber] use_tool curator_s_final_lockbox — used curator_s_hidden_key on curator_s_final_lockbox → unlocked"
+    ],
+    "win_condition": {
+      "object_id": "curator_s_final_lockbox",
+      "state": "unlocked"
+    }
+  }
+}

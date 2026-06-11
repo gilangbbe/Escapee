@@ -1,0 +1,128 @@
+{
+  "world": {
+    "scenario": "A renowned art collector has been found dead in their grand estate, a place frozen in time since the tragedy. The police have ruled it a suicide, but the evidence tells a different story. The only way to uncover the truth is to piece together the events of that night, unravel the hidden motives, and find the killer before the body is moved and the clues are lost forever.",
+    "objective": "Uncover the truth behind the murder before the police arrive and the estate is sealed forever.",
+    "rooms": [
+      {
+        "id": "entry_hall",
+        "description": "The entry hall is thick with the scent of old wood and damp stone, as if the house itself has been holding its breath for years. A single chandelier hangs in the center, its crystals dulled with grime, casting jagged shadows across the cracked marble floor.",
+        "adjacency": {
+          "north": "study"
+        },
+        "goal": "Get portrait_frame_locked_with_cable into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "portrait_frame_locked_with_cable",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "portrait_frame_locked_with_cable"
+        ]
+      },
+      {
+        "id": "study",
+        "description": "The study is heavy with the scent of aged paper and spilled ink, the air thick with the ghost of someone's last moments. A shattered inkwell lies on the floor, its black liquid pooling near a desk where a half-written letter is still clutched in a trembling hand.",
+        "adjacency": {
+          "south": "entry_hall"
+        },
+        "goal": "Get locked_music_box_on_rosewood_table into the 'unlocked' state.",
+        "goal_completion": {
+          "type": "object_state",
+          "object_id": "locked_music_box_on_rosewood_table",
+          "state": "unlocked"
+        },
+        "key_objects": [
+          "locked_music_box_on_rosewood_table"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "id": "antique_trunk_with_bronze_lock",
+        "location": "entry_hall",
+        "description": "A heavy, antique trunk stands in the corner, its lid slightly ajar. The bronze lock is tarnished but intact, and faint scratches line the edges as if someone tried to force it open long ago.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "copper_key_with_carved_ornament"
+      },
+      {
+        "id": "copper_key_with_carved_ornament",
+        "location": "entry_hall",
+        "description": "A small, copper key lies on the floor near the trunk. Its surface is etched with intricate floral patterns, the engraving worn but still visible under the dim candlelight.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "portrait_frame_locked_with_cable",
+        "location": "entry_hall",
+        "description": "A grand portrait of the late art collector hangs on the wall, but the frame is sealed with thick, black cable. The glass is intact, and the edges of the frame are slightly warped as if something was recently removed.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_code": "2045",
+        "code_digits": 4
+      },
+      {
+        "id": "faded_letter_inside_trunk",
+        "location": "antique_trunk_with_bronze_lock",
+        "description": "Inside the trunk, partially buried beneath layers of faded velvet, is a yellowed letter. The ink is smudged in places, but the faint outlines of numbers and symbols can be seen on the back of the page.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": false,
+        "contains_info": "2045"
+      },
+      {
+        "id": "oaken_cabinet_with_glass_doors",
+        "location": "study",
+        "description": "A tall, oaken cabinet with glass doors sits in the center of the room. The doors are slightly ajar, revealing a faint glimmer of silver inside. The lock on the cabinet is broken, but the hinges are still intact.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "silver_key_with_engraved_initials"
+      },
+      {
+        "id": "silver_key_with_engraved_initials",
+        "location": "study",
+        "description": "A slender silver key rests on a velvet-lined tray inside the cabinet. Its handle is engraved with a single letter, 'E,' and the key is warm to the touch, as if recently used.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      },
+      {
+        "id": "locked_music_box_on_rosewood_table",
+        "location": "study",
+        "description": "A small, ornate music box sits on a rosewood table, its lid slightly open. The box is locked with a delicate glass keyhole, and the inside is lined with velvet. A single, tiny button is visible, but it is unresponsive.",
+        "state": "locked",
+        "interactable": true,
+        "takeable": false,
+        "requires_tool": "tarnished_glass_key_inside_cabinet"
+      },
+      {
+        "id": "tarnished_glass_key_inside_cabinet",
+        "location": "oaken_cabinet_with_glass_doors",
+        "description": "A tarnished glass key lies hidden beneath a loose panel inside the cabinet. It is delicate and fragile, its edges slightly cracked, but it still gleams faintly in the light.",
+        "state": "visible",
+        "interactable": true,
+        "takeable": true
+      }
+    ],
+    "rules": [],
+    "solution_path": [
+      "1. [entry_hall] take copper_key_with_carved_ornament — took copper_key_with_carved_ornament",
+      "2. [entry_hall] use_tool antique_trunk_with_bronze_lock — used copper_key_with_carved_ornament on antique_trunk_with_bronze_lock → unlocked",
+      "3. [entry_hall] examine faded_letter_inside_trunk — examined faded_letter_inside_trunk; learned 2045",
+      "4. [entry_hall] enter_code portrait_frame_locked_with_cable — entered code 2045 → portrait_frame_locked_with_cable unlocked",
+      "5. [entry_hall] go study — moved to study",
+      "6. [study] take silver_key_with_engraved_initials — took silver_key_with_engraved_initials",
+      "7. [study] use_tool oaken_cabinet_with_glass_doors — used silver_key_with_engraved_initials on oaken_cabinet_with_glass_doors → unlocked",
+      "8. [study] take tarnished_glass_key_inside_cabinet — took tarnished_glass_key_inside_cabinet",
+      "9. [study] use_tool locked_music_box_on_rosewood_table — used tarnished_glass_key_inside_cabinet on locked_music_box_on_rosewood_table → unlocked"
+    ],
+    "win_condition": {
+      "object_id": "locked_music_box_on_rosewood_table",
+      "state": "unlocked"
+    }
+  }
+}

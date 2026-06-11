@@ -1,0 +1,95 @@
+{
+  "world_id": "world_036",
+  "generated_at": "2026-06-11T08:18:20.237112+00:00",
+  "schema_version": "1",
+  "mystery": {
+    "victim": "",
+    "killer_name": "Claude Delacroix",
+    "proof_object_id": "curator_s_final_lockbox",
+    "motive_hint": "The curator's final secret held the key to a valuable art forgery scheme."
+  },
+  "plot": {
+    "victim": "",
+    "threat": "Claude Delacroix, whose guilt is concealed beneath a carefully arranged crime scene.",
+    "stakes": "The killer is still close — if the team fails to uncover the truth, they escape forever.",
+    "timeline": "",
+    "tension_hint": "The curator's final secret held the key to a valuable art forgery scheme.",
+    "atmosphere": "",
+    "protagonist_context": ""
+  },
+  "adapted_personas": {
+    "Alex Quinn": {
+      "world_role": "Alex Quinn investigates by reading the physical scene — looking for what was moved, what is missing, and what someone left behind.",
+      "voice": "Precise and observational — states what the evidence implies, not what they feel.",
+      "vocabulary": [
+        "who had access",
+        "this was deliberate",
+        "something is missing here"
+      ]
+    },
+    "Riley Sato": {
+      "world_role": "Riley Sato investigates by reading the physical scene — looking for what was moved, what is missing, and what someone left behind.",
+      "voice": "Precise and observational — states what the evidence implies, not what they feel.",
+      "vocabulary": [
+        "who had access",
+        "this was deliberate",
+        "something is missing here"
+      ]
+    }
+  },
+  "suspects": [
+    {
+      "name": "Isabella Finch",
+      "connection_to_victim": "Known to the victim and had recent contact before the crime.",
+      "apparent_motive": "Discovered the curator's forgery scheme and threatened to expose it."
+    },
+    {
+      "name": "Claude Delacroix",
+      "connection_to_victim": "Closely connected to the victim and present at the scene.",
+      "apparent_motive": "The curator owed Claude money from a previous forgery deal that went south."
+    }
+  ],
+  "room_stories": {
+    "entry_hall": "The entry hall serves as a grim reminder of what was lost — each piece of artwork seems to whisper tales of its creator's fate.",
+    "study": "Books and papers litter the floor, suggesting a frantic search for something crucial. The curator's final thoughts are scattered like confetti across this room.",
+    "library": "The library is more than just a collection of books; it's a repository of secrets. Each lock and hidden key tells its own story of betrayal and trust.",
+    "final_chamber": "In the final chamber, the truth lies in wait. Unlocking it will expose not only the curator's secret but also the killer’s intentions."
+  },
+  "discovery_beats": {
+    "brass_key_fob": "The key is still warm — whoever placed it left this room within the hour.",
+    "curator_s_hidden_key": "A tarnished, yet unmistakable key; its shape and monogram match the final lockbox. It seems the curator trusted no one with this secret but himself.",
+    "clue_library_1": "The hidden code reveals a map to an ancient artifact — Isabella Finch's account of being elsewhere on the night of the murder doesn't hold up.",
+    "curator_s_final_lockbox": "The evidence here bears Claude Delacroix's mark — this is the moment the investigation breaks open."
+  },
+  "phase_guidance": {},
+  "conversation_seeds": {
+    "Alex Quinn": [
+      "Isabella Finch was last seen with the curator; her story about leaving early seems dubious.",
+      "Claude Delacroix owed a significant debt to Eugene Thompson from an earlier transaction. He has motive but no alibi."
+    ],
+    "Riley Sato": [
+      "Isabella Finch's recent articles have been critical of Eugene Thompson, making her a likely suspect.",
+      "The curator's hidden key was found by Claude Delacroix's locked trunk — he must know something about the final lockbox."
+    ]
+  },
+  "ending_guidance": {
+    "prevent_escape": "Use the final key to unlock the curator's secret and confront Claude in the final chamber before he escapes.",
+    "resolution": "Uncover the curator's hidden forgery scheme, exposing Claude's true intentions and revealing his guilt.",
+    "won": "Use the final key to unlock the curator's secret and confront Claude in the final chamber before he escapes.",
+    "lost": "The truth stays buried. Claude Delacroix walks free while the manor keeps its secrets.",
+    "lost_by_wrong_deduction": "The wrong name was called. Claude Delacroix slips away."
+  },
+  "solution": {
+    "question": "Who murdered the victim?",
+    "answer": "Claude Delacroix",
+    "answer_aliases": [],
+    "answer_type": "person",
+    "motive": "The curator's final secret held the key to a valuable art forgery scheme.",
+    "proof_object": "curator_s_final_lockbox",
+    "proof_sentence": "",
+    "hint_1": "Focus on who had both a reason and the opportunity — look at the relationships.",
+    "hint_2": "The proof object holds the answer — check what it reveals about its owner.",
+    "victory_narration_hook": "The evidence points unmistakably to Claude Delacroix — every clue was a thread leading here.",
+    "defeat_narration_hook": "The truth stays buried. Claude Delacroix walks free while the manor keeps its secrets."
+  }
+}

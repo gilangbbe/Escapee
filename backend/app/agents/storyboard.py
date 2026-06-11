@@ -49,11 +49,13 @@ class StoryboardMystery:
 
     @classmethod
     def from_dict(cls, d: dict) -> "StoryboardMystery":
+        def _s(v) -> str:
+            return v if isinstance(v, str) else ""
         return cls(
-            victim=d.get("victim", ""),
-            killer_name=d.get("killer_name", ""),
-            proof_object_id=d.get("proof_object_id", ""),
-            motive_hint=d.get("motive_hint", ""),
+            victim=_s(d.get("victim")),
+            killer_name=_s(d.get("killer_name")),
+            proof_object_id=_s(d.get("proof_object_id")),
+            motive_hint=_s(d.get("motive_hint")),
         )
 
     def to_dict(self) -> dict:
@@ -125,18 +127,20 @@ class StoryboardSolution:
 
     @classmethod
     def from_dict(cls, d: dict) -> "StoryboardSolution":
+        def _s(v) -> str:
+            return v if isinstance(v, str) else ""
         return cls(
-            question=d.get("question", ""),
-            answer=d.get("answer", ""),
-            answer_aliases=d.get("answer_aliases", []),
-            answer_type=d.get("answer_type", "person"),
-            motive=d.get("motive", ""),
-            proof_object=d.get("proof_object", ""),
-            proof_sentence=d.get("proof_sentence", ""),
-            hint_1=d.get("hint_1", ""),
-            hint_2=d.get("hint_2", ""),
-            victory_narration_hook=d.get("victory_narration_hook", ""),
-            defeat_narration_hook=d.get("defeat_narration_hook", ""),
+            question=_s(d.get("question")),
+            answer=_s(d.get("answer")),
+            answer_aliases=[a for a in d.get("answer_aliases", []) if isinstance(a, str)],
+            answer_type=_s(d.get("answer_type")) or "person",
+            motive=_s(d.get("motive")),
+            proof_object=_s(d.get("proof_object")),
+            proof_sentence=_s(d.get("proof_sentence")),
+            hint_1=_s(d.get("hint_1")),
+            hint_2=_s(d.get("hint_2")),
+            victory_narration_hook=_s(d.get("victory_narration_hook")),
+            defeat_narration_hook=_s(d.get("defeat_narration_hook")),
         )
 
     def to_dict(self) -> dict:
@@ -350,15 +354,27 @@ class Storyboard:
                 for s in data.get("suspects", [])
                 if isinstance(s, dict) and s.get("name")
             ],
-            room_stories=data.get("room_stories", {}),
-            discovery_beats=data.get("discovery_beats", {}),
-            phase_guidance=data.get("phase_guidance", {}),
+            room_stories={
+                k: v if isinstance(v, str) else ""
+                for k, v in data.get("room_stories", {}).items()
+            },
+            discovery_beats={
+                k: v if isinstance(v, str) else ""
+                for k, v in data.get("discovery_beats", {}).items()
+            },
+            phase_guidance={
+                k: v if isinstance(v, str) else ""
+                for k, v in data.get("phase_guidance", {}).items()
+            },
             conversation_seeds={
                 name: [s for s in seeds if isinstance(s, str)]
                 for name, seeds in data.get("conversation_seeds", {}).items()
                 if isinstance(seeds, list)
             },
-            ending_guidance=data.get("ending_guidance", {}),
+            ending_guidance={
+                k: v if isinstance(v, str) else ""
+                for k, v in data.get("ending_guidance", {}).items()
+            },
             solution=StoryboardSolution.from_dict(solution_raw),
         )
 

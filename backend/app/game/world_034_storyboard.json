@@ -1,0 +1,101 @@
+{
+  "world_id": "world_034",
+  "generated_at": "2026-06-11T07:20:40.170109+00:00",
+  "schema_version": "1",
+  "mystery": {
+    "victim": "Eleanor Blackwood, a wealthy widow who hosted the guests before being found murdered in her study.",
+    "killer_name": "Isabella Finch",
+    "proof_object_id": "whispering_books",
+    "motive_hint": "The killer's motive is deeply rooted in a long-standing rivalry with Eleanor."
+  },
+  "plot": {
+    "victim": "Eleanor Blackwood, a wealthy widow who hosted the guests before being found murdered in her study.",
+    "threat": "Isabella Finch, whose guilt is concealed beneath a carefully arranged crime scene.",
+    "stakes": "The killer is still close — if the team fails to uncover the truth, they escape forever.",
+    "timeline": "",
+    "tension_hint": "The killer's motive is deeply rooted in a long-standing rivalry with Eleanor.",
+    "atmosphere": "",
+    "protagonist_context": ""
+  },
+  "adapted_personas": {
+    "Alex Quinn": {
+      "world_role": "A meticulous investigator tracking down leads and piecing together the puzzle of Eleanor's murder.",
+      "voice": "",
+      "vocabulary": [
+        "bloodstains suggest",
+        "violent struggle",
+        "fingerprints confirm"
+      ]
+    },
+    "Riley Sato": {
+      "world_role": "An astute detective following clues under pressure, restoring order amidst chaos in the crumbling manor.",
+      "voice": "",
+      "vocabulary": [
+        "timing of events",
+        "sequence of footprints",
+        "access to study"
+      ]
+    }
+  },
+  "suspects": [
+    {
+      "name": "Jonathan Hale",
+      "connection_to_victim": "",
+      "apparent_motive": "Owes Eleanor a significant debt that could ruin him financially."
+    },
+    {
+      "name": "Isabella Finch",
+      "connection_to_victim": "",
+      "apparent_motive": "Long-standing rivalry with Eleanor, who humiliated her publicly several years ago."
+    },
+    {
+      "name": "Charles Blackwood",
+      "connection_to_victim": "",
+      "apparent_motive": "Eleanor's estranged brother, whose inheritance would be affected if she died without a will."
+    }
+  ],
+  "room_stories": {
+    "foyer_entry": "The entryway is filled with echoes of past guests and visitors who have come and gone. Each piece of furniture holds a story.",
+    "parlor_room": "A room full of whispers about Eleanor’s past, hidden within the shadows cast by old paintings and artifacts.",
+    "study_corridor": "A passage lined with portraits and memories of those who’ve walked these halls, holding secrets to be unlocked.",
+    "library_chamber": "The library's books whisper tales of old betrayals and hidden truths, awaiting an eager ear to uncover them."
+  },
+  "discovery_beats": {
+    "ornate_mirror": "The mirror shows shifting images when looked at closely, but it's the reflection of a bloodstained floor that catches your eye.",
+    "cipher_bookshelf": "Under certain light, the cipher on the bookshelf reveals hidden messages that could lead to Eleanor’s secrets.",
+    "whispering_books": "As you listen closely, the book whispers secrets revealing Isabella Finch as the murderer.",
+    "hidden_key": "A small key is discovered under a bloodstained floorboard, leading to a locked desk with crucial documents.",
+    "murderer_mask": "The mask hanging in the attic seems out of place, hinting at its maker's dark intentions."
+  },
+  "phase_guidance": {},
+  "conversation_seeds": {
+    "Alex Quinn": [
+      "Jonathan Hale was the last to see Eleanor before she died — his story about leaving early has several inconsistencies.",
+      "Charles Blackwood’s presence at dinner and his late-night departure raise questions about what he might have witnessed or concealed."
+    ],
+    "Riley Sato": [
+      "Isabella Finch had a history with Eleanor that goes back years — her account of their final meeting is vague and evasive.",
+      "The locked desk in the study holds documents signed by both Isabella and Eleanor, suggesting a complex relationship between them."
+    ]
+  },
+  "ending_guidance": {
+    "conclusion": "By uncovering the truth about Eleanor's murder, you prevent Isabella Finch from striking again. The manor’s secrets are revealed, but at great personal cost to all involved.",
+    "outcome": "Your investigation leads to the discovery of Isabella Finch as the killer, ensuring her arrest before she can harm another guest.",
+    "won": "By uncovering the truth about Eleanor's murder, you prevent Isabella Finch from striking again. The manor’s secrets are revealed, but at great personal cost to all involved.",
+    "lost": "The truth stays buried. Isabella Finch walks free while the manor keeps its secrets.",
+    "lost_by_wrong_deduction": "The wrong name was called. Isabella Finch slips away."
+  },
+  "solution": {
+    "question": "Who murdered Eleanor Blackwood?",
+    "answer": "Isabella Finch",
+    "answer_aliases": [],
+    "answer_type": "person",
+    "motive": "The killer's motive is deeply rooted in a long-standing rivalry with Eleanor.",
+    "proof_object": "whispering_books",
+    "proof_sentence": "",
+    "hint_1": "Focus on who had both a reason and the opportunity — look at the relationships.",
+    "hint_2": "The proof object holds the answer — check what it reveals about its owner.",
+    "victory_narration_hook": "The evidence points unmistakably to Isabella Finch — every clue was a thread leading here.",
+    "defeat_narration_hook": "The truth stays buried. Isabella Finch walks free while the manor keeps its secrets."
+  }
+}

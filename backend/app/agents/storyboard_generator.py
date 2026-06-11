@@ -50,9 +50,9 @@ Generate sections IN ORDER — the most critical sections come first.
 
 {
   "mystery": {
-    "victim": "Full sentence. Who was killed, when, and how — a specific named person.",
-    "killer_name": "Full name of the murderer — must match solution.answer exactly.",
-    "proof_object_id": "The object_id from WORLD_DATA.plot_objects that is the irrefutable proof. Must have clue_type='story_clue'. Choose this FIRST — everything else flows from it.",
+    "victim": "Full name of the person killed — e.g. 'Dr. Clara Morse was found dead in the library at dawn'.",
+    "killer_name": "Full name of the murderer — must match solution.answer exactly. Invent a name specific to THIS world's scenario.",
+    "proof_object_id": "COPY the exact `id` string from one WORLD_DATA.plot_objects entry with clue_type='story_clue'. This is the id field — NOT the description. E.g. if the object has id 'curator_s_final_lockbox', write 'curator_s_final_lockbox'.",
     "motive_hint": "1 sentence. The killer's motive — specific but not enough to spoil immediately."
   },
 
@@ -62,7 +62,7 @@ Generate sections IN ORDER — the most critical sections come first.
     "answer_aliases": ["alternative", "phrasings", "accepted"],
     "answer_type": "one of: person / object / location / code",
     "motive": "2 sentences. Full explanation shown only AFTER win.",
-    "proof_object": "Must equal mystery.proof_object_id exactly.",
+    "proof_object": "Must equal mystery.proof_object_id exactly — the id string, not the description.",
     "proof_sentence": "1 sentence. What that evidence specifically proves.",
     "hint_1": "Vague hint after the human's FIRST wrong guess — directional, not spoiling.",
     "hint_2": "More specific hint after the SECOND wrong guess — still no direct spoiler.",
@@ -72,26 +72,45 @@ Generate sections IN ORDER — the most critical sections come first.
 
   "suspects": [
     {
-      "name": "Full name of a plausible suspect (may be invented or from world context)",
+      "name": "Full name of a plausible suspect — invent names specific to THIS world's scenario",
       "connection_to_victim": "1 sentence. How this person knew the victim.",
       "apparent_motive": "1 sentence. Why they might have done it — plausible even if they are innocent.",
       "is_killer": true
     },
     {
-      "name": "A second plausible suspect — a red herring",
+      "name": "A second plausible suspect — a red herring. Use a DIFFERENT name, not from the examples.",
       "connection_to_victim": "1 sentence.",
       "apparent_motive": "1 sentence. Their motive should seem credible for the first half of the game.",
       "is_killer": false
     }
   ],
 
+  "discovery_beats": {
+    "<object_id with clue_type='key'>": "2 sentences. Physical detail + what its presence implies. End on who might have left it or why. Do NOT name any suspect.",
+    "<object_id with clue_type='story_clue' NOT proof>": "2 sentences. Name ONE suspect (not the killer) and connect this evidence to them. Use the ACTUAL suspect names from your suspects list above.",
+    "<object_id matching mystery.proof_object_id>": "2 sentences. REVELATION — name mystery.killer_name (from your mystery block above). State what this proves. Use the ACTUAL killer name you chose, not an example name."
+  },
+
+  "conversation_seeds": {
+    "<character name from WORLD_DATA.players>": [
+      "Seed 1: Names a suspect by their full name and connects physical evidence to them. Do NOT name the killer as killer.",
+      "Seed 2: A different angle — names a different suspect, or probes motive/alibi. Use ACTUAL suspect names from your suspects list."
+    ]
+  },
+
+  "ending_guidance": {
+    "won": "2 sentences. Emotional close for victory. Names the killer (use the name from your mystery block).",
+    "lost": "2 sentences. Emotional close for failure. Specific to this world.",
+    "lost_by_wrong_deduction": "1 sentence. The killer escaped because the wrong name was called."
+  },
+
   "plot": {
     "victim": "1 sentence. Who was harmed/lost, when, and how — with a specific name.",
     "threat": "1 sentence. The antagonist or danger — CONCRETE, not 'the unknown'.",
-    "stakes": "1 sentence. What happens if the team fails. Do NOT name the killer or any suspect — say 'the murderer', 'the killer', or 'whoever is responsible'.",
+    "stakes": "1 sentence. What happens if the team fails. Do NOT name the killer or any suspect.",
     "timeline": "2 sentences. Key events BEFORE the players arrived.",
     "tension_hint": "1 sentence. Vague hint at the hidden motive — not enough to spoil.",
-    "atmosphere": "2 sentences. Specific sensory details — smell, sound, light, temperature. NO 'eerie', 'chilling', 'whispers'.",
+    "atmosphere": "2 sentences. Specific sensory details — smell, sound, light, temperature.",
     "protagonist_context": "1 sentence. Why these specific people are in this exact place."
   },
 
@@ -104,9 +123,9 @@ Generate sections IN ORDER — the most critical sections come first.
   },
 
   "discovery_beats": {
-    "<object_id with clue_type='key'>": "1 sentence. What finding this physical item reveals — specific and physical. Do NOT name any suspect.",
-    "<object_id with clue_type='story_clue' that is NOT the proof_object>": "1 sentence. Describe the evidence and what it implies — ambiguous, points toward 'someone' without naming them. Example: 'The handwriting in the margin matches someone who has been in this room before.'",
-    "<object_id that matches solution.proof_object>": "1 sentence. THIS IS THE REVELATION MOMENT — name the killer explicitly. Example: 'The name scratched into the lining reads Blackwood — the same name on the guest register the night of the murder.'"
+    "<object_id with clue_type='key'>": "2 sentences. Describe the physical detail AND what its presence implies about the investigation — who had access, whether it was recently used, what it tells about the timeline. End on an unanswered question: who left this, who needed it. Do NOT name any suspect.",
+    "<object_id with clue_type='story_clue' that is NOT the proof_object>": "2 sentences. Name ONE suspect (not the killer) and connect this evidence to their access, opportunity, or motive. GOOD: 'The initials scratched here match Jonathan Hale — he has been in this room, and lied about it.' BAD: 'A slender silver key with initials.' (no suspect named — rejected)",
+    "<object_id that matches solution.proof_object>": "2 sentences. THIS IS THE REVELATION MOMENT — name mystery.killer_name explicitly. State exactly what this evidence proves. GOOD: 'The letter is in Isabella Finch's handwriting — she was here the night of the murder.' BAD: 'A yellowed letter with smudged ink.' (killer not named — rejected)"
   },
 
   "conversation_seeds": {
@@ -142,10 +161,33 @@ SUSPECTS — CRITICAL RULES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 DISCOVERY_BEATS — MYSTERY RULES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Only the object matching solution.proof_object should name the killer explicitly.
-- All other discovery_beats must stay AMBIGUOUS — describe what the evidence implies
-  without naming any specific suspect. Use "someone", "whoever did this", "a person who".
-- This preserves the mystery for the human player until the climax reveal.
+Every discovery beat MUST provide investigative value — not just object description.
+Each beat MUST do at least ONE of these:
+  - Reveal a new fact about the crime
+  - Narrow the suspect pool (by naming a suspect and connecting evidence to them)
+  - Establish opportunity, motive, or means for someone
+  - Contradict what someone implied or stated
+  - Connect this clue to the wider picture
+
+BEAT RULES BY CLUE TYPE:
+- clue_type='key': Physical detail + investigative implication. Do NOT name any suspect.
+  GOOD: "The key is still warm — whoever used it left this room within the last hour."
+  BAD:  "A key with floral patterns." ← description only, no investigative value — REJECTED
+
+- clue_type='story_clue' that is NOT proof_object: Name ONE suspect (not the killer).
+  Use the ACTUAL suspect name you invented in the suspects list — not a placeholder.
+  Connect this evidence to their access, opportunity, or motive. May be a red herring.
+  GOOD: "[Suspect name from your list] — the initials match, and they lied about being here."
+  BAD:  "A slender key with initials." ← no suspect named — REJECTED
+
+- clue_type='story_clue' that IS proof_object: MUST name mystery.killer_name explicitly.
+  Use the ACTUAL killer name you invented in the mystery block — not a placeholder, not an example.
+  State exactly what this proves. This is the climax — be definitive.
+  GOOD: "[mystery.killer_name]'s handwriting is on this — they were here the night of the murder."
+  BAD:  "A yellowed letter with smudged ink." ← killer not named — REJECTED
+
+- clue_type='code': Flavor only — atmosphere, no numbers, no codes.
+- clue_type='lock': Skip — write NO beat for lock objects.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ADAPTED_PERSONAS — CRITICAL RULES
@@ -210,7 +252,7 @@ STRICT ANTI-HALLUCINATION RULES
    and in conversation_seeds — this is how the human player learns the answer.
 7. Do NOT invent new rooms, objects, or characters not in WORLD_DATA.
 8. Each vocabulary list must contain exactly 3 short phrases — no full sentences.
-9. Generate sections in this exact order: mystery → solution → suspects → plot → adapted_personas → discovery_beats → conversation_seeds → ending_guidance → room_stories.
+9. Generate sections in this exact order: mystery → solution → suspects → discovery_beats → conversation_seeds → ending_guidance → plot → adapted_personas → room_stories.
 10. mystery.proof_object_id MUST be an object_id from WORLD_DATA.plot_objects.
     It MUST match solution.proof_object exactly.
 """
@@ -351,22 +393,30 @@ def _build_user_prompt(setting: GameSetting, world_id: str, mystery: dict | None
         "  Everything else MUST be consistent with this decision.\n\n"
         "STEP 2 — suspects: 2-3 suspects. Exactly one has is_killer=true (must be mystery.killer_name). "
         "Others are red herrings with plausible motives.\n\n"
-        "STEP 3 — discovery_beats rules:\n"
-        "- clue_type='key': write a beat describing finding the physical item. NO suspect names.\n"
-        "- clue_type='story_clue' that is NOT proof_object: ambiguous evidence — "
-        "describe what it implies WITHOUT naming any suspect. Use 'someone', 'whoever'.\n"
-        "- clue_type='story_clue' that IS mystery.proof_object_id: THIS IS THE REVEAL — name the killer explicitly.\n"
-        "- clue_type='code': write flavor only — do NOT reveal the code value.\n"
-        "- clue_type='lock': skip — only write beats for key/story_clue objects.\n\n"
-        "Generate sections IN ORDER: mystery → solution → suspects → plot → the rest → room_stories last.\n"
+        "STEP 3 — discovery_beats (physical description alone is REJECTED — must have investigative value):\n"
+        "  clue_type='key': physical detail + what presence implies (timeline, access, urgency). No suspect names.\n"
+        "    GOOD: 'The key is still warm — whoever placed it left this room within the hour.'\n"
+        "    BAD:  'A key with carved ornaments.' ← description only, rejected\n"
+        "  clue_type='story_clue' NOT proof: NAME one suspect from your suspects list. Connect evidence to their opportunity or motive.\n"
+        "    IMPORTANT: use the actual name you invented in suspects — NOT 'Isabella Finch', NOT 'Jonathan Hale', NOT any example.\n"
+        "    GOOD: '[your suspect name] — the monogram matches, and they claimed never to have been in this room.'\n"
+        "    BAD:  'A key with an initial.' ← no suspect named, rejected\n"
+        "  clue_type='story_clue' = mystery.proof_object_id: NAME mystery.killer_name (your actual killer). State what it proves.\n"
+        "    IMPORTANT: use the actual killer name from your mystery block — NOT 'Isabella Finch', NOT any example.\n"
+        "    GOOD: '[mystery.killer_name]'s signature is on this — they were here the night of the murder.'\n"
+        "    BAD:  'A letter with smudged symbols.' ← killer not named, rejected\n"
+        "  clue_type='code': atmosphere only, no numbers revealed.\n"
+        "  clue_type='lock': skip entirely.\n\n"
+        "Generate sections IN ORDER: mystery → solution → suspects → discovery_beats → conversation_seeds → ending_guidance → plot → adapted_personas → room_stories.\n"
         "conversation_seeds: exactly 2 items per character. RULES:\n"
         "  - Each seed MUST name at least one suspect from the suspects list by their full name.\n"
         "  - Seeds must NOT name the killer as the killer — name them as suspicious, not guilty.\n"
         "  - Mix: one seed that points toward a red-herring suspect, one that hints at the real killer's motive or opportunity.\n"
-        "  GOOD: 'Isabella Finch was the last to see the victim alive — her account of that evening has two gaps.'\n"
-        "  GOOD: 'Jonathan Hale owed the victim a debt large enough to destroy him — desperation does strange things.'\n"
+        "  IMPORTANT: use the actual names you invented in suspects — NOT 'Isabella Finch', NOT 'Jonathan Hale'.\n"
+        "  GOOD: '[your suspect A] was the last to see the victim alive — their account has two gaps.'\n"
+        "  GOOD: '[your suspect B] owed the victim a debt large enough to destroy them.'\n"
         "  BAD: 'The bloodstains suggest a violent struggle.' (no suspect named — rejected)\n"
-        "  BAD: 'Jonathan Hale is the killer.' (names killer explicitly — rejected)\n"
+        "  BAD: '[killer name] is the killer.' (names killer as guilty — rejected)\n"
         "Output raw JSON only. Follow ALL STRICT ANTI-HALLUCINATION RULES."
     )
 
@@ -430,15 +480,27 @@ class StoryboardGenerator:
             return Storyboard(world_id=world_id)
 
         data = self._sanitize_adapted_personas(data, setting)
-        self._repair(data, world_id=world_id, mystery=mystery)
+        self._repair(data, world_id=world_id, mystery=mystery, setting=setting)
         self._validate(data, world_id=world_id, mystery=mystery)
         storyboard = Storyboard.from_dict(data)
         storyboard.world_id = world_id
         storyboard.generated_at = datetime.now(timezone.utc).isoformat()
         return storyboard
 
+    @staticmethod
+    def _s(v) -> str:
+        """Coerce any LLM value to a plain string — guards against the model returning
+        a nested dict or list where a string field was expected."""
+        if isinstance(v, str):
+            return v
+        if v is None:
+            return ""
+        if isinstance(v, (list, dict)):
+            return ""
+        return str(v)
+
     def _repair(
-        self, data: dict, *, world_id: str, mystery: dict | None
+        self, data: dict, *, world_id: str, mystery: dict | None, setting: "GameSetting | None" = None
     ) -> None:
         """Patch common LLM failures before the storyboard is built.
 
@@ -449,15 +511,52 @@ class StoryboardGenerator:
         solution = data.get("solution") if isinstance(data.get("solution"), dict) else {}
 
         # Authoritative killer / proof: world JSON anchor > LLM mystery > solution
-        anchor_killer = (mystery or {}).get("killer_name", "")
-        anchor_proof = (mystery or {}).get("proof_object_id", "")
-        gen_killer = gen_mystery.get("killer_name", "")
-        gen_proof = gen_mystery.get("proof_object_id", "")
-        gen_victim = gen_mystery.get("victim", "") or (mystery or {}).get("victim", "")
-        gen_motive = gen_mystery.get("motive_hint", "") or (mystery or {}).get("motive_hint", "")
+        # _s() guards against the LLM returning dicts/lists for string fields.
+        anchor_killer = self._s((mystery or {}).get("killer_name"))
+        anchor_proof = self._s((mystery or {}).get("proof_object_id"))
+        gen_killer = self._s(gen_mystery.get("killer_name"))
+        gen_proof = self._s(gen_mystery.get("proof_object_id"))
+        gen_victim = self._s(gen_mystery.get("victim")) or self._s((mystery or {}).get("victim"))
+        gen_motive = self._s(gen_mystery.get("motive_hint")) or self._s((mystery or {}).get("motive_hint"))
 
-        killer = anchor_killer or gen_killer or solution.get("answer", "")
-        proof = anchor_proof or gen_proof or solution.get("proof_object", "")
+        killer = anchor_killer or gen_killer or self._s(solution.get("answer"))
+        proof = anchor_proof or gen_proof or self._s(solution.get("proof_object"))
+
+        # ── validate proof is an object id, not a description ───────────────
+        # The model sometimes copies the object description instead of its id.
+        # An id is snake_case (no spaces); a description has spaces and is longer.
+        valid_obj_ids: set[str] = set()
+        if setting is not None:
+            valid_obj_ids = {o.id for o in setting.objects}
+
+        if proof and (" " in proof or (valid_obj_ids and proof not in valid_obj_ids)):
+            # proof looks like a description — recover from known object ids or discovery_beats keys
+            recovered = ""
+            # Priority 1: match against valid setting objects with story_clue type
+            if valid_obj_ids and setting is not None:
+                # Find plot objects that are story_clues
+                for o in setting.objects:
+                    if o.id in valid_obj_ids and not o.id.startswith(("gate_", "scenic_", "filler_")):
+                        if hasattr(o, "contains_info") and o.contains_info and not re.search(r"\d", o.contains_info):
+                            recovered = o.id
+                            break
+            # Priority 2: look at discovery_beats keys for a beat already mentioning the killer
+            if not recovered:
+                beats = data.get("discovery_beats", {})
+                if isinstance(beats, dict) and killer:
+                    killer_last = killer.split()[-1]
+                    for obj_id, beat_text in beats.items():
+                        if " " not in obj_id and killer_last in self._s(beat_text):
+                            recovered = obj_id
+                            break
+            if recovered:
+                print(f"[StoryboardGenerator] REPAIR {world_id}: proof_object_id was a description — recovered {recovered!r}")
+                proof = recovered
+                # Clear the bad description value so the mystery/solution blocks write the correct id.
+                if isinstance(data.get("mystery"), dict):
+                    data["mystery"]["proof_object_id"] = ""
+                if isinstance(data.get("solution"), dict):
+                    data["solution"]["proof_object"] = ""
 
         # ── mystery block ────────────────────────────────────────────────────
         if "mystery" not in data or not isinstance(data["mystery"], dict):
@@ -541,6 +640,15 @@ class StoryboardGenerator:
                     or ""
                 )
                 is_killer = s.get("is_killer", name == killer)
+                # Back-fill apparent_motive if blank
+                if not apparent_motive:
+                    if is_killer and gen_motive:
+                        apparent_motive = gen_motive
+                    elif is_killer:
+                        apparent_motive = "Their exact motive remains unclear — but they had the most to gain."
+                    else:
+                        apparent_motive = "Their connection to the victim gave them both means and opportunity."
+                    print(f"[StoryboardGenerator] REPAIR {world_id}: suspects[{name!r}].apparent_motive patched")
                 normalized.append({
                     "name": name,
                     "connection_to_victim": connection,
@@ -548,6 +656,59 @@ class StoryboardGenerator:
                     "is_killer": is_killer,
                 })
             data["suspects"] = normalized
+
+        # ── discovery_beats: normalize values to strings + patch proof beat ───
+        discovery_beats = data.get("discovery_beats", {})
+        if isinstance(discovery_beats, dict):
+            # Coerce any dict/list values the LLM may have nested inside beats.
+            data["discovery_beats"] = {
+                k: self._s(v) for k, v in discovery_beats.items()
+            }
+            discovery_beats = data["discovery_beats"]
+            if proof and killer:
+                beat = discovery_beats.get(proof, "")
+                killer_last = killer.split()[-1] if killer else ""
+                if not beat or (killer_last and killer_last not in beat):
+                    discovery_beats[proof] = (
+                        f"The evidence here bears {killer}'s mark — "
+                        f"this is the moment the investigation breaks open."
+                    )
+                    print(f"[StoryboardGenerator] REPAIR {world_id}: discovery_beats[{proof!r}] patched to name killer {killer!r}")
+
+        # ── adapted_personas: fallback if model left them blank ─────────────
+        if setting is not None:
+            personas = data.get("adapted_personas")
+            if not isinstance(personas, dict):
+                data["adapted_personas"] = {}
+                personas = data["adapted_personas"]
+            for p in (setting.players or []):
+                entry = personas.get(p.name)
+                if not isinstance(entry, dict):
+                    entry = {}
+                    personas[p.name] = entry
+                if not entry.get("world_role"):
+                    entry["world_role"] = (
+                        f"{p.name} investigates by reading the physical scene — "
+                        f"looking for what was moved, what is missing, and what someone left behind."
+                    )
+                    print(f"[StoryboardGenerator] REPAIR {world_id}: adapted_personas[{p.name!r}].world_role patched")
+                if not entry.get("voice"):
+                    entry["voice"] = "Precise and observational — states what the evidence implies, not what they feel."
+                if not entry.get("vocabulary"):
+                    entry["vocabulary"] = ["who had access", "this was deliberate", "something is missing here"]
+
+        # ── suspects: patch connection_to_victim if blank ────────────────────
+        for s in data.get("suspects", []):
+            if not isinstance(s, dict):
+                continue
+            if not s.get("connection_to_victim") and s.get("name"):
+                name = s["name"]
+                is_killer = s.get("is_killer", name == killer)
+                s["connection_to_victim"] = (
+                    "Closely connected to the victim and present at the scene."
+                    if is_killer else
+                    "Known to the victim and had recent contact before the crime."
+                )
 
         # ── ending_guidance: fix wrong keys ─────────────────────────────────
         # Model sometimes generates descriptive keys instead of won/lost/lost_by_wrong_deduction.
