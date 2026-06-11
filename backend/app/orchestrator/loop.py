@@ -811,11 +811,12 @@ class GameOrchestrator:
         )
         if prose:
             await self._emit(
-                EventKind.NARRATION,
+                EventKind.DISCOVERY,
                 None,
                 prose,
                 turn=self.sim.state.turn,
                 record=False,
+                data={"object_id": obj_id, "is_proof": bool(proof_obj and obj_id == proof_obj)},
             )
 
     async def _maybe_narrate_room_entry(self, room_id: str, actor_name: str) -> None:

@@ -37,7 +37,7 @@ type SepItem = { type: "sep"; turn: number; key: string };
 type EventItem = { type: "event"; event: EventMessage; key: string };
 type RenderItem = SepItem | EventItem;
 
-const SKIP_KINDS = new Set(["planner", "prompt", "decision", "human_turn"]);
+const SKIP_KINDS = new Set(["planner", "prompt", "decision", "human_turn", "human_deduction"]);
 
 export function NarrativeFeed({ events, personas }: Props) {
   const items = useMemo<RenderItem[]>(() => {
@@ -86,6 +86,16 @@ function ChatEvent({ event, personas }: { event: EventMessage; personas: Persona
 
   if (event.kind === "narration") {
     return <div className="chat-narration">{event.text}</div>;
+  }
+
+  if (event.kind === "discovery") {
+    const isProof = (event.data as Record<string, unknown> | null | undefined)?.is_proof;
+    return (
+      <div className={`chat-discovery ${isProof ? "chat-discovery-proof" : ""}`}>
+        <span className="chat-discovery-icon">{isProof ? "🔑" : "🔎"}</span>
+        <div className="chat-discovery-text">{event.text}</div>
+      </div>
+    );
   }
 
   if (event.kind === "system") {

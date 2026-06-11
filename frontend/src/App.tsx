@@ -215,7 +215,6 @@ export default function App() {
           {/* Case file: suspects + evidence */}
           <CaseFilePanel
             suspects={state.setup?.suspects ?? []}
-            proofObjectId={state.setup?.proof_object_id ?? ""}
             events={state.events}
           />
 

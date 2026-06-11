@@ -3,25 +3,25 @@ import type { EventMessage, Suspect } from "../types";
 
 interface Props {
   suspects: Suspect[];
-  proofObjectId: string;
   events: EventMessage[];
 }
 
-export function CaseFilePanel({ suspects, proofObjectId, events }: Props) {
-  // Derive proof-found status from system events mentioning the proof object.
-  const proofFound = useMemo(() => {
-    if (!proofObjectId) return false;
-    return events.some(
-      (e) =>
-        e.kind === "system" &&
-        e.text.includes(proofObjectId.replace(/_/g, " ").toLowerCase()) ||
-        (e.kind === "system" && e.text.includes(proofObjectId))
-    );
-  }, [events, proofObjectId]);
+export function CaseFilePanel({ suspects, events }: Props) {
+  // Proof found when any discovery event carries is_proof: true.
+  const proofFound = useMemo(
+    () =>
+      events.some(
+        (e) =>
+          e.kind === "discovery" &&
+          (e.data as Record<string, unknown> | null | undefined)?.is_proof === true
+      ),
+    [events]
+  );
 
-  // Evidence log: system events that signal real progress (contain "✓").
+  // Evidence log: storyboard discovery beats only (kind === "discovery").
+  // These are the pre-written narrative sentences from the storyboard, not mechanical codes.
   const evidence = useMemo(
-    () => events.filter((e) => e.kind === "system" && e.text.startsWith("✓")),
+    () => events.filter((e) => e.kind === "discovery"),
     [events]
   );
 
@@ -79,11 +79,14 @@ export function CaseFilePanel({ suspects, proofObjectId, events }: Props) {
           <p className="case-empty">No evidence collected yet.</p>
         ) : (
           <ul className="evidence-list">
-            {evidence.map((e, i) => (
-              <li key={i} className="evidence-item">
-                {e.text.replace(/^✓\s*/, "")}
-              </li>
-            ))}
+            {evidence.map((e, i) => {
+              const isProof = (e.data as Record<string, unknown> | null | undefined)?.is_proof;
+              return (
+                <li key={i} className={`evidence-item ${isProof ? "evidence-item-proof" : ""}`}>
+                  {isProof ? <><span className="evidence-proof-badge">KEY EVIDENCE</span>{e.text}</> : e.text}
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

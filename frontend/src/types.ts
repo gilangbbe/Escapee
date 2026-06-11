@@ -31,7 +31,7 @@ export interface PersonaInfo {
   is_human?: boolean;
 }
 
-export type EventKind = "speech" | "observation" | "system" | "planner" | "prompt" | "decision" | "narration" | "human_turn" | "human_deduction";
+export type EventKind = "speech" | "observation" | "system" | "planner" | "prompt" | "decision" | "narration" | "discovery" | "human_turn" | "human_deduction";
 
 export interface PlannerCandidate {
   rank: number;
