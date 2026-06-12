@@ -427,6 +427,8 @@ def build_dialogue_context_package(
     world_snapshot: "WorldSnapshot | None" = None,
     adapted_world_role: str = "",
     adapted_vocabulary: list[str] | None = None,
+    adapted_voice: str = "",
+    adapted_sample_lines: list[str] | None = None,
     conversation_seed: str = "",
     proof_revealed: bool = False,
     killer_name: str = "",
@@ -457,6 +459,18 @@ def build_dialogue_context_package(
     # Vocabulary removed from narrator context — it's already in the player agent's system
     # prompt via apply_storyboard_persona. Exposing it here caused the model to fixate on
     # specific phrases ("the story of this room") and repeat them across every turn.
+    # Instead: voice (1 line) + sample_lines (few-shot register anchors). Local models
+    # imitate example lines far better than they follow style adjectives, and the
+    # "never reuse" rule prevents the catchphrase loop that vocabulary caused.
+    voice_line = f"- HOW THEY SPEAK: {adapted_voice}\n" if adapted_voice else ""
+    samples_section = ""
+    if adapted_sample_lines:
+        rendered = "\n".join(f'    "{s}"' for s in adapted_sample_lines[:3])
+        samples_section = (
+            "- REGISTER EXAMPLES (match this rhythm and attitude — NEVER copy these "
+            "lines or their phrases; the situation is always different):\n"
+            f"{rendered}\n"
+        )
 
     # Unused conversation seed — a plot-rooted observation to surface if relevant.
     seed_section = (
@@ -501,7 +515,9 @@ def build_dialogue_context_package(
         f"- NAME: {actor_name}\n"
         + (f"- PRONOUNS: {actor_gender} — use correct pronouns throughout\n" if actor_gender else "")
         + f"{role_line}\n"
-        f"- BACKSTORY_HINT: {actor_backstory or 'ordinary survivor under pressure'}\n"
+        + voice_line
+        + samples_section
+        + f"- BACKSTORY_HINT: {actor_backstory or 'ordinary survivor under pressure'}\n"
         f"- MOOD: {_mood_for(status, success=success)}\n\n"
         "ACTION_EVENT:\n"
         f"- ATTEMPT: {action_text}\n"
@@ -517,6 +533,8 @@ def build_dialogue_context_package(
         "- FORBIDDEN: — or – or -- or rhetorical questions (Why...? What...? Could this...?)\n"
         "- FORBIDDEN: echoing PLAYER_MOTIVATION word-for-word\n"
         "- FORBIDDEN: invented facts not in SIMULATOR_OUTCOME\n"
+        "- FORBIDDEN: reusing any distinctive phrase that already appears in STORY_SO_FAR — "
+        "if this character said something similar before, find a NEW way to say it\n"
         "Write the single dialogue line now. Stop after the closing quote."
     )
 
@@ -588,6 +606,8 @@ def build_turn_user_prompt(
     world_snapshot: "WorldSnapshot | None" = None,
     adapted_world_role: str = "",
     adapted_vocabulary: list[str] | None = None,
+    adapted_voice: str = "",
+    adapted_sample_lines: list[str] | None = None,
     conversation_seed: str = "",
     proof_revealed: bool = False,
     killer_name: str = "",
@@ -612,6 +632,8 @@ def build_turn_user_prompt(
         world_snapshot=world_snapshot,
         adapted_world_role=adapted_world_role,
         adapted_vocabulary=adapted_vocabulary,
+        adapted_voice=adapted_voice,
+        adapted_sample_lines=adapted_sample_lines,
         conversation_seed=conversation_seed,
         proof_revealed=proof_revealed,
         killer_name=killer_name,

@@ -1,104 +1,112 @@
 {
   "world_id": "world_037",
-  "generated_at": "2026-06-12T02:44:05.019591+00:00",
+  "generated_at": "2026-06-12T03:21:36.560973+00:00",
   "schema_version": "1",
   "mystery": {
-    "victim": "Evelyn Harper died from multiple stab wounds in the dining hall.",
-    "killer_name": "Margaret Sinclair",
+    "victim": "Sir Reginald Hawthorne was found dead in the study, his throat slashed.",
+    "killer_name": "Lady Evelyn Pembroke",
     "proof_object_id": "bloodstained_diary_page",
-    "motive_hint": "She had long resented Evelyn's inheritance and believed it was rightfully hers."
+    "motive_hint": "The diary reveals Lady Evelyn's desperate attempts to uncover a hidden inheritance."
   },
   "plot": {
-    "victim": "Evelyn Harper died from multiple stab wounds in the dining hall.",
-    "threat": "The storm outside is intensifying, threatening to collapse the manor at any moment.",
-    "stakes": "Failure means being trapped in a collapsing structure with no escape and the killer still at large.",
-    "timeline": "Two hours before your arrival, Evelyn Harper was found dead by Margaret Sinclair. She had long resented Evelyn's inheritance and believed it was rightfully hers.",
-    "tension_hint": "The clues suggest that Margaret carefully planned this murder over a prolonged period to ensure she would never be caught.",
-    "atmosphere": "The air is thick with the scent of old blood, damp stone, and mildew. The only sound is the distant rumbling of thunder and the creaking of ancient wooden beams as they strain against the weight of water-logged walls.",
-    "protagonist_context": "You are here because you received a cryptic message from an anonymous source claiming to have crucial information about Evelyn's death."
+    "victim": "Sir Reginald Hawthorne was found dead in the study with his throat slashed.",
+    "threat": "The storm is worsening, cutting off all escape routes except through a final locked door deep inside the manor.",
+    "stakes": "Failure means being trapped within as the manor collapses around you, potentially leading to your demise.",
+    "timeline": "Two days ago, Sir Reginald was last seen reviewing documents in his study. Yesterday morning, Lady Evelyn visited him, and her mood turned visibly grim after their conversation.",
+    "tension_hint": "A hidden diary suggests that a secret inheritance may have driven the killer's actions.",
+    "atmosphere": "The air is thick with the musty smell of old blood and damp stone, punctuated by the sound of distant thunder. The dim candlelight flickers across the walls, casting eerie shadows as you move through the storm-ravaged manor.",
+    "protagonist_context": "Alex Quinn and Riley Sato have been thrust into this perilous situation after a sudden power failure trapped them within the decaying mansion."
   },
   "adapted_personas": {
     "Alex Quinn": {
-      "world_role": "As a meticulous investigator, Alex focuses on physical evidence and the sequence of events leading up to the murder.",
-      "voice": "Alex speaks in hushed tones, always searching for more details.",
+      "world_role": "In the realm of investigation, Alex has an eye for physical evidence. They can discern intent from objects and their placement.",
+      "voice": "A no-nonsense tone with a hint of methodical precision.",
       "vocabulary": [
-        "clues",
-        "correlation",
-        "evidence"
+        "evidence trail",
+        "clue patterns",
+        "intent signatures"
+      ],
+      "sample_lines": [
+        "This cut in the carpet suggests someone dragged something heavy through here.",
+        "The lack of dust on this corner indicates it was recently disturbed."
       ]
     },
     "Riley Sato": {
-      "world_role": "With a keen eye for systems and timing, Riley deciphers the sequence of events based on clues left behind.",
-      "voice": "Riley's voice is methodical and steady, with a hint of urgency.",
+      "world_role": "As a systems operator, Riley deciphers sequences and timing of events to piece together what happened before their arrival.",
+      "voice": "Efficient and direct, with a practical approach that leaves little room for speculation.",
       "vocabulary": [
-        "sequence",
-        "timing",
-        "clues"
+        "sequence analysis",
+        "event flow",
+        "timeline reconstruction"
+      ],
+      "sample_lines": [
+        "If the power was cut at 10 PM, it must have taken two hours to restore.",
+        "The study's security logs show forced entry around midnight."
       ]
     }
   },
   "suspects": [
     {
-      "name": "Margaret Sinclair",
-      "connection_to_victim": "She was Evelyn Harper's cousin and lived in the manor.",
-      "apparent_motive": "Envious of Evelyn's inheritance, Margaret stood to gain from her death."
+      "name": "Sir Reginald Hawthorne",
+      "connection_to_victim": "Victim - he was found dead in his study.",
+      "apparent_motive": "None - he had no reason to kill himself."
     },
     {
-      "name": "Thomas Blackwood",
-      "connection_to_victim": "He worked as a caretaker for the manor and often argued with Evelyn about upkeep costs.",
-      "apparent_motive": "Feeling unappreciated by Evelyn, Thomas had reason to resent her financial demands."
+      "name": "Lady Evelyn Pembroke",
+      "connection_to_victim": "She was Sir Reginald's estranged niece, seeking inheritance secrets hidden in the manor.",
+      "apparent_motive": "Driven by greed for her family’s lost fortune and to uncover a secret inheritance from Sir Reginald."
     },
     {
-      "name": "Juliette Grey",
-      "connection_to_victim": "She was a former governess who left after an unpleasant encounter with Evelyn.",
-      "apparent_motive": "Carrying ill will from her past, Juliette saw the inheritance as her chance for revenge."
+      "name": "Mr. Charles Blackwood",
+      "connection_to_victim": "He was the caretaker who had lived in the manor for years, knew everyone's secrets.",
+      "apparent_motive": "Possibly seeking to protect himself or his position within the estate."
     }
   ],
   "room_stories": {
-    "entrance_hall": "This grand room was the last place Evelyn was seen alive, filled with her belongings and photographs that tell her story.",
-    "study": "Evelyn's study reveals a collection of books and documents hinting at her inheritance dispute with Margaret Sinclair.",
-    "library": "The library holds dusty tomes and secret letters exchanged between Evelyn and Margaret, painting a picture of their rivalry.",
-    "dining_hall": "Here lies the body of Evelyn Harper, surrounded by scattered dishes and a knife covered in blood.",
-    "attic": "The attic conceals hidden passages and relics from the past, including evidence that may reveal the killer's identity."
+    "entrance_hall": "This grand space is where your journey begins, with eerie portraits and a cold stone floor hinting at the manor’s history.",
+    "study": "Sir Reginald's study holds the key to understanding his life and death. Dusty books and scattered papers reveal clues about the victim and killer.",
+    "library": "An extensive collection of books covers every inch of wall, but a single overturned bookshelf hints at hidden secrets within these walls.",
+    "dining_hall": "The dining hall reflects grandeur gone astray; shattered chandeliers hang precariously over scattered dishes, telling a story of recent turmoil and haste.",
+    "attic": "This cramped space harbors the final secrets. The attic is where you must confront the truth before time runs out."
   },
   "discovery_beats": {
-    "clue_entrance_hall_1": "This code was created by Thomas Blackwood while he was investigating Evelyn's strange behavior.",
-    "clue_entrance_hall_2": "The numbers here seem to match a pattern Thomas noticed in Evelyn's financial records.",
-    "clue_study_1": "Juliette Grey had this clue in her possession recently, as the paper is stained with ink from her diary.",
-    "bloodstained_menu_with_scratched_notes": "This menu was found near where Juliette claimed she last saw Evelyn alive.",
-    "bloodstained_diary_page": "The numbers and symbols on this page directly implicate Margaret Sinclair in Evelyn's death, proving her long-held resentment over the inheritance.",
-    "torn_letter_inside_trunk": "Thomas Blackwood inserted this letter into the trunk during his search for evidence against Evelyn's killer."
+    "clue_entrance_hall_1": "This scrap of paper bears a note from Mr. Charles Blackwood, who was seen near this area last night with unusual fervor.",
+    "clue_entrance_hall_2": "Another code-filled page is found, but it also references Lady Evelyn's frantic search for clues about an old will hidden within the manor.",
+    "clue_study_1": "This document details plans by Mr. Charles Blackwood to secretly access restricted areas of the mansion during a stormy night.",
+    "bloodstained_menu_with_scratched_notes": "The symbols on this menu match those found in Lady Evelyn's journal, suggesting she visited the dining hall right before Sir Reginald's murder.",
+    "bloodstained_diary_page": "This diary entry reveals that Lady Evelyn Pembroke discovered damning evidence against herself and desperately tried to cover it up.",
+    "torn_letter_inside_trunk": "The torn letter found in the trunk leads back to Mr. Charles Blackwood, hinting at his involvement with a secretive organization within the manor."
   },
   "phase_guidance": {},
   "conversation_seeds": {
     "Alex Quinn": [
-      "Thomas Blackwood was seen arguing with Evelyn about her finances on the night of her death, and he seems unusually interested in old documents.",
-      "Juliette Grey found a torn letter near the dining hall that references Evelyn's inheritance dispute. She believes it could be crucial evidence."
+      "Mr. Charles Blackwood was last seen near Sir Reginald's study on the night of the murder.",
+      "Lady Evelyn was found pacing around the dining hall late into the evening."
     ],
     "Riley Sato": [
-      "Thomas Blackwood mentioned to me earlier that Juliette had been acting suspiciously around the time of Evelyn's death, always looking for old documents.",
-      "Juliette Grey told me she overheard a heated argument between Margaret Sinclair and Evelyn regarding the estate's finances before Evelyn was killed."
+      "The code you discovered in the entrance hall matches entries in Mr. Charles Blackwood's personal journal.",
+      "Lady Evelyn has a history with Sir Reginald and may have had reason to be angry with him."
     ]
   },
   "ending_guidance": {
-    "won": "You've uncovered the truth: Margaret Sinclair was driven by her long-standing resentment towards Evelyn's inheritance, leading to the murder in the dining hall.",
-    "lost": "The storm outside grows more intense as you leave without uncovering the true killer. The mansion's secrets remain locked within its walls.",
-    "lost_by_wrong_deduction": "Margaret Sinclair escapes undetected while you focus on Thomas Blackwood and Juliette Grey, leaving the real culprit to slip away."
+    "won": "You've unraveled the truth: Lady Evelyn Pembroke was driven by desperation to murder Sir Reginald. The bloodstained diary proves it.",
+    "lost": "Without concrete evidence, the identity of the killer remains a mystery. The storm rages on as the manor's dark secrets are left untold.",
+    "lost_by_wrong_deduction": "Mr. Charles Blackwood slips away unnoticed as you wrongly accuse Lady Evelyn of Sir Reginald's murder."
   },
   "solution": {
-    "question": "Who murdered Evelyn Harper?",
-    "answer": "Margaret Sinclair",
+    "question": "Who murdered Sir Reginald Hawthorne?",
+    "answer": "Lady Evelyn Pembroke",
     "answer_aliases": [
-      "Sinclair",
-      "Miss Sinclair"
+      "Pembroke",
+      "Lady Pembroke"
     ],
     "answer_type": "person",
-    "motive": "Margaret had harbored resentment towards Evelyn for years, believing the manor should have belonged to her. When Evelyn finally inherited everything, Margaret snapped and killed her in a fit of rage.",
+    "motive": "Evelyn was driven by greed and a desire to reclaim her family's lost fortune. The diary pages show her frantic attempts to decipher hidden clues left by her ancestors.",
     "proof_object": "bloodstained_diary_page",
-    "proof_sentence": "This diary page proves that Margaret was indeed present at the time of the murder as it contains bloodstains matching those found on the victim.",
-    "hint_1": "Look for evidence in rooms connected to personal vendettas and inheritances.",
-    "hint_2": "Check items related to old family secrets and diaries hidden away in secluded areas.",
-    "victory_narration_hook": "You've uncovered Margaret Sinclair's bloodstained diary page as definitive proof of her guilt.",
-    "defeat_narration_hook": "The storm outside grows stronger, sealing your fate within the manor along with Evelyn Harper's unanswered secrets."
+    "proof_sentence": "The blood-stained diary page contains Evelyn's desperate scribbles, revealing her motive and guilt in the murder of Sir Reginald Hawthorne.",
+    "hint_1": "Look for a significant object that has been tampered with or appears out of place in the attic.",
+    "hint_2": "Consider where Sir Reginald's personal items might be hidden. The diary provides crucial insights.",
+    "victory_narration_hook": "With the bloody diary page as proof, you expose Lady Evelyn Pembroke as the killer and unravel the mystery behind the inheritance.",
+    "defeat_narration_hook": "The storm intensifies, the manor groans under its weight, and the truth about Sir Reginald's murder remains buried."
   }
 }

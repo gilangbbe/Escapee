@@ -73,17 +73,29 @@ class StoryboardPersona:
     world_role: str = ""
     voice: str = ""
     vocabulary: list[str] = field(default_factory=list)
+    # Few-shot style anchors for the dialogue model: example lines in this
+    # character's register. Far more effective than abstract style adjectives
+    # for local models — they imitate examples, not descriptions.
+    sample_lines: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, d: dict) -> "StoryboardPersona":
         return cls(
-            world_role=d.get("world_role", ""),
-            voice=d.get("voice", ""),
-            vocabulary=d.get("vocabulary", []),
+            world_role=d.get("world_role", "") if isinstance(d.get("world_role"), str) else "",
+            voice=d.get("voice", "") if isinstance(d.get("voice"), str) else "",
+            vocabulary=[v for v in d.get("vocabulary", []) if isinstance(v, str)]
+            if isinstance(d.get("vocabulary"), list) else [],
+            sample_lines=[v for v in d.get("sample_lines", []) if isinstance(v, str)]
+            if isinstance(d.get("sample_lines"), list) else [],
         )
 
     def to_dict(self) -> dict:
-        return {"world_role": self.world_role, "voice": self.voice, "vocabulary": self.vocabulary}
+        return {
+            "world_role": self.world_role,
+            "voice": self.voice,
+            "vocabulary": self.vocabulary,
+            "sample_lines": self.sample_lines,
+        }
 
 
 @dataclass

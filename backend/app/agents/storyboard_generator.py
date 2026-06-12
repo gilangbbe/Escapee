@@ -126,7 +126,8 @@ You output ONE JSON object with exactly three sections:
     "<player name from WORLD_DATA.players>": {
       "world_role": "1-2 sentences. HOW they investigate in this genre — their lens on clues. NOT their job title.",
       "voice": "1 sentence. A speaking style distinct from every other character.",
-      "vocabulary": ["3-6 word phrase", "3-6 word phrase", "3-6 word phrase"]
+      "vocabulary": ["3-6 word phrase", "3-6 word phrase", "3-6 word phrase"],
+      "sample_lines": ["one full example line of dialogue in this character's exact register", "a second example line, different situation"]
     }
   },
   "room_stories": { "<room_id from WORLD_DATA.rooms>": "1 sentence — this room's narrative role." }
@@ -139,6 +140,13 @@ ADAPTED_PERSONAS RULES:
   Scout → reads the ENVIRONMENT: what was moved, cleaned, or left behind
 - vocabulary: exactly 3 phrases, 3-6 words each, natural investigation speech for this genre.
   BANNED words: system, power, restore, circuit, override, scan, malfunction, panel, grid, reboot, diagnostic.
+- sample_lines: exactly 2 full dialogue lines (10-18 words each) showing the character
+  reacting to evidence. These define the character's REGISTER: sentence rhythm, attitude,
+  how blunt or careful they are. Make the two characters' registers clearly different —
+  e.g. one clipped and declarative, one probing and wry.
+  Example contrast (invent your own content, match the world):
+    clipped: "Three scratches on the lock plate. Fresh. Someone forced this in a hurry."
+    wry:     "Curious that the dust stops at the cabinet edge, as if someone tidied up after themselves."
 - Each character must sound DIFFERENT from every other character.
 
 room_stories: one entry per room id in WORLD_DATA.rooms — no invented rooms.
@@ -644,24 +652,36 @@ class StoryboardGenerator:
         # ── adapted_personas: fallback if model left them blank ─────────────
         if setting is not None:
             _persona_archetypes = [
-                # (world_role_template, voice, vocabulary)
+                # (world_role_template, voice, vocabulary, sample_lines)
                 (
                     "{name} reads the physical scene for what it implies about intent — "
                     "the angle of a disturbed object, what's been moved, what someone tried to hide.",
                     "Precise and dry — states what the evidence implies, never what they feel.",
                     ["this wasn't accidental", "look at what's missing", "the evidence contradicts that"],
+                    [
+                        "Scratches around the keyhole. Fresh ones. This was forced by someone in a hurry.",
+                        "The frame is intact but the hinge is bent. That takes deliberate force, not an accident.",
+                    ],
                 ),
                 (
                     "{name} maps the sequence of events — who was where, in what order, "
                     "and whether the timing points to premeditation.",
                     "Methodical and measured — frames observations as timelines, not accusations.",
                     ["the timing is off", "who had access", "someone planned this"],
+                    [
+                        "Follow the order here. The door was locked after the lamp was broken, not before.",
+                        "If the letter arrived that morning, someone had hours to prepare. That changes everything.",
+                    ],
                 ),
                 (
                     "{name} reads spaces before touching anything — spots what was moved, "
                     "cleaned, or deliberately left behind.",
                     "Quiet and observational — notices what others overlook, asks questions instead of statements.",
                     ["something was staged here", "this was cleaned in a hurry", "someone came back"],
+                    [
+                        "Odd. The dust stops in a clean line at the cabinet edge, like something sat there until recently.",
+                        "Everything in this room faces the door. Except that chair. Someone turned it around.",
+                    ],
                 ),
             ]
             personas = data.get("adapted_personas")
@@ -681,6 +701,8 @@ class StoryboardGenerator:
                     entry["voice"] = archetype[1]
                 if not entry.get("vocabulary"):
                     entry["vocabulary"] = list(archetype[2])
+                if not entry.get("sample_lines"):
+                    entry["sample_lines"] = list(archetype[3])
 
         # ── suspects: patch connection_to_victim if blank ────────────────────
         for s in data.get("suspects", []):

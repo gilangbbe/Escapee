@@ -218,6 +218,8 @@ class GameMasterNarrator:
                 world_snapshot=world_snapshot,
                 adapted_world_role=persona.world_role if persona else "",
                 adapted_vocabulary=persona.vocabulary if persona else None,
+                adapted_voice=persona.voice if persona else "",
+                adapted_sample_lines=persona.sample_lines if persona else None,
                 conversation_seed=seed or "",
                 proof_revealed=self._proof_revealed,
                 killer_name=killer_name,
