@@ -328,15 +328,21 @@ class Storyboard:
 
     @classmethod
     def from_dict(cls, data: dict) -> "Storyboard":
-        plot = data.get("plot", {})
-        personas_raw = data.get("adapted_personas", {})
-        solution_raw = data.get("solution", {})
-        mystery_raw = data.get("mystery", {})
+        def _d(key: str) -> dict:
+            """Get a dict field, tolerating the LLM emitting a list/string/null instead."""
+            v = data.get(key)
+            return v if isinstance(v, dict) else {}
+
+        plot = _d("plot")
+        personas_raw = _d("adapted_personas")
+        solution_raw = _d("solution")
+        mystery_raw = _d("mystery")
+        suspects_raw = data.get("suspects")
         return cls(
             world_id=data.get("world_id", ""),
             generated_at=data.get("generated_at", ""),
             schema_version=data.get("schema_version", SCHEMA_VERSION),
-            mystery=StoryboardMystery.from_dict(mystery_raw) if isinstance(mystery_raw, dict) else StoryboardMystery(),
+            mystery=StoryboardMystery.from_dict(mystery_raw),
             plot_victim=plot.get("victim", ""),
             plot_threat=plot.get("threat", ""),
             plot_stakes=plot.get("stakes", ""),
@@ -351,29 +357,29 @@ class Storyboard:
             },
             suspects=[
                 {k: v for k, v in s.items() if k != "is_killer"}
-                for s in data.get("suspects", [])
+                for s in (suspects_raw if isinstance(suspects_raw, list) else [])
                 if isinstance(s, dict) and s.get("name")
             ],
             room_stories={
                 k: v if isinstance(v, str) else ""
-                for k, v in data.get("room_stories", {}).items()
+                for k, v in _d("room_stories").items()
             },
             discovery_beats={
                 k: v if isinstance(v, str) else ""
-                for k, v in data.get("discovery_beats", {}).items()
+                for k, v in _d("discovery_beats").items()
             },
             phase_guidance={
                 k: v if isinstance(v, str) else ""
-                for k, v in data.get("phase_guidance", {}).items()
+                for k, v in _d("phase_guidance").items()
             },
             conversation_seeds={
                 name: [s for s in seeds if isinstance(s, str)]
-                for name, seeds in data.get("conversation_seeds", {}).items()
+                for name, seeds in _d("conversation_seeds").items()
                 if isinstance(seeds, list)
             },
             ending_guidance={
                 k: v if isinstance(v, str) else ""
-                for k, v in data.get("ending_guidance", {}).items()
+                for k, v in _d("ending_guidance").items()
             },
             solution=StoryboardSolution.from_dict(solution_raw),
         )

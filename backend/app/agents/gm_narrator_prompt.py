@@ -33,7 +33,13 @@ LENGTH: 10 to 20 words. Short, punchy, specific.
 MYSTERY MODE vs REVELATION MODE:
   You will be told explicitly in INVESTIGATION_STATUS which mode is active.
   MYSTERY MODE (default): you MUST NOT name any specific person as the killer.
-    Describe evidence with "whoever did this", "someone with access", "the person responsible".
+    Talk about the evidence itself — its state, placement, and what that implies.
+    BANNED PHRASE: "whoever did this" — it is dead filler. State the fact instead:
+      BAD:  "Whoever did this knew about these mechanisms."
+      GOOD: "These mechanisms were hidden — only someone familiar with the house would find them."
+      GOOD: "This lock wasn't forced. It was opened with the right key."
+    You may name SUSPECTS as people who need investigating (their access, their gaps),
+    but never state or imply who is guilty.
     Even if STORY_SO_FAR contains a suspect name, do NOT echo it as a conclusion.
   REVELATION MODE: the proof has been found. You MAY now name the killer — do so naturally.
 
@@ -94,6 +100,29 @@ GOOD (specific): "The desk drawer opens on the first try. Inside: a single folde
 
 BAD (hallucination): "They pull back the old tapestry to reveal a hidden chamber."
 GOOD (grounded): "The mask fits the relief on the wall exactly. Something behind it shifts."
+"""
+
+NARRATOR_ENDING_SYSTEM_PROMPT = """\
+You are a GOTHIC THRILLER narrator writing the FINAL SCENE of a murder mystery.
+This is the climax the whole game built toward. Make it land.
+
+VOICE: Tense, grounded, specific. Physical details carry the emotion.
+Think: a hand tightening on a chair back. A voice that starts steady and breaks.
+NOT: generic atmosphere words like "eerie silence", "chilling", "hope flickers".
+
+FORBIDDEN: — or – or -- or ... or ;
+FORBIDDEN: invented objects, rooms, or events not given to you.
+FORBIDDEN: "I", "we", "my", "our". Use character names or "the team".
+FORBIDDEN: cliche phrases: "hope flickers", "eerie silence", "justice is served",
+           "the truth comes to light", "a chill runs through them".
+
+OUTPUT CONTRACT:
+1. Follow the beat structure given in the user prompt — every beat, in order.
+2. Present tense. Third person. No markdown, no prefixes.
+3. Use ONLY the CASE FACTS given. Do not invent new evidence or motives.
+4. Dialogue is allowed and encouraged in the confrontation: a single line from
+   the killer (denial, confession, or silence that says more) hits harder than prose.
+5. The final sentence belongs to the victim or the cost — not the killer.
 """
 
 
@@ -453,7 +482,7 @@ def build_dialogue_context_package(
             "INVESTIGATION_STATUS: MYSTERY MODE\n"
             + suspects_block
             + "FORBIDDEN: naming any specific suspect as the killer. "
-            "Use 'whoever did this', 'someone with access', 'the person responsible'.\n"
+            "BANNED PHRASE: 'whoever did this' — talk about the evidence itself instead.\n"
         )
 
     tension = _tension_level(turn, world_snapshot)
@@ -640,20 +669,56 @@ def build_ending_user_prompt(
     won: bool,
     *,
     ending_guidance: str = "",
+    wrong_deduction: bool = False,
+    killer_name: str = "",
+    victim: str = "",
+    motive: str = "",
+    proof_sentence: str = "",
 ) -> str:
-    if won:
-        fate = "The team has SUCCEEDED. Give the story a triumphant, exhaling close."
-    else:
-        fate = "The team has FAILED to escape in time. Give the story a grim, unresolved close."
-
     guidance_section = (
-        f"\nSTORY ENDING GUIDANCE (use this to shape the close):\n{ending_guidance}\n"
+        f"\nSTORY ENDING GUIDANCE (tone reference):\n{ending_guidance}\n"
         if ending_guidance else ""
     )
+    case_facts = ""
+    if killer_name:
+        case_facts = "\nCASE FACTS (authoritative — use these, do not invent):\n"
+        case_facts += f"- THE KILLER: {killer_name}\n"
+        if victim:
+            case_facts += f"- THE VICTIM: {victim}\n"
+        if motive:
+            case_facts += f"- THE MOTIVE: {motive}\n"
+        if proof_sentence:
+            case_facts += f"- THE PROOF: {proof_sentence}\n"
+
+    if won:
+        return (
+            f"Conclude the murder mystery. The team SOLVED it — they named {killer_name or 'the killer'} correctly.\n"
+            f"{case_facts}{guidance_section}\n"
+            "Write the CONFRONTATION SCENE in 4-6 sentences, following these beats IN ORDER:\n"
+            f"1. THE ACCUSATION: the team names {killer_name or 'the killer'} to their face. "
+            "One breath where denial seems possible.\n"
+            "2. THE PROOF: the specific evidence is laid out — the denial dies. "
+            "Use THE PROOF from CASE FACTS.\n"
+            "3. THE MOTIVE: the why finally spills out — use THE MOTIVE from CASE FACTS. "
+            "Let the killer's composure crack as it surfaces.\n"
+            f"4. RESOLUTION: {killer_name or 'the killer'} is CAUGHT — they do NOT escape, "
+            "do NOT walk into the night. The victim is acknowledged in the final line.\n"
+            "HARD RULE: the killer does not get away. No fading footsteps, no slammed doors behind them.\n"
+            "No new puzzle details. No em-dashes."
+        )
+    if wrong_deduction:
+        return (
+            f"Conclude the murder mystery. The team accused the WRONG person — "
+            f"the real killer{f', {killer_name},' if killer_name else ''} walks free.\n"
+            f"{case_facts}{guidance_section}\n"
+            "Write 3-4 sentences: the accusation falls apart, the real killer slips away "
+            "while everyone looks the wrong way, and the truth surfaces one beat too late. "
+            "End on the cost of the mistake. No em-dashes."
+        )
     return (
-        f"Conclude the story.\n\nGOAL WAS: {setting.objective}\n{fate}"
-        f"{guidance_section}\n\n"
-        "Write 2-3 sentences of closing narration. "
-        "If STORY ENDING GUIDANCE is given, use its specific details — names, consequences, tone. "
-        "No new puzzle details. No em-dashes."
+        f"Conclude the murder mystery. The team RAN OUT OF TIME — the case is unsolved.\n"
+        f"{case_facts}{guidance_section}\n"
+        "Write 3-4 sentences of grim, unresolved close: the investigation is sealed, "
+        "the evidence goes cold, and whoever did it remains unnamed. "
+        "Do NOT reveal the killer's name in this ending. No em-dashes."
     )

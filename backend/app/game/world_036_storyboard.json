@@ -1,95 +1,103 @@
 {
   "world_id": "world_036",
-  "generated_at": "2026-06-11T08:18:20.237112+00:00",
+  "generated_at": "2026-06-12T01:50:29.931201+00:00",
   "schema_version": "1",
   "mystery": {
     "victim": "",
-    "killer_name": "Claude Delacroix",
-    "proof_object_id": "curator_s_final_lockbox",
-    "motive_hint": "The curator's final secret held the key to a valuable art forgery scheme."
+    "killer_name": "Charles Rivers",
+    "proof_object_id": "",
+    "motive_hint": "The curator's final journal reveals a deep-seated rivalry with Charles."
   },
   "plot": {
     "victim": "",
-    "threat": "Claude Delacroix, whose guilt is concealed beneath a carefully arranged crime scene.",
+    "threat": "Charles Rivers, whose guilt is concealed beneath a carefully arranged crime scene.",
     "stakes": "The killer is still close — if the team fails to uncover the truth, they escape forever.",
     "timeline": "",
-    "tension_hint": "The curator's final secret held the key to a valuable art forgery scheme.",
+    "tension_hint": "The curator's final journal reveals a deep-seated rivalry with Charles.",
     "atmosphere": "",
     "protagonist_context": ""
   },
   "adapted_personas": {
     "Alex Quinn": {
-      "world_role": "Alex Quinn investigates by reading the physical scene — looking for what was moved, what is missing, and what someone left behind.",
-      "voice": "Precise and observational — states what the evidence implies, not what they feel.",
+      "world_role": "Alex Quinn reads the physical scene for what it implies about intent — the angle of a disturbed object, what's been moved, what someone tried to hide.",
+      "voice": "Precise and dry — states what the evidence implies, never what they feel.",
       "vocabulary": [
-        "who had access",
-        "this was deliberate",
-        "something is missing here"
+        "this wasn't accidental",
+        "look at what's missing",
+        "the evidence contradicts that"
       ]
     },
     "Riley Sato": {
-      "world_role": "Riley Sato investigates by reading the physical scene — looking for what was moved, what is missing, and what someone left behind.",
-      "voice": "Precise and observational — states what the evidence implies, not what they feel.",
+      "world_role": "Riley Sato maps the sequence of events — who was where, in what order, and whether the timing points to premeditation.",
+      "voice": "Methodical and measured — frames observations as timelines, not accusations.",
       "vocabulary": [
+        "the timing is off",
         "who had access",
-        "this was deliberate",
-        "something is missing here"
+        "someone planned this"
       ]
     }
   },
   "suspects": [
     {
-      "name": "Isabella Finch",
-      "connection_to_victim": "Known to the victim and had recent contact before the crime.",
-      "apparent_motive": "Discovered the curator's forgery scheme and threatened to expose it."
+      "name": "Charles Rivers",
+      "connection_to_victim": "Closely connected to the victim and present at the scene.",
+      "apparent_motive": "Rivalry over recognition in the art world, deep-seated resentment towards Edward Clarke's influence."
     },
     {
-      "name": "Claude Delacroix",
-      "connection_to_victim": "Closely connected to the victim and present at the scene.",
-      "apparent_motive": "The curator owed Claude money from a previous forgery deal that went south."
+      "name": "Julia Thompson",
+      "connection_to_victim": "Known to the victim and had recent contact before the crime.",
+      "apparent_motive": "Edward had been considering ending their business partnership over suspicions of fraud."
+    },
+    {
+      "name": "Thomas Jackson",
+      "connection_to_victim": "Known to the victim and had recent contact before the crime.",
+      "apparent_motive": "Possibly inherited a significant debt from Edward Clarke."
     }
   ],
   "room_stories": {
-    "entry_hall": "The entry hall serves as a grim reminder of what was lost — each piece of artwork seems to whisper tales of its creator's fate.",
-    "study": "Books and papers litter the floor, suggesting a frantic search for something crucial. The curator's final thoughts are scattered like confetti across this room.",
-    "library": "The library is more than just a collection of books; it's a repository of secrets. Each lock and hidden key tells its own story of betrayal and trust.",
-    "final_chamber": "In the final chamber, the truth lies in wait. Unlocking it will expose not only the curator's secret but also the killer’s intentions."
+    "entry_hall": "The entry hall once welcomed visitors with warmth and hospitality, but now whispers of a tragic past linger in the air.",
+    "study": "Edward Clarke's study is cluttered with personal artifacts and papers, hinting at his complex life and relationships.",
+    "library": "The library holds countless secrets within its walls, each book and lockbox revealing clues to Edward’s final enigma.",
+    "final_chamber": "Beyond the oak door lies a chamber of shadows and revelations, waiting for those brave enough to uncover its mysteries."
   },
   "discovery_beats": {
-    "brass_key_fob": "The key is still warm — whoever placed it left this room within the hour.",
-    "curator_s_hidden_key": "A tarnished, yet unmistakable key; its shape and monogram match the final lockbox. It seems the curator trusted no one with this secret but himself.",
-    "clue_library_1": "The hidden code reveals a map to an ancient artifact — Isabella Finch's account of being elsewhere on the night of the murder doesn't hold up.",
-    "curator_s_final_lockbox": "The evidence here bears Claude Delacroix's mark — this is the moment the investigation breaks open."
+    "clue_library_1": "These annotations are in Julia Thompson's handwriting — she studied these codes for the curator's secret events.",
+    "brass_key_fob": "'Charles Rivers' fingerprints are on this key fob, suggesting he was seen recently near the entrance hall and lied about his whereabouts.",
+    "curator_silver_case": "The case contains Edward Clarke's private journals. Julia Thompson had access to them before their disappearance.",
+    "obsidian_lockbox": "Thomas Jackson's monogram matches — he claims not to have entered this room but lied, as evidenced by the dust patterns on the lockbox.",
+    "mahogany_door": "The door reveals traces of recent activity, matching Thomas Jackson's known movements in and out of the library.",
+    "curator_s_final_lockbox": "'Charles Rivers' signature is on this — he was here the night of the murder. The final secret lies within.",
+    "curator_s_hidden_key": "The evidence here bears Charles Rivers's mark — this is the moment the investigation breaks open."
   },
   "phase_guidance": {},
   "conversation_seeds": {
     "Alex Quinn": [
-      "Isabella Finch was last seen with the curator; her story about leaving early seems dubious.",
-      "Claude Delacroix owed a significant debt to Eugene Thompson from an earlier transaction. He has motive but no alibi."
+      "Julia Thompson was the last to see Edward Clarke alive before his disappearance — her account has two significant gaps in time.",
+      "Thomas Jackson owes a large debt to Edward Clarke, which would have been devastating to uncover."
     ],
     "Riley Sato": [
-      "Isabella Finch's recent articles have been critical of Eugene Thompson, making her a likely suspect.",
-      "The curator's hidden key was found by Claude Delacroix's locked trunk — he must know something about the final lockbox."
+      "'Charles Rivers' alibi doesn't hold up under scrutiny. He was near the mansion when he claimed to be elsewhere.",
+      "Julia Thompson's business dealings with Edward Clarke may have soured his judgment of her, leading him to reconsider their partnership."
     ]
   },
   "ending_guidance": {
-    "prevent_escape": "Use the final key to unlock the curator's secret and confront Claude in the final chamber before he escapes.",
-    "resolution": "Uncover the curator's hidden forgery scheme, exposing Claude's true intentions and revealing his guilt.",
-    "won": "Use the final key to unlock the curator's secret and confront Claude in the final chamber before he escapes.",
-    "lost": "The truth stays buried. Claude Delacroix walks free while the manor keeps its secrets.",
-    "lost_by_wrong_deduction": "The wrong name was called. Claude Delacroix slips away."
+    "failure_message": "Without uncovering the key to the final lockbox, you miss your chance to expose Charles Rivers as the murderer before he escapes.",
+    "success_message": "With the hidden key in hand, you unlock the curator's final secret and apprehend Charles Rivers before he can leave the mansion.",
+    "won": "Without uncovering the key to the final lockbox, you miss your chance to expose Charles Rivers as the murderer before he escapes.",
+    "lost": "The truth stays buried. Charles Rivers walks free while the manor keeps its secrets.",
+    "lost_by_wrong_deduction": "The wrong name was called. Charles Rivers slips away."
   },
   "solution": {
     "question": "Who murdered the victim?",
-    "answer": "Claude Delacroix",
+    "answer": "Charles Rivers",
     "answer_aliases": [],
     "answer_type": "person",
-    "motive": "The curator's final secret held the key to a valuable art forgery scheme.",
-    "proof_object": "curator_s_final_lockbox",
+    "motive": "The curator's final journal reveals a deep-seated rivalry with Charles.",
+    "proof_object": "",
     "proof_sentence": "",
     "hint_1": "Focus on who had both a reason and the opportunity — look at the relationships.",
     "hint_2": "The proof object holds the answer — check what it reveals about its owner.",
-    "victory_narration_hook": "The evidence points unmistakably to Claude Delacroix — every clue was a thread leading here.",
-    "defeat_narration_hook": "The truth stays buried. Claude Delacroix walks free while the manor keeps its secrets."
+    "victory_narration_hook": "The evidence points unmistakably to Charles Rivers — every clue was a thread leading here.",
+    "defeat_narration_hook": "The truth stays buried. Charles Rivers walks free while the manor keeps its secrets."
   }
 }

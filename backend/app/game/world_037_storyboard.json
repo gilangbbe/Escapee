@@ -1,0 +1,104 @@
+{
+  "world_id": "world_037",
+  "generated_at": "2026-06-12T02:44:05.019591+00:00",
+  "schema_version": "1",
+  "mystery": {
+    "victim": "Evelyn Harper died from multiple stab wounds in the dining hall.",
+    "killer_name": "Margaret Sinclair",
+    "proof_object_id": "bloodstained_diary_page",
+    "motive_hint": "She had long resented Evelyn's inheritance and believed it was rightfully hers."
+  },
+  "plot": {
+    "victim": "Evelyn Harper died from multiple stab wounds in the dining hall.",
+    "threat": "The storm outside is intensifying, threatening to collapse the manor at any moment.",
+    "stakes": "Failure means being trapped in a collapsing structure with no escape and the killer still at large.",
+    "timeline": "Two hours before your arrival, Evelyn Harper was found dead by Margaret Sinclair. She had long resented Evelyn's inheritance and believed it was rightfully hers.",
+    "tension_hint": "The clues suggest that Margaret carefully planned this murder over a prolonged period to ensure she would never be caught.",
+    "atmosphere": "The air is thick with the scent of old blood, damp stone, and mildew. The only sound is the distant rumbling of thunder and the creaking of ancient wooden beams as they strain against the weight of water-logged walls.",
+    "protagonist_context": "You are here because you received a cryptic message from an anonymous source claiming to have crucial information about Evelyn's death."
+  },
+  "adapted_personas": {
+    "Alex Quinn": {
+      "world_role": "As a meticulous investigator, Alex focuses on physical evidence and the sequence of events leading up to the murder.",
+      "voice": "Alex speaks in hushed tones, always searching for more details.",
+      "vocabulary": [
+        "clues",
+        "correlation",
+        "evidence"
+      ]
+    },
+    "Riley Sato": {
+      "world_role": "With a keen eye for systems and timing, Riley deciphers the sequence of events based on clues left behind.",
+      "voice": "Riley's voice is methodical and steady, with a hint of urgency.",
+      "vocabulary": [
+        "sequence",
+        "timing",
+        "clues"
+      ]
+    }
+  },
+  "suspects": [
+    {
+      "name": "Margaret Sinclair",
+      "connection_to_victim": "She was Evelyn Harper's cousin and lived in the manor.",
+      "apparent_motive": "Envious of Evelyn's inheritance, Margaret stood to gain from her death."
+    },
+    {
+      "name": "Thomas Blackwood",
+      "connection_to_victim": "He worked as a caretaker for the manor and often argued with Evelyn about upkeep costs.",
+      "apparent_motive": "Feeling unappreciated by Evelyn, Thomas had reason to resent her financial demands."
+    },
+    {
+      "name": "Juliette Grey",
+      "connection_to_victim": "She was a former governess who left after an unpleasant encounter with Evelyn.",
+      "apparent_motive": "Carrying ill will from her past, Juliette saw the inheritance as her chance for revenge."
+    }
+  ],
+  "room_stories": {
+    "entrance_hall": "This grand room was the last place Evelyn was seen alive, filled with her belongings and photographs that tell her story.",
+    "study": "Evelyn's study reveals a collection of books and documents hinting at her inheritance dispute with Margaret Sinclair.",
+    "library": "The library holds dusty tomes and secret letters exchanged between Evelyn and Margaret, painting a picture of their rivalry.",
+    "dining_hall": "Here lies the body of Evelyn Harper, surrounded by scattered dishes and a knife covered in blood.",
+    "attic": "The attic conceals hidden passages and relics from the past, including evidence that may reveal the killer's identity."
+  },
+  "discovery_beats": {
+    "clue_entrance_hall_1": "This code was created by Thomas Blackwood while he was investigating Evelyn's strange behavior.",
+    "clue_entrance_hall_2": "The numbers here seem to match a pattern Thomas noticed in Evelyn's financial records.",
+    "clue_study_1": "Juliette Grey had this clue in her possession recently, as the paper is stained with ink from her diary.",
+    "bloodstained_menu_with_scratched_notes": "This menu was found near where Juliette claimed she last saw Evelyn alive.",
+    "bloodstained_diary_page": "The numbers and symbols on this page directly implicate Margaret Sinclair in Evelyn's death, proving her long-held resentment over the inheritance.",
+    "torn_letter_inside_trunk": "Thomas Blackwood inserted this letter into the trunk during his search for evidence against Evelyn's killer."
+  },
+  "phase_guidance": {},
+  "conversation_seeds": {
+    "Alex Quinn": [
+      "Thomas Blackwood was seen arguing with Evelyn about her finances on the night of her death, and he seems unusually interested in old documents.",
+      "Juliette Grey found a torn letter near the dining hall that references Evelyn's inheritance dispute. She believes it could be crucial evidence."
+    ],
+    "Riley Sato": [
+      "Thomas Blackwood mentioned to me earlier that Juliette had been acting suspiciously around the time of Evelyn's death, always looking for old documents.",
+      "Juliette Grey told me she overheard a heated argument between Margaret Sinclair and Evelyn regarding the estate's finances before Evelyn was killed."
+    ]
+  },
+  "ending_guidance": {
+    "won": "You've uncovered the truth: Margaret Sinclair was driven by her long-standing resentment towards Evelyn's inheritance, leading to the murder in the dining hall.",
+    "lost": "The storm outside grows more intense as you leave without uncovering the true killer. The mansion's secrets remain locked within its walls.",
+    "lost_by_wrong_deduction": "Margaret Sinclair escapes undetected while you focus on Thomas Blackwood and Juliette Grey, leaving the real culprit to slip away."
+  },
+  "solution": {
+    "question": "Who murdered Evelyn Harper?",
+    "answer": "Margaret Sinclair",
+    "answer_aliases": [
+      "Sinclair",
+      "Miss Sinclair"
+    ],
+    "answer_type": "person",
+    "motive": "Margaret had harbored resentment towards Evelyn for years, believing the manor should have belonged to her. When Evelyn finally inherited everything, Margaret snapped and killed her in a fit of rage.",
+    "proof_object": "bloodstained_diary_page",
+    "proof_sentence": "This diary page proves that Margaret was indeed present at the time of the murder as it contains bloodstains matching those found on the victim.",
+    "hint_1": "Look for evidence in rooms connected to personal vendettas and inheritances.",
+    "hint_2": "Check items related to old family secrets and diaries hidden away in secluded areas.",
+    "victory_narration_hook": "You've uncovered Margaret Sinclair's bloodstained diary page as definitive proof of her guilt.",
+    "defeat_narration_hook": "The storm outside grows stronger, sealing your fate within the manor along with Evelyn Harper's unanswered secrets."
+  }
+}

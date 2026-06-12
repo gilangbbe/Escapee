@@ -801,6 +801,12 @@ class GameOrchestrator:
         proof_obj = sb.mystery.proof_object_id or sb.solution.proof_object
         if proof_obj and obj_id == proof_obj:
             self.narrator.reveal_proof()
+        # Only storyboard-authored beats count as case-file EVIDENCE. The runtime
+        # LLM fallback produces atmospheric prose, not evidence — emit that as
+        # plain narration so it never pollutes the evidence log. The proof object
+        # is always evidence regardless: it is the revelation moment.
+        is_proof = bool(proof_obj and obj_id == proof_obj)
+        is_storyboard_beat = bool(sb.discovery_beat(obj_id)) or is_proof
         prose = await self.narrator.narrate_discovery(
             actor_name=actor_name,
             item_id=obj_id,
@@ -810,14 +816,23 @@ class GameOrchestrator:
             scenario=self.setting.scenario,
         )
         if prose:
-            await self._emit(
-                EventKind.DISCOVERY,
-                None,
-                prose,
-                turn=self.sim.state.turn,
-                record=False,
-                data={"object_id": obj_id, "is_proof": bool(proof_obj and obj_id == proof_obj)},
-            )
+            if is_storyboard_beat:
+                await self._emit(
+                    EventKind.DISCOVERY,
+                    None,
+                    prose,
+                    turn=self.sim.state.turn,
+                    record=False,
+                    data={"object_id": obj_id, "is_proof": is_proof},
+                )
+            else:
+                await self._emit(
+                    EventKind.NARRATION,
+                    None,
+                    prose,
+                    turn=self.sim.state.turn,
+                    record=False,
+                )
 
     async def _maybe_narrate_room_entry(self, room_id: str, actor_name: str) -> None:
         """Emit a one-time atmospheric NARRATION card the first time a room is entered."""

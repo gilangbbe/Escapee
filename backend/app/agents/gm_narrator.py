@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 
 from app.agents.gm_narrator_prompt import (
     ActionExecutionStatus,
+    NARRATOR_ENDING_SYSTEM_PROMPT,
     NARRATOR_EVENT_SYSTEM_PROMPT,
     NARRATOR_SYSTEM_PROMPT,
     SystemEventKind,
@@ -336,14 +337,27 @@ class GameMasterNarrator:
     async def narrate_ending(
         self, setting: GameSetting, won: bool, *, wrong_deduction: bool = False
     ) -> str:
+        sb = self.storyboard
+        killer_name = sb.mystery.killer_name or sb.solution.answer
         fallback = (
-            "The crew breaks free into the light." if won
+            f"The evidence leaves no room for doubt. {killer_name} is caught — the case is closed."
+            if won and killer_name
+            else "The crew breaks free into the light." if won
             else "Time runs out. The truth stays buried."
         )
-        ending_guidance = self.storyboard.ending_text(won, wrong_deduction=wrong_deduction)
+        ending_guidance = sb.ending_text(won, wrong_deduction=wrong_deduction)
         text = await self._say(
-            build_ending_user_prompt(setting, won, ending_guidance=ending_guidance),
-            system=NARRATOR_EVENT_SYSTEM_PROMPT,
+            build_ending_user_prompt(
+                setting,
+                won,
+                ending_guidance=ending_guidance,
+                wrong_deduction=wrong_deduction,
+                killer_name=killer_name,
+                victim=sb.mystery.victim or sb.plot_victim,
+                motive=sb.solution.motive or sb.mystery.motive_hint,
+                proof_sentence=sb.solution.proof_sentence,
+            ),
+            system=NARRATOR_ENDING_SYSTEM_PROMPT,
             fallback=fallback,
         )
         self._remember(text)
